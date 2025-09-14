@@ -1,0 +1,101 @@
+.register {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    background: linear-gradient(45deg, rgb(196, 182, 182), rgb(179, 121, 124), rgb(182, 126, 128), rgb(211, 150, 150));
+    background-size: 400% 400%;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.main {
+    display: flex;
+    /* height: 100%;
+    width: 100%; */
+    width: fit-content;
+    height: fit-content;
+    padding: .5%;
+    border: 1px solid black;
+    border-radius: 40px;
+    background-color: white;
+}
+
+.icon {
+    width: 50px;
+    height: 50px;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+    padding-top: 9%;
+    padding-left: 5%;
+}
+
+.i {
+    width: 500px;
+    height: 100%;
+    border-radius: 40px;
+}
+
+.comp {
+    display: flex;
+    height: 100%;
+    justify-content: space-evenly;
+    /* border-radius: 40px; */
+}
+
+/* .head {
+    top: -200px;
+    left: -100px;
+    position: relative;
+} */
+
+.inps {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.elems {
+    /* display: flex; */
+    /* align-items: center; */
+    /* justify-content: center; */
+    padding-left: 5%;
+}
+
+input {
+    height: 50px;
+    border-radius: 20px;
+    margin-bottom: 9%;
+    margin-top: 5%;
+}
+
+.butt {
+    height: 50px;
+    border-radius: 20px;
+    background-color: black;
+    color: white;
+}
+
+a {
+    cursor: pointer;
+}

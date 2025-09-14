@@ -1,0 +1,25 @@
+<div class="login">
+    <div class="main">
+        <div class="comp">
+            <div class="ii">
+                <img src="../../assets/icons/kk.jpeg" alt="" class="i">
+            </div>
+            <div class="card">
+                <div class="head">
+                    <h1>Log in</h1>
+                    <br>
+                    <p>don't have an account? <a (click)="ToRegister()">Create an Account</a></p>
+                </div>
+                <div class="inps">
+                    <p class="elems">username</p>
+                    <input type="text" placeholder="    Enter your username" (input)="setUsername($event.target.value)"
+                        [value]="username">
+                    <p class="elems">Password</p>
+                    <input type="password" name="" id="" placeholder="      Enter your password" (input)="setPassword($event.target.value)">
+                    <br>
+                    <button class="butt">Log in</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

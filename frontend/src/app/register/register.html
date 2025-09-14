@@ -1,0 +1,26 @@
+<div class="register">
+    <div class="main">
+        <div class="comp">
+            <div class="ii">
+                <img src="../../assets/icons/Manhattan drink!.jpeg" alt="" class="i">
+            </div>
+            <div class="card">
+                <div class="head">
+                    <h1>Register</h1>
+                    <br>
+                    <p>if you have an account already? <a (click)="ToLogin()"> Sign in</a></p>
+                </div>
+                <div class="inps">
+                    <p class="elems">Email</p>
+                    <input type="email" placeholder="    Enter your email" (input)="setEmail($event.target.value)" [value]="email">
+                    <p class="elems">Username</p>
+                    <input type="text" placeholder="    Enter your username" (input)="setUsername($event.target.value)" [value]="username">
+                    <p class="elems">Password</p>
+                    <input type="password" name="" id="" placeholder="      Enter your password" (input)="setPassword($event.target.value)">
+                    <br>
+                    <button class="butt">Log in</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
