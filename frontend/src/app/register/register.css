@@ -59,14 +59,8 @@ nav {
     display: flex;
     height: 100%;
     justify-content: space-evenly;
-    /* border-radius: 40px; */
 }
 
-/* .head {
-    top: -200px;
-    left: -100px;
-    position: relative;
-} */
 
 .inps {
     margin-top: 50px;
@@ -76,17 +70,15 @@ nav {
 }
 
 .elems {
-    /* display: flex; */
-    /* align-items: center; */
-    /* justify-content: center; */
-    padding-left: 5%;
+    padding-left: 0%;
 }
 
 input {
-    height: 50px;
+    height: 30px;
     border-radius: 20px;
-    margin-bottom: 9%;
-    margin-top: 5%;
+    padding-left: 3%;
+    margin-bottom: 3%;
+    margin-top: 1%;
 }
 
 .butt {
@@ -98,4 +90,11 @@ input {
 
 a {
     cursor: pointer;
+}
+
+.err {
+    justify-self: center;
+    align-self: center;
+    margin: 2%;
+    color: red;
 }

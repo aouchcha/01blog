@@ -11,15 +11,19 @@
                     <p>if you have an account already? <a (click)="ToLogin()"> Sign in</a></p>
                 </div>
                 <div class="inps">
-                    <p class="elems">Email</p>
-                    <input type="email" placeholder="    Enter your email" (input)="setEmail($event.target.value)" [value]="email">
-                    <p class="elems">Username</p>
-                    <input type="text" placeholder="    Enter your username" (input)="setUsername($event.target.value)" [value]="username">
-                    <p class="elems">Password</p>
-                    <input type="password" name="" id="" placeholder="      Enter your password" (input)="setPassword($event.target.value)">
+                    <p class="elems">Email :</p>
+                    <input type="email" placeholder="Enter your email" (input)="setEmail($event.target.value)"
+                        [value]="email" required>
+                    <p class="elems">Username :</p>
+                    <input type="text" placeholder="Enter your username" (input)="setUsername($event.target.value)"
+                        [value]="username" required>
+                    <p class="elems">Password :</p>
+                    <input type="password" name="" id="" placeholder="Enter your password"
+                        (input)="setPassword($event.target.value)" required>
                     <br>
                     <button class="butt" (click)="SignUp()">Log in</button>
                 </div>
+                <p class="err">{{error}}</p>
             </div>
         </div>
     </div>

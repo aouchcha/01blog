@@ -99,3 +99,10 @@ input {
 a {
     cursor: pointer;
 }
+
+.err {
+    justify-self: center;
+    align-self: center;
+    margin: 2%;
+    color: red;
+}

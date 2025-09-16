@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+// import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-register',
@@ -12,8 +13,10 @@ export class Register {
   username: string = '';
   password: string = '';
   email: string = '';
+  error: String = '';
+  // sss: ChangeDetectorRef;
 
-  constructor(public router: Router, public http: HttpClient) { };
+  constructor(private router: Router, private http: HttpClient, private stateup: ChangeDetectorRef) { };
 
   public setUsername(username: string): void {
     this.username = username;
@@ -35,13 +38,14 @@ export class Register {
 
   public SignUp() {
     const user = {
-      "username" : this.username,
-      "password" : this.password,
-      "email" : this.email
+      "username": this.username,
+      "password": this.password,
+      "email": this.email
     }
 
-    // console.log("|||||||||||||||||||||||||||||||||||",user);
-    
+    console.log("|||||||||||||||||||||||||||||||||||", user);
+    // console.log(user);
+
 
     this.http.post('http://localhost:8080/api/register', user).subscribe({
       next: (response) => {
@@ -50,8 +54,12 @@ export class Register {
         // this.router.navigate(['login']);
       },
       error: (error) => {
-        console.error('Registration failed:', error);
-        alert('Registration failed. Please try again.');
+        this.error = error.error;
+        this.stateup.detectChanges();
+        setTimeout(() => {
+          this.error = '';
+          this.stateup.detectChanges();
+        }, 5000);
       }
     })
   }
