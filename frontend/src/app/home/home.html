@@ -14,64 +14,30 @@
             </div>
         </div>
         <div class="center-card">
-            <!-- Post 1 -->
-            <div class="post-card">
+            <div class="post-card" *ngFor="let post of posts">
                 <div class="post-header">
-                    <img src="https://via.placeholder.com/40" alt="User Avatar" class="avatar">
-                    <div>
-                        <strong>Alice</strong> · <span class="timestamp">2h ago</span>
-                    </div>
+                    <!-- <img [src]="post.user.avatarUrl || 'https://via.placeholder.com/40'" alt="User Avatar"
+                        class="avatar"> -->
+                    <!-- <div>
+                        <strong>{{ post.user.username }}</strong> ·
+                        <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
+                    </div> -->
                 </div>
                 <div class="post-content">
-                    <p>Just finished my first Spring Boot API! 🚀
-                        It handles user registration and authentication. Learned so much about REST controllers today.
-                    </p>
-                    <img src="https://via.placeholder.com/400x200" alt="Post Image" class="post-media">
+                    <p>{{ post.description }}</p>
+                    <!-- Optional post media -->
+                    <img *ngIf="post.imageUrl" [src]="post.imageUrl" alt="Post Image" class="post-media">
                 </div>
                 <div class="post-actions">
-                    ❤️ 12 · 💬 4 · ↗️ Share · ⚠️ Report
+                    ❤️ {{ post.likes || 0 }} · 💬 {{ post.comments || 0 }} · ↗️ Share · ⚠️ Report
                 </div>
             </div>
 
-            <!-- Post 2 -->
-            <div class="post-card">
-                <div class="post-header">
-                    <img src="https://via.placeholder.com/40" alt="User Avatar" class="avatar">
-                    <div>
-                        <strong>Bob</strong> · <span class="timestamp">5h ago</span>
-                    </div>
-                </div>
-                <div class="post-content">
-                    <p>Experimenting with Angular routing today.
-                        Here’s a screenshot of my component layout 👇</p>
-                    <img src="https://via.placeholder.com/400x200" alt="Post Image" class="post-media">
-                </div>
-                <div class="post-actions">
-                    ❤️ 8 · 💬 2 · ↗️ Share · ⚠️ Report
-                </div>
-            </div>
-
-            <!-- Post 3 -->
-            <div class="post-card">
-                <div class="post-header">
-                    <img src="https://via.placeholder.com/40" alt="User Avatar" class="avatar">
-                    <div>
-                        <strong>Charlie</strong> · <span class="timestamp">1d ago</span>
-                    </div>
-                </div>
-                <div class="post-content">
-                    <p>Started learning PostgreSQL today. Setting up relationships between users and posts was tricky,
-                        but I nailed it! 💪</p>
-                    <img src="https://via.placeholder.com/400x200" alt="Post Image" class="post-media">
-                </div>
-                <div class="post-actions">
-                    ❤️ 20 · 💬 6 · ↗️ Share · ⚠️ Report
-                </div>
-            </div>
             <div class="create-post">
                 <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="avatar">
-                <textarea name="" id="" placeholder="Share Something"></textarea>
-                <button>Share</button>
+                <textarea #newpost placeholder="Share Something"
+                    (input)="setDescription(newpost.value)">{{ getDescription() }}</textarea>
+                <button (click)="CreatePost()">Share</button>
             </div>
         </div>
 

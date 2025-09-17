@@ -12,7 +12,6 @@ export class Login {
   username : string = '';
   password : string = '';
   error : string = '';
-  res : any = {"token": ''};
   constructor(private router : Router, private http: HttpClient, private stateup: ChangeDetectorRef){};
  
   public setUsername(username: string): void {
@@ -28,18 +27,18 @@ export class Login {
   }
 
   public Submit() {
-    console.log("wesh wesh");
+    // console.log("wesh wesh");
     
     const body = {
       "username" : this.username,
       "password" : this.password
     }
 
-    this.http.post('http://localhost:8080/api/login', body).subscribe({
+    this.http.post<any>('http://localhost:8080/api/login', body).subscribe({
       next: (res) => {
         console.log('log in successful !', typeof res, res);
-        this.res = res;
-        localStorage.setItem("JWT", this.res.token);
+        // this.res = res;
+        localStorage.setItem("JWT", res.token);
         this.router.navigate([""]);
       },
       error: (error) => {
