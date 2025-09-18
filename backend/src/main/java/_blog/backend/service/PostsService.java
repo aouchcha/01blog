@@ -34,10 +34,9 @@ public class PostsService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the user is not valid");
         }
 
-        List<Post> posts = postRepository.findAll();
+        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
         for (Post p : posts) {
-            System.err.println(p.getDescription());
-            System.err.println(p.getCreatedAt());
+            p.setMedia("http://localhost:8080/uploads/" + p.getMedia());
         }
         return ResponseEntity.ok().body(Map.of("posts", posts));
     }

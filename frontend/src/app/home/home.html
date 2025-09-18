@@ -2,9 +2,9 @@
     <div class="main-card">
         <div class="right-card">
             <div class="infos">
-                <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="avatar">
-                <h3>My name</h3>
-                <p>My username</p>
+                <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="avatar" class="avatar">
+                <!-- <h3>My name</h3> -->
+                <p>{{me.username}}</p>
             </div>
             <div class="comps">
                 <p class="comp">News Feed</p>
@@ -14,31 +14,63 @@
             </div>
         </div>
         <div class="center-card">
+            <div class="create-post">
+                <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="avatar" class="avatar">
+                <textarea #newpost [(ngModel)]="description" placeholder="Share Something"></textarea>
+                <p class="MediaContainer" *ngIf="media !== null"><b>Link To Upload : {{mediaName}}</b></p>
+                <label for="Media" class="button">
+                    Select Media
+                </label>
+                <input type="file" id="Media" (change)="setMedia($event)" class="Media" accept="image/*, video/*">
+                <button (click)="CreatePost()">Share</button>
+                <button (click)="Cancel()">Cancel</button>
+            </div>
             <div class="post-card" *ngFor="let post of posts">
                 <div class="post-header">
-                    <!-- <img [src]="post.user.avatarUrl || 'https://via.placeholder.com/40'" alt="User Avatar"
-                        class="avatar"> -->
-                    <!-- <div>
+                    <div class="icons">
+                        <img [src]="post.user.avatarUrl || 'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'"
+                            alt="User Avatar" class="avatar">
+                        <button mat-icon-button [matMenuTriggerFor]="optionsMenu" matTooltip="Options" class="optionsMenu">
+                            <mat-icon>more_vert</mat-icon>
+                        </button>
+                        <!-- Menu that shows when the button is clicked -->
+                        <mat-menu #optionsMenu="matMenu" class="optionsMenu">
+                            <button mat-menu-item (click)="updatePost(post)" class="optionsMenu">
+                                <mat-icon>edit</mat-icon>
+                                <span>Update</span>
+                            </button>
+                            <button mat-menu-item (click)="deletePost(post)" class="optionsMenu">
+                                <mat-icon>delete</mat-icon>
+                                <span>Delete</span>
+                            </button>
+                        </mat-menu>
+                    </div>
+
+                    <div>
                         <strong>{{ post.user.username }}</strong> ·
                         <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
-                    </div> -->
+                    </div>
                 </div>
                 <div class="post-content">
                     <p>{{ post.description }}</p>
                     <!-- Optional post media -->
-                    <img *ngIf="post.imageUrl" [src]="post.imageUrl" alt="Post Image" class="post-media">
+                     <div class="post-containt" *ngIf="!post.media?.endsWith('null')">
+                    <!-- <video *ngIf="!post.media?.endsWith('null')" [src]="post.media" alt="Post Image" class="post-media" preload="metadata" controls></video>div class="media-block"> -->
+                        <ng-container [ngSwitch]="post.media?.split('.').pop()">
+                            <img *ngSwitchCase="'jpg'" [src]="post.media" alt="Post image" class="post-media">
+                            <img *ngSwitchCase="'jpeg'" [src]="post.media" alt="Post image" class="post-media">
+                            <img *ngSwitchCase="'png'" [src]="post.media" alt="Post image" class="post-media">
+                            <video *ngSwitchCase="'mp4'" [src]="post.media" controls class="post-media" preload="metadata"></video>
+                            <!-- <p *ngSwitchDefault>No media</p> -->
+                        </ng-container>
+                    </div>
                 </div>
                 <div class="post-actions">
                     ❤️ {{ post.likes || 0 }} · 💬 {{ post.comments || 0 }} · ↗️ Share · ⚠️ Report
                 </div>
             </div>
 
-            <div class="create-post">
-                <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="avatar">
-                <textarea #newpost placeholder="Share Something"
-                    (input)="setDescription(newpost.value)">{{ getDescription() }}</textarea>
-                <button (click)="CreatePost()">Share</button>
-            </div>
+
         </div>
 
         <div class="left-card">

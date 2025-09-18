@@ -24,7 +24,7 @@ public class Post {
     @Column(nullable = false)
     private String description;
 
-    // private String content;
+    private String media;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -36,35 +36,44 @@ public class Post {
     public Post() {};
 
 
-    public void setDescription(String description) {
-        this.description = description;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDescription() {
         return description;
     }
 
-    // public void setContent(String content) {
-    //     this.content = content;
-    // }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
     public void setUser(User user) {
         this.user = user;
     }
 
-    // public void setUser(User user) {
-    //     this.user = user;
-    // }
+    public String getMedia() {
+        return media;
+    }
 
-//     public String getContent() {
-//         return content;
-//     }
+    public void setMedia(String media) {
+        System.err.println("SETMEDIA ====================>   "+ media);
+        this.media = media;
+    }
 }

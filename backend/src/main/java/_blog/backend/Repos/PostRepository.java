@@ -10,6 +10,7 @@ import _blog.backend.Entitys.User.User;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
-    // List<Post> findByUser(User user);
-    // List<Post> findByUserId(Long userId);
+    List<Post> findByUser(User user);
+    List<Post> findByUserId(Long userId);
+    List<Post> findAllByOrderByCreatedAtDesc();
 }
