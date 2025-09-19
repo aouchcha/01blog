@@ -2,20 +2,22 @@
     <div class="main-card">
         <div class="right-card">
             <div class="infos">
-                <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="avatar" class="avatar">
+                <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="avatar"
+                    class="avatar">
                 <!-- <h3>My name</h3> -->
                 <p>{{me.username}}</p>
             </div>
             <div class="comps">
                 <p class="comp">News Feed</p>
-                <p class="comp">Messages</p>
+                <!-- <p class="comp">Messages</p> -->
                 <p class="comp">Friends</p>
                 <p class="comp">Profile</p>
             </div>
         </div>
         <div class="center-card">
             <div class="create-post">
-                <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="avatar" class="avatar">
+                <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="avatar"
+                    class="avatar">
                 <textarea #newpost [(ngModel)]="description" placeholder="Share Something"></textarea>
                 <p class="MediaContainer" *ngIf="media !== null"><b>Link To Upload : {{mediaName}}</b></p>
                 <label for="Media" class="button">
@@ -30,8 +32,9 @@
                     <div class="icons">
                         <img [src]="post.user.avatarUrl || 'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'"
                             alt="User Avatar" class="avatar">
-                        <button mat-icon-button [matMenuTriggerFor]="optionsMenu" matTooltip="Options" class="optionsMenu">
-                            <mat-icon>more_vert</mat-icon>
+                        <button mat-icon-button [matMenuTriggerFor]="optionsMenu" matTooltip="Options" *ngIf="post.user.username === me.username"
+                            class="optionsMenu">
+                            <mat-icon class="optionsMenu">more_vert</mat-icon>
                         </button>
                         <!-- Menu that shows when the button is clicked -->
                         <mat-menu #optionsMenu="matMenu" class="optionsMenu">
@@ -54,19 +57,25 @@
                 <div class="post-content">
                     <p>{{ post.description }}</p>
                     <!-- Optional post media -->
-                     <div class="post-containt" *ngIf="!post.media?.endsWith('null')">
-                    <!-- <video *ngIf="!post.media?.endsWith('null')" [src]="post.media" alt="Post Image" class="post-media" preload="metadata" controls></video>div class="media-block"> -->
+                    <div class="post-containt" *ngIf="!post.media?.endsWith('null')">
+                        <!-- <video *ngIf="!post.media?.endsWith('null')" [src]="post.media" alt="Post Image" class="post-media" preload="metadata" controls></video>div class="media-block"> -->
                         <ng-container [ngSwitch]="post.media?.split('.').pop()">
                             <img *ngSwitchCase="'jpg'" [src]="post.media" alt="Post image" class="post-media">
                             <img *ngSwitchCase="'jpeg'" [src]="post.media" alt="Post image" class="post-media">
                             <img *ngSwitchCase="'png'" [src]="post.media" alt="Post image" class="post-media">
-                            <video *ngSwitchCase="'mp4'" [src]="post.media" controls class="post-media" preload="metadata"></video>
+                            <video *ngSwitchCase="'mp4'" [src]="post.media" controls class="post-media"
+                                preload="metadata"></video>
                             <!-- <p *ngSwitchDefault>No media</p> -->
                         </ng-container>
                     </div>
                 </div>
                 <div class="post-actions">
-                    ❤️ {{ post.likes || 0 }} · 💬 {{ post.comments || 0 }} · ↗️ Share · ⚠️ Report
+                    <button class="interactions" (click)="React(post.id)">
+                        ❤️ {{ post.likeCount || 0 }}
+                    </button>
+                    <button class="interactions">
+                        💬 {{ post.comments || 0 }}
+                    </button>
                 </div>
             </div>
 
@@ -74,22 +83,16 @@
         </div>
 
         <div class="left-card">
-            <h2>Suggestions</h2>
-            <div class="user">
-                <p>username1</p>
-                <button>Follow</button>
-            </div>
-            <div class="user">
-                <p>username2</p>
-                <button>Follow</button>
-            </div>
-            <div class="user">
-                <p>username3</p>
-                <button>Follow</button>
-            </div>
-            <div class="user">
-                <p>username4</p>
-                <button>Follow</button>
+            <button (click)="Logout()">Logout</button>
+            <div class="suggetions" *ngIf="others && others.length > 0">
+                <h2>Suggestions</h2>
+                <div class="others" *ngFor="let user of others">
+                    <div class="user">
+                        <p>{{user.username}}</p>
+                        <button (click)="Follow(user.id)">Follow</button>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>

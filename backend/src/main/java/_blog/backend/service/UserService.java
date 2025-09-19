@@ -28,4 +28,13 @@ public class UserService {
         User u = userRepository.findByUsername(username);
         return ResponseEntity.ok().body(Map.of("me",u));
     }
+
+    public ResponseEntity<?> getUsers(String token) {
+        final String username = jwtUtil.getUsername(token);
+        if (!userRepository.existsByUsername(username)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalide user"));
+        }
+        List<User> users = userRepository.findByUsernameNot(username);
+        return ResponseEntity.ok().body(Map.of("users",users));
+    }
 }

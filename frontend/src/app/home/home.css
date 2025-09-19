@@ -50,6 +50,11 @@
     width: max-content;
     height: max-content;
     padding: 5%;
+    justify-content: space-evenly;
+}
+
+.suggetions {
+    margin-top: 50%;
 }
 
 .infos {
@@ -139,16 +144,38 @@ textarea {
     display: flex;
     flex-direction: column;
     padding: 1%;
+    margin-top: 2%;
+}
+
+.post-containt {
+    /* padding: 1%; */
+    margin-top: 2%;
+    /* border: 10px solid red; */
+    border-radius: 30px;
 }
 
 .post-media {
-    height: 300px;
-    width: 300px;
+    /* height: 300px; */
+    width: 50vh;
+    /* width: 100%; */
+    height: 50vh;
+    border-radius: 30px;
+    margin-left: 2%;
 }
 
 .post-actions {
 
     padding: 1%;
+}
+
+.interactions {
+    background-color: transparent;
+    left: 0;
+}
+
+.interactions:hover {
+    cursor: pointer;
+    background-color: rgb(145, 92, 94);
 }
 
 .icons {
@@ -162,8 +189,11 @@ textarea {
 .optionsMenu {
     background-color: transparent;
     color: black;
-    /* display: flex;
-    flex-direction: row; */
+    justify-self: center;
+}
+
+.optionsMenu:hover {
+    cursor: pointer;
 }
 
 .Media {

@@ -28,7 +28,8 @@ export class Home implements OnInit {
   public description: string = '';
   private token: String | null = '';
   public posts: any = [];
-  public me : any = {};
+  public me: any = {};
+  public others: any = [];
   public mediaName: String | null = null;
   public media: File | null = null;
   public type: String = 'image';
@@ -40,26 +41,30 @@ export class Home implements OnInit {
       return;
     }
     console.log("hanni");
-    
-    this.getAllPosts();
-    this.getMe();
+    this.loadHome()
+   
   }
 
-  // public setDescription(): void {
-  //   // console.log(description);
-
-  //   this.description = "e";
-  // }
+  public loadHome() {
+    this.getOthers();
+    this.getMe();
+    this.getAllPosts();
+  }
 
   public getDescription(): String {
     return this.description;
   }
 
-  public Cancel():void {
-
+  public Cancel(): void {
     this.description = '';
     this.mediaName = null;
     this.media = null;
+  }
+
+  public Logout(): void {
+    localStorage.removeItem("JWT");
+    this.token = null;
+    this.router.navigate(["login"])
   }
 
   public setMedia(event: Event): void {
@@ -68,7 +73,6 @@ export class Home implements OnInit {
       this.media = input.files[0];  // store the file itself
       this.mediaName = input.files[0].name;
     }
-    console.log('Selected file:', this.media);
   }
 
   public CreatePost(): void {
@@ -86,20 +90,20 @@ export class Home implements OnInit {
       data,
       generateHeader(this.token)
     ).subscribe({
-        next: (res) => {
-          console.log("ranni");
-          this.Cancel()
-          this.getAllPosts();
-        },
-        error: (err) => {
-          console.log(err);
-          // this.router.navigate(["login"])
-        }
-      })
+      next: () => {
+        console.log("ranni");
+        this.Cancel()
+        this.getAllPosts();
+      },
+      error: (err) => {
+        console.log(err);
+        // this.router.navigate(["login"])
+      }
+    })
   }
 
   public CheckToken(): boolean {
-    
+
     const Token = localStorage.getItem("JWT");
     if (!Token) {
       return false;
@@ -108,8 +112,8 @@ export class Home implements OnInit {
     return true;
   }
 
-  public getAllPosts() {
-    this.http.get<any> (
+  public getAllPosts(): void {
+    this.http.get<any>(
       generateURL("post"),
       generateHeader(this.token)
     ).subscribe({
@@ -127,7 +131,7 @@ export class Home implements OnInit {
     })
   }
 
-  public getMe() {
+  public getMe(): void {
     this.http.get<any>(
       generateURL("me"),
       generateHeader(this.token)
@@ -142,11 +146,66 @@ export class Home implements OnInit {
     })
   }
 
+  public getOthers(): void {
+    this.http.get<any>(
+      generateURL("users"),
+      generateHeader(this.token)
+    ).subscribe({
+      next: (res) => {
+        console.log("all users ========",res);
+        this.others = res.users;
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
+
   public updatePost(post: any) {
     console.log('Update', post);
   }
 
   public deletePost(post: any) {
     console.log('Delete', post);
+  }
+
+  public React(post_id: Number): void {
+    console.log("post id ========= ", post_id);
+    this.http.post<any>(
+      generateURL("react"),
+      {
+        "post_id": post_id
+      },
+      generateHeader(this.token)
+    ).subscribe({
+      next: (res) => {
+        console.log(res);
+        // this.posts = res.posts;
+        // this.stateup.detectChanges();
+        this.getAllPosts()
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
+
+  public Follow(user_id: Number): void {
+    console.log("zebbi");
+    
+    this.http.post<any>(
+      generateURL("follow"),
+      {
+        "followed_id": user_id
+      },
+      generateHeader(this.token)
+    ).subscribe({
+      next: (res) => {
+        console.log(res);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
   }
 }
