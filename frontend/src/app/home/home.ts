@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { generateHeader, generateURL } from '../helpers/genarateHeader';
+import { generateHeader, generateURL, CheckToken } from '../helpers/genarateHeader';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { StateService } from '../helpers/state-service';
 
 
 @Component({
@@ -33,19 +34,20 @@ export class Home implements OnInit {
   public mediaName: String | null = null;
   public media: File | null = null;
   public type: String = 'image';
-  constructor(private http: HttpClient, private router: Router, private stateup: ChangeDetectorRef) { }
+  constructor(private http: HttpClient, private router: Router, private state: StateService) { }
 
   ngOnInit(): void {
-    if (!this.CheckToken()) {
+    if (!CheckToken()) {
       this.router.navigate(["login"]);
       return;
     }
     console.log("hanni");
+    this.token = localStorage.getItem("JWT");
     this.loadHome()
    
   }
 
-  public loadHome() {
+  public loadHome(): void {
     this.getOthers();
     this.getMe();
     this.getAllPosts();
@@ -76,7 +78,7 @@ export class Home implements OnInit {
   }
 
   public CreatePost(): void {
-    if (!this.CheckToken()) {
+    if (!CheckToken()) {
       this.router.navigate(["login"]);
       return;
     }
@@ -102,15 +104,15 @@ export class Home implements OnInit {
     })
   }
 
-  public CheckToken(): boolean {
+  // public CheckToken(): boolean {
 
-    const Token = localStorage.getItem("JWT");
-    if (!Token) {
-      return false;
-    }
-    this.token = Token;
-    return true;
-  }
+  //   const Token = localStorage.getItem("JWT");
+  //   if (!Token) {
+  //     return false;
+  //   }
+  //   this.token = Token;
+  //   return true;
+  // }
 
   public getAllPosts(): void {
     this.http.get<any>(
@@ -202,10 +204,17 @@ export class Home implements OnInit {
     ).subscribe({
       next: (res) => {
         console.log(res);
+        this.getOthers()
       },
       error: (err) => {
         console.log(err);
       }
     })
+  }
+
+  public ShowSinglePost(post_id: Number) : void {
+    this.state.setPostId(post_id);
+    this.state.setCurrentUser(this.me);
+    this.router.navigate(["post"])
   }
 }

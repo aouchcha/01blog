@@ -56,7 +56,7 @@ public class ReactionService {
             final Like l = reactionRepository.findByPost_IdAndUser_Username(post_id, username);
             reactionRepository.delete(l);
         }
-        p.get().setLikeCount(reactionRepository.countByPost_id(post_id));
+        p.get().setLikeCount(reactionRepository.countByPost_id(post_id));   
         return ResponseEntity.ok().body(Map.of("message","post "+status+" with success"));
     }
 }

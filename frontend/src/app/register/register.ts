@@ -51,7 +51,7 @@ export class Register {
       next: (response) => {
         console.log('Registration successful:', response);
         // Redirect to login on success
-        // this.router.navigate(['login']);
+        this.router.navigate(['login']);
       },
       error: (error) => {
         this.error = error.error;

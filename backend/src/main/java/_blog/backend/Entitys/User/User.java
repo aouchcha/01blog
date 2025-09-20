@@ -11,23 +11,28 @@ import jakarta.persistence.Table;
 @Table(name = "users")
 
 public class User {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment in PostgreSQL
     @Column(unique = true, nullable = false)
     private Long id;
-    
+
     @Column(unique = true, nullable = false)
     private String username;
-    
+
     @Column(unique = true, nullable = false)
     private String email;
-    
+
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private Role role;
-   
-    public User(){}
+
+    private boolean follow = false;
+
+    public User() {
+    }
 
     public User(String username, String email, String password, Role role) {
         this.username = username;
@@ -76,4 +81,13 @@ public class User {
     public void setRole(Role role) {
         this.role = role;
     }
+
+    public boolean getFollow() {
+        return follow;
+    }
+
+    public void setFollow(boolean follow) {
+        this.follow = follow;
+    }
+
 }

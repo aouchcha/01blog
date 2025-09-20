@@ -8,9 +8,11 @@ import jakarta.transaction.Transactional;
 import java.util.*;
 
 import _blog.backend.Entitys.User.User;
+import _blog.backend.Repos.FollowRepositry;
 import _blog.backend.Repos.UserRepository;
 
 import _blog.backend.helpers.JwtUtil;
+
 @Service
 @Transactional
 public class UserService {
@@ -19,14 +21,17 @@ public class UserService {
 
     @Autowired
     private JwtUtil jwtUtil;
-    
+
+    @Autowired
+    private FollowRepositry followRepositry;
+
     public ResponseEntity<?> getData(String token) {
         final String username = jwtUtil.getUsername(token);
         if (!userRepository.existsByUsername(username)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalide user"));
         }
         User u = userRepository.findByUsername(username);
-        return ResponseEntity.ok().body(Map.of("me",u));
+        return ResponseEntity.ok().body(Map.of("me", u));
     }
 
     public ResponseEntity<?> getUsers(String token) {
@@ -35,6 +40,20 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalide user"));
         }
         List<User> users = userRepository.findByUsernameNot(username);
-        return ResponseEntity.ok().body(Map.of("users",users));
+        User me = userRepository.findByUsername(username);
+
+        for (User u : users) {
+            if (followRepositry.existsByFollower_IdAndFollowed_Id(me.getId(), u.getId())) {
+                u.setFollow(true);
+            } else {
+                u.setFollow(false);
+            }
+            System.err.println(u.getEmail());
+        }
+        users = users.stream()
+                .sorted(Comparator.comparing(User::getId))
+                .toList();
+
+        return ResponseEntity.ok().body(Map.of("users", users));
     }
 }

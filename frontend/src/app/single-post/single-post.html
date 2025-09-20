@@ -1,31 +1,4 @@
-<div class="Home">
-    <div class="main-card">
-        <div class="right-card">
-            <div class="infos">
-                <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="avatar"
-                    class="avatar">
-                <p>{{me.username}}</p>
-            </div>
-            <div class="comps">
-                <button class="comp" (click)="getAllPosts()">News Feed</button>
-                <button class="comp">Friends</button>
-                <button class="comp">Profile</button>
-            </div>
-        </div>
-        <div class="center-card">
-            <div class="create-post">
-                <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="avatar"
-                    class="avatar">
-                <textarea #newpost [(ngModel)]="description" placeholder="Share Something"></textarea>
-                <p class="MediaContainer" *ngIf="media !== null"><b>Link To Upload : {{mediaName}}</b></p>
-                <label for="Media" class="button">
-                    Select Media
-                </label>
-                <input type="file" id="Media" (change)="setMedia($event)" class="Media" accept="image/*, video/*">
-                <button (click)="CreatePost()">Share</button>
-                <button (click)="Cancel()">Cancel</button>
-            </div>
-            <div class="post-card" *ngFor="let post of posts">
+ <div class="post-card">
                 <div class="post-header">
                     <div class="icons">
                         <img [src]="post.user.avatarUrl || 'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'"
@@ -72,22 +45,3 @@
                     </button>
                 </div>
             </div>
-
-
-        </div>
-
-        <div class="left-card">
-            <button (click)="Logout()" class="logout">Logout</button>
-            <div class="suggetions" *ngIf="others && others.length > 0">
-                <h2>Suggestions</h2>
-                <div class="others" *ngFor="let user of others">
-                    <div class="user">
-                        <p>{{user.username}}</p>
-                        <button (click)="Follow(user.id)" class="follow">{{ user.follow ? 'Unfollow' : 'Follow' }}</button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-</div>

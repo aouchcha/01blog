@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -52,21 +53,6 @@ public class MainController {
         return loginservice.signin(loginRequest);
     }
     
-
-    @Autowired PostsService postsService;
-    @GetMapping("/post")
-    public ResponseEntity<?> getPosts(@RequestHeader("Authorization") String header) {
-        String token = header.replace("Bearer", "");
-        return postsService.getPosts(token);
-    }
-    
-    @Autowired
-    private CreatePostService createPostService;
-    @PostMapping("/post")
-    public ResponseEntity<?> CreatePost(@ModelAttribute PostRequst postRequst, @RequestHeader("Authorization") String header) {
-        String token = header.replace("Bearer", "");
-        return createPostService.create(postRequst, token);
-    }
 
     @Autowired
     private UserService userService;

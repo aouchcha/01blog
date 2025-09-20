@@ -2,6 +2,7 @@ package _blog.backend.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,5 +40,21 @@ public class PostsService {
             p.setMedia("http://localhost:8080/uploads/" + p.getMedia());
         }
         return ResponseEntity.ok().body(Map.of("posts", posts));
+    }
+
+    public ResponseEntity<?> getSinglePost(Long post_id, String token) {
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("your token isn't valid");
+        }
+
+        final String username = jwtUtil.getUsername(token);
+
+        if (!userRepository.existsByUsername(username)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the user is not valid");
+        }
+
+        Optional<Post> p = postRepository.findById(post_id);
+        return ResponseEntity.ok().body(Map.of("post", p.get()));
+
     }
 }
