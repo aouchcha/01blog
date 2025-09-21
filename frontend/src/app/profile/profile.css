@@ -18,8 +18,8 @@
 
 .container {
     background-color: #222;
-    position: absolute;
-    height: 100vh;
+    position: relative;
+    min-height: 100%;
     width: 100vw;
 }
 
@@ -30,7 +30,7 @@
     display: flex;
     gap: var(--gap);
     align-items: center;
-    background-color:#444343 ;
+    background-color: #444343;
     padding: 2%;
     border-radius: 20px;
 }
@@ -128,22 +128,25 @@ span {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 18px;
-
+    align-items: start; /* <-- this is key: prevents equal-height rows */
 }
+
 
 /* Post card */
 .post-card {
-    /* background: var(--card);
-    border-radius: var(--radius); */
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    display: flex;
+       display: flex
+;
     flex-direction: column;
-    height: 100%;
-    border: 1px solid black;
+    /* width: 100%; */
+    /* margin-bottom: 0; */
+    background: #6c7a89;
     border-radius: 15px;
+    padding: 15px;
+    border: 1px solid black;
     background-color: #738095;
+    /* height: auto;*/
 }
+
 
 .post-card-header {
     display: flex;
