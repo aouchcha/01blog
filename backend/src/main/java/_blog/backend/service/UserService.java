@@ -5,12 +5,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.*;
 
+import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.User.User;
+import _blog.backend.Repos.CommentRepository;
 import _blog.backend.Repos.FollowRepositry;
+import _blog.backend.Repos.PostRepository;
 import _blog.backend.Repos.UserRepository;
-
+import _blog.backend.helpers.HandleMedia;
 import _blog.backend.helpers.JwtUtil;
 
 @Service
@@ -24,6 +29,18 @@ public class UserService {
 
     @Autowired
     private FollowRepositry followRepositry;
+
+    @Autowired
+    private PostRepository postRepository;
+
+   
+ 
+
+    @Autowired
+    private HandleMedia handleMedia;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     public ResponseEntity<?> getData(String token) {
         final String username = jwtUtil.getUsername(token);
@@ -55,5 +72,18 @@ public class UserService {
                 .toList();
 
         return ResponseEntity.ok().body(Map.of("users", users));
+    }
+
+    public ResponseEntity<?> getUSerProfile(String username, String token) {
+        final String myName = jwtUtil.getUsername(token);
+        if (!userRepository.existsByUsername(username) || !userRepository.existsByUsername(myName)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalid user"));
+        }
+
+        final User ProfileInfos = userRepository.findByUsername(username);
+        List<Post> posts = postRepository.findAllByUser_Id(ProfileInfos.getId());
+        // posts = handleMedia.FixUrl(posts);
+        
+        return ResponseEntity.ok(Map.of("user", ProfileInfos, "posts", posts));
     }
 }

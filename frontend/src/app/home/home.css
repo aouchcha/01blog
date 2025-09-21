@@ -31,6 +31,10 @@
     border-radius: 50%;
 }
 
+.avatar:hover, .toprofile:hover {
+    cursor: pointer;
+}
+
 .pics {
     width: 100%;
     height: 100%;

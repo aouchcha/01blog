@@ -1,47 +1,73 @@
- <div class="post-card">
-                <div class="post-header">
-                    <div class="icons">
-                        <img [src]="post.user.avatarUrl || 'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'"
-                            alt="User Avatar" class="avatar">
-                        <button mat-icon-button [matMenuTriggerFor]="optionsMenu" matTooltip="Options" *ngIf="post.user.username === me.username"
-                            class="optionsMenu">
-                            <mat-icon class="optionsMenu">more_vert</mat-icon>
-                        </button>
-                        <mat-menu #optionsMenu="matMenu" class="optionsMenu">
-                            <button mat-menu-item (click)="updatePost(post)" class="optionsMenu">
-                                <mat-icon>edit</mat-icon>
-                                <span>Update</span>
-                            </button>
-                            <button mat-menu-item (click)="deletePost(post)" class="optionsMenu">
-                                <mat-icon>delete</mat-icon>
-                                <span>Delete</span>
-                            </button>
-                        </mat-menu>
-                    </div>
+<div class="parent">
+    <div class="post-card">
+        <div class="post-header">
+            <div class="icons">
+                <img [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" alt="User Avatar"
+                    class="avatar">
+                <button mat-icon-button [matMenuTriggerFor]="optionsMenu" matTooltip="Options"
+                    *ngIf="post.user.username === me.username" class="optionsMenu">
+                    <mat-icon class="optionsMenu">more_vert</mat-icon>
+                </button>
+                <mat-menu #optionsMenu="matMenu" class="optionsMenu">
+                    <button mat-menu-item (click)="updatePost(post)" class="optionsMenu">
+                        <mat-icon>edit</mat-icon>
+                        <span>Update</span>
+                    </button>
+                    <button mat-menu-item (click)="deletePost(post)" class="optionsMenu">
+                        <mat-icon>delete</mat-icon>
+                        <span>Delete</span>
+                    </button>
+                </mat-menu>
+            </div>
 
-                    <div>
-                        <strong>{{ post.user.username }}</strong> ·
-                        <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
-                    </div>
+            <div>
+                <strong>{{ post.user.username }}</strong> ·
+                  <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
+            </div>
+        </div>
+        <div class="post-content">
+            <p>{{ post.description }}</p>
+            <div class="post-containt" *ngIf="!post.mediaUrl?.endsWith('null')">
+                <ng-container [ngSwitch]="post.mediaUrl ? post.mediaUrl.split('.').pop()?.toLowerCase() : ''">
+                    <img *ngSwitchCase="'jpg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                    <img *ngSwitchCase="'jpeg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                    <img *ngSwitchCase="'png'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                    <video *ngSwitchCase="'mp4'" [src]="post.mediaUrl" controls class="post-media"
+                        preload="metadata"></video>
+                </ng-container>
+            </div>
+        </div>
+        <div class="post-actions">
+            <button class="interactions" (click)="React(post.id)">
+                ❤️ {{ post.likeCount || 0 }}
+            </button>
+            <button class="interactions">
+                💬 {{ post.commentsCount || 0 }}
+            </button>
+
+            <button (click)="Home()">Home</button>
+        </div>
+    </div>
+    <div class="comment-card">
+        <div class="creation">
+            <textarea [(ngModel)]="content" name="" id="" placeholder="Enter a comment"></textarea>
+            <button (click)="Comment()">Comment</button>
+        </div>
+        <div class="comments" *ngFor="let c of comments">
+            <div class="comment-header">
+                <div class="icons">
+                    <img [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" alt="User Avatar"
+                        class="avatar">
                 </div>
-                <div class="post-content">
-                    <p>{{ post.description }}</p>
-                    <div class="post-containt" *ngIf="!post.media?.endsWith('null')">
-                        <ng-container [ngSwitch]="post.media?.split('.').pop()">
-                            <img *ngSwitchCase="'jpg'" [src]="post.media" alt="Post image" class="post-media">
-                            <img *ngSwitchCase="'jpeg'" [src]="post.media" alt="Post image" class="post-media">
-                            <img *ngSwitchCase="'png'" [src]="post.media" alt="Post image" class="post-media">
-                            <video *ngSwitchCase="'mp4'" [src]="post.media" controls class="post-media"
-                                preload="metadata"></video>
-                        </ng-container>
-                    </div>
-                </div>
-                <div class="post-actions">
-                    <button class="interactions" (click)="React(post.id)">
-                        ❤️ {{ post.likeCount || 0 }}
-                    </button>
-                    <button class="interactions" (click)="ShowSinglePost(post.id)">
-                        💬 {{ post.comments || 0 }}
-                    </button>
+
+                <div>
+                    <strong>{{ c.user.username }}</strong> ·
+                  <span class="timestamp">{{ c.createdAt | date:'short' }}</span>
                 </div>
             </div>
+            <div class="content">
+                {{c.content}}
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,75 +1,23 @@
-.main-card {
-    width: 100%;
-    min-height: 100vh;
-    min-width: 100vh;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    /* position: absolute; */
-    background: linear-gradient(45deg, rgb(218, 216, 216), rgb(179, 121, 124), rgb(179, 88, 91), rgb(112, 64, 64));
-    background-size: 400% 400%;
-    animation: gradientShift 3s ease infinite;
-}
-
-@keyframes gradientShift {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
 .avatar {
     height: 50px;
     width: 50px;
     border-radius: 50%;
 }
 
-.pics {
+/* .pics {
     width: 100%;
     height: 100%;
-}
+} */
 
-.right-card {
-    display: flex;
-    flex-direction: column;
-    width: 10%;
-    height: max-content;
-    padding: 2%;
-    margin-top: 2%;
-    margin-left: 2%;
-    background-color: rgb(112, 64, 64);
-    border-radius: 40px;
-}
-
-.left-card {
-    display: flex;
-    flex-direction: column;
-    width: max-content;
-    height: max-content;
-    padding: 5%;
-    justify-content: space-evenly;
-}
-
-.suggetions {
-    margin-top: 50%;
-}
-
-.infos {
+/* .infos {
     width: max-content;
     display: flex;
     flex-direction: column;
     align-items: center;
     align-self: center;
-}
+} */
 
-.comps {
+/* .comps {
     display: flex;
     flex-direction: column;
 }
@@ -89,45 +37,53 @@
     cursor: pointer;
     background-color: white;
     color: black;
-}
+} */
 
-.user {
+/* .user {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     margin-top: 9%;
-}
+} */
 
 button,
 .button {
     border-radius: 20px;
-    padding: 2%;
+    padding: 1%;
     background-color: black;
     color: white;
     margin-left: 1%;
 }
 
-.button:hover, button:hover {
+.button:hover,
+button:hover {
     cursor: pointer;
 }
 
-.center-card {
+/* .center-card {
     width: fit-content;
     padding: 3%;
     width: 50%;
+} */
+
+.parent {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    height: 100vh;
 }
 
 .post-card {
-    margin: 2%;
     border: 1px black solid;
-    padding: 5%;
-    width: 100%;
+
     background-color: rgb(207, 143, 145);
     border-radius: 30px;
+    width: 50vw;
+
 }
 
-.create-post {
+/* .create-post {
     width: 100%;
     margin-left: 5%;
     margin-bottom: 5%;
@@ -142,16 +98,17 @@ textarea {
     padding: 1%;
     margin-bottom: 1%;
     margin-top: 1%;
-}
+} */
 
 .post-header {
-    padding: 1%;
+    margin: 4%;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    /* justify-items: center;
+    /* justify-content: space-around; */
+    /* justify-items: center; */
     align-items: center;
-    align-content: center; */
+    align-content: center;
+    align-self: center;
 }
 
 .post-content {
@@ -159,27 +116,38 @@ textarea {
     flex-direction: column;
     padding: 1%;
     margin-top: 2%;
+    display: flex;
+    align-items: center;
+    align-content: center;
 }
 
 .post-containt {
     /* padding: 1%; */
-    margin-top: 2%;
+    /* margin-top: 2%; */
     /* border: 10px solid red; */
-    border-radius: 30px;
+    /* border-radius: 30px; */
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    width: 50%;
+    /* height: 100%; */
 }
 
 .post-media {
     /* height: 300px; */
-    width: 50vh;
+    width: 90%;
     /* width: 100%; */
     height: 50vh;
     border-radius: 30px;
-    margin-left: 2%;
+    margin-top: 3%;
 }
 
 .post-actions {
-
-    padding: 1%;
+    display: flex;
+    justify-content: center;
+    gap: 3%;
+    margin-top: 2%;
 }
 
 .interactions {
@@ -227,4 +195,49 @@ textarea {
     /* background-color: brown; */
     /* opacity: 90%; */
     background: rgb(145, 92, 94);
+}
+
+.comment-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px black solid;
+
+    background-color: rgb(182, 98, 101);
+    border-radius: 30px;
+    width: 50vw;
+    overflow: auto;
+
+}
+
+textarea {
+    width: 70%;
+    border-radius: 10px;
+    resize: none;
+    padding: 1.5%;
+}
+
+.creation {
+    margin: 2%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.comments {
+    margin-left: 2%;
+    background-color: rosybrown;
+    margin-bottom: 2%;
+    padding: 2%;
+    width: 90%;
+    border-radius: 30px;
+}
+
+.comment-header {
+    /* display: flex;    */
+    /* justify-content: space-evenly; */
+    margin: 2% 0;
+}
+
+img:hover {
+    cursor: pointer;
 }

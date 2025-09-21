@@ -1,0 +1,47 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from "@angular/common/http";
+import { Router } from "@angular/router";
+import { generateURL, generateHeader } from "./helpers/genarateHeader";
+import { Observable } from 'rxjs';
+
+@Injectable({
+    providedIn: 'root'
+})
+export class PostsService {
+
+    constructor(private router: Router, private http: HttpClient) { }
+
+    public getAllPosts(token: String | null): Observable<any> {
+        return this.http.get<any>(
+            generateURL("post"),
+            generateHeader(token)
+        );
+    }
+
+    public getSinglePost(token: String | null, post_id: number) {
+        console.log({ token });
+
+        return this.http.get<any>(
+            generateURL(`post/${post_id}`),
+            generateHeader(token)
+        )
+    }
+
+    public React(token: String | null, post_id: number) {
+        return this.http.post<any>(
+            generateURL("react"),
+            {
+                "post_id": post_id
+            },
+            generateHeader(token)
+        )
+    }
+
+    public updatePost(post: any) {
+        console.log('Update', post);
+    }
+
+    public deletePost(post: any) {
+        console.log('Delete', post);
+    }
+}

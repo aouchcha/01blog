@@ -9,10 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import _blog.backend.Repos.CommentRepository;
 import _blog.backend.Repos.PostRepository;
 import _blog.backend.Repos.UserRepository;
+import _blog.backend.Entitys.Comment.Comment;
 import _blog.backend.Entitys.Post.Post;
 import _blog.backend.helpers.JwtUtil;
+import _blog.backend.helpers.HandleMedia;
+
 
 @Service
 public class PostsService {
@@ -25,36 +29,46 @@ public class PostsService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
+    // @Autowired
+    // private CommentsService commentsService;
+
+    @Autowired
+    private HandleMedia handleMedia;
     public ResponseEntity<?> getPosts(String token) {
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("your token isn't valid");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","your token isn't valid"));
         }
         final String username = jwtUtil.getUsername(token);
 
         if (!userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the user is not valid");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
         }
 
         List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
-        for (Post p : posts) {
-            p.setMedia("http://localhost:8080/uploads/" + p.getMedia());
-        }
+        // posts = handleMedia.FixUrl(posts);
         return ResponseEntity.ok().body(Map.of("posts", posts));
     }
 
     public ResponseEntity<?> getSinglePost(Long post_id, String token) {
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("your token isn't valid");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","your token isn't valid"));
         }
 
         final String username = jwtUtil.getUsername(token);
 
         if (!userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("the user is not valid");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
         }
 
         Optional<Post> p = postRepository.findById(post_id);
-        return ResponseEntity.ok().body(Map.of("post", p.get()));
+        // p.get().setMedia("http://localhost:8080/uploads/" + p.get().getMedia());
+        p.get().setCommentsCount(commentRepository.countByPost_id(p.get().getId()));
+
+        List<Comment> comments = commentRepository.findAllByPost_id(post_id);
+       return ResponseEntity.ok().body(Map.of("post", p.get(), "comments", comments));
 
     }
 }

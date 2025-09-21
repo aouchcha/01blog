@@ -13,6 +13,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import _blog.backend.Entitys.Comment.Comment;
 import _blog.backend.Entitys.Interactions.Reactions.Like;
 import _blog.backend.Entitys.User.User;
 
@@ -32,6 +34,9 @@ public class Post {
 
     private String media;
 
+    @Transient
+    private String mediaUrl;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -40,12 +45,16 @@ public class Post {
     private User user;
 
     private Long LikeCount = 0L;
+    private Long CommentsCount = 0L;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
 
-    public Post() {};
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 
+    public Post() {
+    };
 
     public Long getId() {
         return id;
@@ -84,7 +93,7 @@ public class Post {
     }
 
     public void setMedia(String media) {
-        System.err.println("SETMEDIA ====================>   "+ media);
+        System.err.println("SETMEDIA ====================>   " + media);
         this.media = media;
     }
 
@@ -94,5 +103,17 @@ public class Post {
 
     public void setLikeCount(Long likeCount) {
         LikeCount = likeCount;
+    }
+
+    public Long getCommentsCount() {
+        return CommentsCount;
+    }
+
+    public void setCommentsCount(Long commentsCount) {
+        CommentsCount = commentsCount;
+    }
+
+    public String getMediaUrl() {
+        return media == null ? null : "http://localhost:8080/uploads/" + media;
     }
 }

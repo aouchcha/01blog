@@ -8,7 +8,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { StateService } from '../helpers/state-service';
+// import { StateService } from '../helpers/state-service';
+import { PostsService } from '../PostsService';
+import { UserService } from '../UserService';
 
 
 @Component({
@@ -34,17 +36,17 @@ export class Home implements OnInit {
   public mediaName: String | null = null;
   public media: File | null = null;
   public type: String = 'image';
-  constructor(private http: HttpClient, private router: Router, private state: StateService) { }
+  constructor(private http: HttpClient, private router: Router, private postsService: PostsService, private userServise: UserService) { }
 
   ngOnInit(): void {
-    if (!CheckToken()) {
+    if (CheckToken() === null) {
       this.router.navigate(["login"]);
       return;
     }
     console.log("hanni");
     this.token = localStorage.getItem("JWT");
     this.loadHome()
-   
+
   }
 
   public loadHome(): void {
@@ -66,7 +68,7 @@ export class Home implements OnInit {
   public Logout(): void {
     localStorage.removeItem("JWT");
     this.token = null;
-    this.router.navigate(["login"])
+    // this.router.navigate(["login"])
   }
 
   public setMedia(event: Event): void {
@@ -78,7 +80,7 @@ export class Home implements OnInit {
   }
 
   public CreatePost(): void {
-    if (!CheckToken()) {
+    if (CheckToken() === null) {
       this.router.navigate(["login"]);
       return;
     }
@@ -99,7 +101,9 @@ export class Home implements OnInit {
       },
       error: (err) => {
         console.log(err);
-        // this.router.navigate(["login"])
+        if (err.status === 403) {
+          this.router.navigate(["login"])
+        }
       }
     })
   }
@@ -115,10 +119,7 @@ export class Home implements OnInit {
   // }
 
   public getAllPosts(): void {
-    this.http.get<any>(
-      generateURL("post"),
-      generateHeader(this.token)
-    ).subscribe({
+    this.postsService.getAllPosts(this.token).subscribe({
       next: (res) => {
         res.posts.forEach((p: any) => {
           console.log(p);
@@ -127,17 +128,16 @@ export class Home implements OnInit {
       },
       error: (err) => {
         console.log(err);
-        this.router.navigate(["login"])
+        if (err.status == 401) {
+          this.router.navigate(["login"])
+        }
 
       }
     })
   }
 
   public getMe(): void {
-    this.http.get<any>(
-      generateURL("me"),
-      generateHeader(this.token)
-    ).subscribe({
+    this.userServise.getMe(this.token).subscribe({
       next: (res) => {
         console.log(res);
         this.me = res.me;
@@ -154,7 +154,7 @@ export class Home implements OnInit {
       generateHeader(this.token)
     ).subscribe({
       next: (res) => {
-        console.log("all users ========",res);
+        console.log("all users ========", res);
         this.others = res.users;
       },
       error: (err) => {
@@ -164,22 +164,16 @@ export class Home implements OnInit {
   }
 
   public updatePost(post: any) {
-    console.log('Update', post);
+    this.postsService.updatePost(post)
   }
 
   public deletePost(post: any) {
-    console.log('Delete', post);
+    this.postsService.deletePost(post)
   }
 
-  public React(post_id: Number): void {
+  public React(post_id: number): void {
     console.log("post id ========= ", post_id);
-    this.http.post<any>(
-      generateURL("react"),
-      {
-        "post_id": post_id
-      },
-      generateHeader(this.token)
-    ).subscribe({
+    this.postsService.React(this.token, post_id).subscribe({
       next: (res) => {
         console.log(res);
         // this.posts = res.posts;
@@ -192,9 +186,9 @@ export class Home implements OnInit {
     })
   }
 
-  public Follow(user_id: Number): void {
+  public Follow(user_id: number): void {
     console.log("zebbi");
-    
+
     this.http.post<any>(
       generateURL("follow"),
       {
@@ -212,9 +206,12 @@ export class Home implements OnInit {
     })
   }
 
-  public ShowSinglePost(post_id: Number) : void {
-    this.state.setPostId(post_id);
-    this.state.setCurrentUser(this.me);
-    this.router.navigate(["post"])
+  public ShowSinglePost(post_id: number): void {
+    this.router.navigate([`post/${post_id}`])
+  }
+
+  public ToProfile(username: String) {
+    console.log({ username });
+    this.router.navigate([`/${username}`])
   }
 }

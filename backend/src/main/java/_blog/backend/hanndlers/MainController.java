@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import _blog.backend.service.RegisterService;
 import _blog.backend.service.LoginService;
+import _blog.backend.service.CommentsService;
 import _blog.backend.service.CreatePostService;
 import _blog.backend.service.FollowService;
 import _blog.backend.service.PostsService;
@@ -24,6 +25,7 @@ import _blog.backend.service.ReactionService;
 import _blog.backend.service.UserService;
 import _blog.backend.Entitys.User.RegisterRequest;
 import _blog.backend.Entitys.User.LoginRequest;
+import _blog.backend.Entitys.Comment.CommentRequest;
 import _blog.backend.Entitys.Interactions.Follow.FollowRequest;
 import _blog.backend.Entitys.Interactions.Reactions.LikeRequest;
 import _blog.backend.Entitys.Post.PostRequst;
@@ -98,6 +100,27 @@ public class MainController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
         return followService.follow(followRequest, token);
+    }
+
+    @Autowired
+    private CommentsService commentsService;
+
+    @PostMapping("/comment")
+    public ResponseEntity<?> CreateComments(@RequestBody CommentRequest commentRequest, @RequestHeader("Authorization") String header) {
+        String token = header.replace("Bearer", "");
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        }
+        return commentsService.create(commentRequest, token);
+    }
+
+    @GetMapping("user/{username}")
+    public ResponseEntity<?> getProfile(@PathVariable String username, @RequestHeader("Authorization") String header) {
+         String token = header.replace("Bearer", "");
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        }
+        return userService.getUSerProfile(username, token);
     }
 }
 

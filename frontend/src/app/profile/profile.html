@@ -1,0 +1,100 @@
+<div class="container">
+    <section class="profile-wrap">
+      <div class="profile-header">
+        <img class="avatar" [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" alt="Avatar">
+    
+        <div class="profile-info">
+          <div class="row">
+            <h1 class="username">{{ me.username }}</h1>
+    
+            <!-- Follow / Unfollow button: show follow if not following -->
+            <button class="btn btn-edit"
+                    *ngIf="user.username !== me?.username"
+                    >
+              {{ me.follow ? 'Unfollow' : 'Follow' }}
+            </button>
+    
+            <!-- Edit profile button (only owner) -->
+            <button class="btn btn-edit" *ngIf="user.username === me?.username">
+              Edit profile
+            </button>
+          </div>
+    
+          <!-- <p class="bio" *ngIf="user.bio">{{ me.bio }}</p> -->
+    
+          <div class="stats">
+            <div class="stat">
+              <strong>{{ posts?.length || 0 }}</strong>
+              <span>Posts</span>
+            </div>
+            <div class="stat">
+              <strong>0</strong>
+              <span>Followers</span>
+            </div>
+            <div class="stat">
+              <strong>0</strong>
+              <span>Following</span>
+            </div>
+          </div>
+    
+          <div class="meta">
+            <span *ngIf="user.email">📍 {{ user.email }}</span>
+            <!-- <span *ngIf="user.joinedAt"> · Joined {{ user.joinedAt | date:'mediumDate' }}</span> -->
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- POSTS GRID -->
+    <section class="posts-wrap">
+      <div *ngIf="!posts || posts.length === 0" class="empty">
+        <p>No posts yet.</p>
+      </div>
+    
+      <div class="posts-grid" *ngIf="posts && posts.length > 0">
+        <article class="post-card" *ngFor="let post of posts">
+          <header class="post-card-header">
+            <div class="author">
+              <img class="avatar-sm" [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" alt="author">
+              <div>
+                <strong>{{ post.user.username }}</strong>
+                <div class="time">{{ post.createdAt | date:'short' }}</div>
+              </div>
+            </div>
+    
+            <!-- show edit/delete only for owner -->
+            <div class="post-actions">
+              <!-- <button *ngIf="post.user.username === me?.username" (click)="updatePost(post)" class="icon-btn">✎</button>
+              <button *ngIf="post.user.username === me?.username" (click)="deletePost(post)" class="icon-btn">🗑</button> -->
+            </div>
+          </header>
+    
+          <!-- Media (image or video) -->
+          <div class="media-area" *ngIf="!post.mediaUrl?.endsWith('null')">
+                <ng-container [ngSwitch]="post.mediaUrl ? post.mediaUrl.split('.').pop()?.toLowerCase() : ''">
+                    <img *ngSwitchCase="'jpg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                    <img *ngSwitchCase="'jpeg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                    <img *ngSwitchCase="'png'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                    <video *ngSwitchCase="'mp4'" [src]="post.mediaUrl" controls class="post-media"
+                        preload="metadata"></video>
+                </ng-container>
+            </div>
+    
+          <div class="post-body">
+            <p class="description">{{ post.description }}</p>
+    
+            <div class="post-footer">
+              <div class="reactions">
+                <button class="reaction">❤️ {{ post.likeCount || 0 }}</button>
+                <button class="reaction comment-btn">💬 {{ post.commentsCount || 0 }}</button>
+              </div>
+    
+              <!-- <div class="share">
+                <button (click)="sharePost(post)">↗️ Share</button>
+              </div> -->
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+</div>
