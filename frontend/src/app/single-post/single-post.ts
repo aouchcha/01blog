@@ -98,15 +98,21 @@ export class SinglePost implements OnInit {
       },
     })
   }
-
-  public updatePost(post: Post) {
-    this.postsService.updatePost(post);
+  public updatePost(post_id: number) {
+    this.postsService.updatePost(this.token, post_id)
   }
 
-  public deletePost(post: Post) {
-    this.postsService.deletePost(post)
+  public deletePost(post_id: number) {
+    this.postsService.deletePost(this.token, post_id).subscribe({
+      next: (res) => {
+        console.log(res);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+    
   }
-
   public React(post_id: number) {
     console.log(post_id);
 

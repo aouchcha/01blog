@@ -22,19 +22,24 @@ public class LoginService {
     private final UserRepository userRepositry;
     // @Autowired
     private final JwtUtil jwtUtils;
-    public LoginService(UserRepository repo,  JwtUtil jwtUtils) { this.userRepositry = repo; this.jwtUtils = jwtUtils;}
+
+    public LoginService(UserRepository repo, JwtUtil jwtUtils) {
+        this.userRepositry = repo;
+        this.jwtUtils = jwtUtils;
+    }
+
     public ResponseEntity<?> signin(LoginRequest request) {
         System.err.println(request.getUsername());
         System.err.println(request.getPassword());
         // Optional<User> MaybeUser = userRepositry.findByUsername;
-        if (userRepositry.existsByUsername(request.getUsername())) {
-            User u = userRepositry.findByUsername(request.getUsername());
-            if (u.getPassword().equals(request.getPassword())) {
-                String token = jwtUtils.generateToken(u.getUsername(), u.getPassword());
-                return ResponseEntity.ok(Map.of("token",token));
-            }
+        if (!userRepositry.existsByUsername(request.getUsername())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("incorrect username");
+        }
+        User u = userRepositry.findByUsername(request.getUsername());
+        if (!u.getPassword().equals(request.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("incorrect password");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("incorrect username");
+        String token = jwtUtils.generateToken(u.getUsername(), u.getPassword());
+        return ResponseEntity.ok(Map.of("token", token, "user", u));
     }
 }

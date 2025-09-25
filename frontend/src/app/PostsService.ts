@@ -37,11 +37,14 @@ export class PostsService {
         )
     }
 
-    public updatePost(post: any) {
-        console.log('Update', post);
+    public updatePost(token: String | null, post_id: number) {
+        // console.log('Update', post);
     }
 
-    public deletePost(post: any) {
-        console.log('Delete', post);
+    public deletePost(token: String | null, post_id: number): Observable<any> {
+        return this.http.delete(
+            generateURL(`post/${post_id}`),
+            generateHeader(token)
+        );
     }
 }

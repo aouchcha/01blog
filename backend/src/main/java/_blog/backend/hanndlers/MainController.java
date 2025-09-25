@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,9 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import _blog.backend.service.RegisterService;
 import _blog.backend.service.LoginService;
 import _blog.backend.service.CommentsService;
-import _blog.backend.service.CreatePostService;
 import _blog.backend.service.FollowService;
-import _blog.backend.service.PostsService;
 import _blog.backend.service.ReactionService;
 import _blog.backend.service.UserService;
 import _blog.backend.Entitys.User.RegisterRequest;
@@ -28,7 +25,6 @@ import _blog.backend.Entitys.User.LoginRequest;
 import _blog.backend.Entitys.Comment.CommentRequest;
 import _blog.backend.Entitys.Interactions.Follow.FollowRequest;
 import _blog.backend.Entitys.Interactions.Reactions.LikeRequest;
-import _blog.backend.Entitys.Post.PostRequst;
 
 import _blog.backend.helpers.JwtUtil;
 

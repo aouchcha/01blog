@@ -30,6 +30,8 @@ export class Profile implements OnInit {
   public user: User = new User();
   public me: User = new User();
   public posts: any = [];
+  public followers: number = 0;
+  public followings: number = 0;
 
   constructor(private router: Router, private route: ActivatedRoute, private userService: UserService) { }
 
@@ -57,10 +59,18 @@ export class Profile implements OnInit {
         console.log(res);
         this.user = res.user;
         this.posts = res.posts;
+        this.followers = res.followers
+        this.followings = res.followings
       },
       error: (err) => {
         console.log(err);
       }
     })
+  }
+
+  public Home() {
+    console.log("home");
+    
+    this.router.navigate([""])
   }
 }

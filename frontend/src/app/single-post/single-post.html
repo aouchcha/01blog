@@ -9,11 +9,11 @@
                     <mat-icon class="optionsMenu">more_vert</mat-icon>
                 </button>
                 <mat-menu #optionsMenu="matMenu" class="optionsMenu">
-                    <button mat-menu-item (click)="updatePost(post)" class="optionsMenu">
+                    <button mat-menu-item (click)="updatePost(post.id)" class="optionsMenu">
                         <mat-icon>edit</mat-icon>
                         <span>Update</span>
                     </button>
-                    <button mat-menu-item (click)="deletePost(post)" class="optionsMenu">
+                    <button mat-menu-item (click)="deletePost(post.id)" class="optionsMenu">
                         <mat-icon>delete</mat-icon>
                         <span>Delete</span>
                     </button>

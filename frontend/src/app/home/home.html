@@ -9,7 +9,7 @@
             <div class="comps">
                 <button class="comp" (click)="getAllPosts()">News Feed</button>
                 <button class="comp">Friends</button>
-                <button class="comp">Profile</button>
+                <button class="comp" (click)="ToProfile(me.username)">Profile</button>
             </div>
         </div>
         <div class="center-card">
@@ -25,21 +25,24 @@
                 <button (click)="CreatePost()">Share</button>
                 <button (click)="Cancel()">Cancel</button>
             </div>
+            <div *ngIf="!posts || posts.length === 0" class="post-card">
+                <p>No posts yet.</p>
+            </div>
             <div class="post-card" *ngFor="let post of posts">
                 <div class="post-header">
                     <div class="icons">
                         <img [src]="post.user.avatarUrl || 'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'"
                             alt="User Avatar" class="avatar" (click)="ToProfile(post.user.username)">
-                        <button mat-icon-button [matMenuTriggerFor]="optionsMenu" matTooltip="Options" *ngIf="post.user.username === me.username"
-                            class="optionsMenu">
+                        <button mat-icon-button [matMenuTriggerFor]="optionsMenu" matTooltip="Options"
+                            *ngIf="post.user.username === me.username" class="optionsMenu">
                             <mat-icon class="optionsMenu">more_vert</mat-icon>
                         </button>
                         <mat-menu #optionsMenu="matMenu" class="optionsMenu">
-                            <button mat-menu-item (click)="updatePost(post)" class="optionsMenu">
+                            <button mat-menu-item (click)="updatePost(post.id)" class="optionsMenu">
                                 <mat-icon>edit</mat-icon>
                                 <span>Update</span>
                             </button>
-                            <button mat-menu-item (click)="deletePost(post)" class="optionsMenu">
+                            <button mat-menu-item (click)="deletePost(post.id)" class="optionsMenu">
                                 <mat-icon>delete</mat-icon>
                                 <span>Delete</span>
                             </button>
@@ -83,7 +86,8 @@
                 <div class="others" *ngFor="let user of others">
                     <div class="user">
                         <p (click)="ToProfile(user.username)" class="toprofile">{{user.username}}</p>
-                        <button (click)="Follow(user.id)" class="follow">{{ user.follow ? 'Unfollow' : 'Follow' }}</button>
+                        <button (click)="Follow(user.id)" class="follow">{{ user.follow ? 'Unfollow' : 'Follow'
+                            }}</button>
                     </div>
 
                 </div>

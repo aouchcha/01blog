@@ -36,10 +36,14 @@ export class Login {
 
     this.http.post<any>('http://localhost:8080/api/login', body).subscribe({
       next: (res) => {
-        console.log('log in successful !', typeof res, res);
+        console.log('log in successful !', res.user.role, res);
         // this.res = res;
         localStorage.setItem("JWT", res.token);
-        this.router.navigate([""]);
+        if (res.user.role == "User") {
+          this.router.navigate([""]);
+        }else {
+          this.router.navigate(["admin"])
+        }
       },
       error: (error) => {
         console.log(error);

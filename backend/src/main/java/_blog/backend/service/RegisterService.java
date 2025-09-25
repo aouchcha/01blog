@@ -17,9 +17,6 @@ public class RegisterService {
     private final UserRepository userRepositry;
     public RegisterService(UserRepository repo) { this.userRepositry = repo; }
     public ResponseEntity<?> register(RegisterRequest request) {
-        // System.out.println("Email  " + request.getEmail());
-        // System.out.println("USername   "+request.getUsername());
-        // System.out.println("Pass    " +request.getPassword());
         if (request.getUsername().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The username is required");
         }
@@ -39,12 +36,10 @@ public class RegisterService {
         }
 
         try {
-            User u = new User(request.getUsername(), request.getEmail(), request.getPassword(), Role.Admin);
-            // System.out.println("ID     "+u.getId());
+            User u = new User(request.getUsername(), request.getEmail(), request.getPassword(), Role.User);
             userRepositry.save(u);
             return ResponseEntity.status(HttpStatus.CREATED).body(u);
         }catch(Exception e) {
-            // System.err.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
         }
     }

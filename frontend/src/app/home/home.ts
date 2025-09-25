@@ -68,7 +68,7 @@ export class Home implements OnInit {
   public Logout(): void {
     localStorage.removeItem("JWT");
     this.token = null;
-    // this.router.navigate(["login"])
+    this.router.navigate(["login"])
   }
 
   public setMedia(event: Event): void {
@@ -163,12 +163,20 @@ export class Home implements OnInit {
     })
   }
 
-  public updatePost(post: any) {
-    this.postsService.updatePost(post)
+  public updatePost(post_id: number) {
+    this.postsService.updatePost(this.token, post_id)
   }
 
-  public deletePost(post: any) {
-    this.postsService.deletePost(post)
+  public deletePost(post_id: number) {
+    this.postsService.deletePost(this.token, post_id).subscribe({
+      next: (res) => {
+        console.log(res);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+    
   }
 
   public React(post_id: number): void {

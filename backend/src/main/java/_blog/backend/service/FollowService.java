@@ -13,8 +13,10 @@ import _blog.backend.Entitys.User.User;
 import _blog.backend.Repos.FollowRepositry;
 import _blog.backend.Repos.UserRepository;
 import _blog.backend.helpers.JwtUtil;
+import jakarta.transaction.Transactional;
 
 @Service
+@Transactional
 public class FollowService {
     @Autowired
     private JwtUtil jwtUtil;
