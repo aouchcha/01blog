@@ -50,7 +50,7 @@
     </div>
     <div class="comment-card">
         <div class="creation">
-            <textarea [(ngModel)]="content" name="" id="" placeholder="Enter a comment"></textarea>
+            <textarea [(ngModel)]="content" placeholder="Enter a comment"></textarea>
             <button (click)="Comment()">Comment</button>
         </div>
         <div class="comments" *ngFor="let c of comments">

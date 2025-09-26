@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { Login } from './login/login';
-import { Register } from './register/register';
-import { Home } from './home/home';
-import { SinglePost } from './single-post/single-post';
-import { Profile } from './profile/profile';
-import { Admin } from './admin/admin';
+import { Login } from './ViewModel/login/login';
+import { Register } from './ViewModel/register/register';
+import { Home } from './ViewModel/home/home';
+import { SinglePost } from './ViewModel/single-post/single-post';
+import { Profile } from './ViewModel/profile/profile';
+import { Admin } from './ViewModel/admin/admin';
 
 export const routes: Routes = [
     { path: "login", component: Login },

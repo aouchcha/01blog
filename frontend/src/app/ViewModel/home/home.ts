@@ -1,16 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { generateHeader, generateURL, CheckToken } from '../helpers/genarateHeader';
+import { CheckToken } from '../../helpers/genarateHeader';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-// import { StateService } from '../helpers/state-service';
-import { PostsService } from '../PostsService';
-import { UserService } from '../UserService';
+import { PostsService } from '../../services/posts.service';
+import { UserService } from '../../services/user.service';
 
 
 @Component({
@@ -36,14 +35,13 @@ export class Home implements OnInit {
   public mediaName: String | null = null;
   public media: File | null = null;
   public type: String = 'image';
-  constructor(private http: HttpClient, private router: Router, private postsService: PostsService, private userServise: UserService) { }
+  constructor(private router: Router, private postsService: PostsService, private userServise: UserService) { }
 
   ngOnInit(): void {
     if (CheckToken() === null) {
       this.router.navigate(["login"]);
       return;
     }
-    console.log("hanni");
     this.token = localStorage.getItem("JWT");
     this.loadHome()
 
@@ -89,13 +87,8 @@ export class Home implements OnInit {
     if (this.media) {
       data.append("media", this.media)
     }
-    this.http.post<any>(
-      generateURL("post"),
-      data,
-      generateHeader(this.token)
-    ).subscribe({
+    this.postsService.CreatePost(this.token, data).subscribe({
       next: () => {
-        console.log("ranni");
         this.Cancel()
         this.getAllPosts();
       },
@@ -107,16 +100,6 @@ export class Home implements OnInit {
       }
     })
   }
-
-  // public CheckToken(): boolean {
-
-  //   const Token = localStorage.getItem("JWT");
-  //   if (!Token) {
-  //     return false;
-  //   }
-  //   this.token = Token;
-  //   return true;
-  // }
 
   public getAllPosts(): void {
     this.postsService.getAllPosts(this.token).subscribe({
@@ -149,10 +132,7 @@ export class Home implements OnInit {
   }
 
   public getOthers(): void {
-    this.http.get<any>(
-      generateURL("users"),
-      generateHeader(this.token)
-    ).subscribe({
+    this.userServise.getOtherUsers(this.token).subscribe({
       next: (res) => {
         console.log("all users ========", res);
         this.others = res.users;
@@ -184,8 +164,6 @@ export class Home implements OnInit {
     this.postsService.React(this.token, post_id).subscribe({
       next: (res) => {
         console.log(res);
-        // this.posts = res.posts;
-        // this.stateup.detectChanges();
         this.getAllPosts()
       },
       error: (err) => {
@@ -197,13 +175,7 @@ export class Home implements OnInit {
   public Follow(user_id: number): void {
     console.log("zebbi");
 
-    this.http.post<any>(
-      generateURL("follow"),
-      {
-        "followed_id": user_id
-      },
-      generateHeader(this.token)
-    ).subscribe({
+    this.userServise.Follow(user_id, this.token).subscribe({
       next: (res) => {
         console.log(res);
         this.getOthers()

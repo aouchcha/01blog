@@ -1,8 +1,6 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-// import { ChangeDetectorRef } from '@angular/core';
-
+import { AuthModel } from '../../services/auth.service';
 @Component({
   selector: 'app-register',
   imports: [],
@@ -16,7 +14,7 @@ export class Register {
   error: String = '';
   // sss: ChangeDetectorRef;
 
-  constructor(private router: Router, private http: HttpClient, private stateup: ChangeDetectorRef) { };
+  constructor(private router: Router, private authModel: AuthModel, private stateup: ChangeDetectorRef) { };
 
   public setUsername(username: string): void {
     this.username = username;
@@ -43,11 +41,7 @@ export class Register {
       "email": this.email
     }
 
-    console.log("|||||||||||||||||||||||||||||||||||", user);
-    // console.log(user);
-
-
-    this.http.post('http://localhost:8080/api/register', user).subscribe({
+    this.authModel.Register(user).subscribe({
       next: (response) => {
         console.log('Registration successful:', response);
         // Redirect to login on success

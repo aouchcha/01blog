@@ -15,8 +15,6 @@ import _blog.backend.Repos.UserRepository;
 import _blog.backend.Entitys.Comment.Comment;
 import _blog.backend.Entitys.Post.Post;
 import _blog.backend.helpers.JwtUtil;
-import _blog.backend.helpers.HandleMedia;
-
 
 @Service
 public class PostsService {
@@ -32,11 +30,6 @@ public class PostsService {
     @Autowired
     private CommentRepository commentRepository;
 
-    // @Autowired
-    // private CommentsService commentsService;
-
-    @Autowired
-    private HandleMedia handleMedia;
     public ResponseEntity<?> getPosts(String token) {
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","your token isn't valid"));

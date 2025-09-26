@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthModel } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +12,7 @@ export class Login {
   username : string = '';
   password : string = '';
   error : string = '';
-  constructor(private router : Router, private http: HttpClient, private stateup: ChangeDetectorRef){};
+  constructor(private router : Router, private stateup: ChangeDetectorRef, private authModel: AuthModel){};
  
   public setUsername(username: string): void {
     this.username = username;
@@ -34,7 +34,7 @@ export class Login {
       "password" : this.password
     }
 
-    this.http.post<any>('http://localhost:8080/api/login', body).subscribe({
+    this.authModel.Login(body).subscribe({
       next: (res) => {
         console.log('log in successful !', res.user.role, res);
         // this.res = res;

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { CheckToken } from '../helpers/genarateHeader';
+import { CheckToken } from '../../helpers/genarateHeader';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UserService } from '../UserService';
-import { User } from '../helpers/User';
+import { UserService } from '../../services/user.service';
+import { User } from '../../models/User'; 
 import { CommonModule } from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
@@ -42,6 +42,7 @@ export class Profile implements OnInit {
     }
     this.token = CheckToken();
     this.username = String(this.route.snapshot.paramMap.get('username'));
+
     this.userService.getMe(this.token).subscribe({
       next: (res) => {
         this.me = res.me;

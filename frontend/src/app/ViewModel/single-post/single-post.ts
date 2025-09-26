@@ -3,15 +3,15 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 // import { StateService } from '../helpers/state-service';
-import { generateURL, generateHeader, CheckToken } from '../helpers/genarateHeader';
+import { generateURL, generateHeader, CheckToken } from '../../helpers/genarateHeader';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { PostsService } from '../PostsService';
-import { UserService } from '../UserService';
-import { User } from '../helpers/User';
-import { Post } from '../helpers/Post';
+import { PostsService } from '../../services/posts.service';
+import { UserService } from '../../services/user.service';
+import { User } from '../../models/User'; 
+import { Post } from '../../models/Post'; 
 import { FormsModule } from '@angular/forms';
 // import { Comment } from '../helpers/Comments';
 
@@ -81,14 +81,7 @@ export class SinglePost implements OnInit {
   }
 
   public Comment() {
-    this.http.post<any>(
-      generateURL("comment"),
-      {
-        "content": this.content,
-        "post_id": this.post_id
-      },
-      generateHeader(this.token)
-    ).subscribe({
+   this.postsService.CreateComment(this.content, this.post_id, this.token).subscribe({
       next: (res) => {
         this.getPost()
         this.content = '';
