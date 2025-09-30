@@ -5,24 +5,49 @@
 
       <div class="profile-info">
         <div class="row">
-          <h1 class="username">{{ me.username }}</h1>
+          <h1 class="username">{{ user.username }}</h1>
 
           <!-- Follow / Unfollow button: show follow if not following -->
           <div>
-            <button class="btn btn-edit" *ngIf="user.username !== me?.username">
-              {{ me.follow ? 'Unfollow' : 'Follow' }}
+            <button class="btn btn-edit" *ngIf="user.username !== me.username && me.role !== 'Admin'" (click)="Follow()">
+              {{ user.follow ? 'Unfollow' : 'Follow' }}
             </button>
 
             <!-- Edit profile button (only owner) -->
             <button class="btn btn-edit" *ngIf="user.username === me?.username">
               Edit profile
             </button>
-            <button class="btn btn-edit" (click)="Home()">
+            <button class="btn btn-edit" *ngIf="me.role !== 'Admin'" (click)="Home()">
               Home
+            </button>
+             <button class="btn btn-edit" *ngIf="me.role === 'Admin'" (click)="ToDashBoard()">
+              To DashBoard
+            </button>
+            <button class="btn btn-edit" *ngIf="user.id != me.id && me.role !== 'Admin'" (click)="OpenReportSection()">
+              Report
+            </button>
+             <button class="btn btn-edit" *ngIf="me.role === 'Admin'" (click)="ToDashBoard()">
+              REmove The USer
             </button>
           </div>
         </div>
 
+        <div class="report-card" *ngIf="DoYouWantReport">
+          <div class="group">
+            <textarea [(ngModel)]="description" required="true" id="report-input" type="text" class="input"></textarea>
+            <span class="highlight"></span>
+            <span class="bar"></span>
+            <label>Name</label>
+          </div>
+          <!-- <textarea [(ngModel)]="description" id="report-input" placeholder="What is your reason"></textarea> -->
+          <button class="btn btn-edit" *ngIf="user.username !== me?.username" (click)="Report()">
+            Submit
+          </button>
+          <button class="btn btn-edit" (click)="Cancel()">
+            Cancel
+          </button>
+        </div>
+        <!-- <p>DEBUG: {{ description }}</p> -->
         <!-- <p class="bio" *ngIf="user.bio">{{ me.bio }}</p> -->
 
         <div class="stats">
@@ -63,13 +88,13 @@
               <strong>{{ post.user.username }}</strong>
               <div class="time">{{ post.createdAt | date:'short' }}</div>
             </div>
+            <div class="post-actions">
+              <button *ngIf="post.user.username === me?.username || me?.role === 'Admin'" class="icon-btn">🗑</button>
+            </div>
           </div>
 
           <!-- show edit/delete only for owner -->
-          <div class="post-actions">
-            <!-- <button *ngIf="post.user.username === me?.username" (click)="updatePost(post)" class="icon-btn">✎</button>
-              <button *ngIf="post.user.username === me?.username" (click)="deletePost(post)" class="icon-btn">🗑</button> -->
-          </div>
+
         </header>
 
         <!-- Media (image or video) -->
@@ -90,10 +115,6 @@
               <button class="reaction">❤️ {{ post.likeCount || 0 }}</button>
               <button class="reaction comment-btn">💬 {{ post.commentsCount || 0 }}</button>
             </div>
-
-            <!-- <div class="share">
-                <button (click)="sharePost(post)">↗️ Share</button>
-              </div> -->
           </div>
         </div>
       </article>

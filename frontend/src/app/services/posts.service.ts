@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { Router } from "@angular/router";
 import { generateURL, generateHeader } from "../helpers/genarateHeader";
 import { Observable } from 'rxjs';
 
@@ -9,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class PostsService {
 
-    constructor(private router: Router, private http: HttpClient) { }
+    constructor(private http: HttpClient) { }
 
     public CreatePost(token: String | null, data: FormData): Observable<any> {
         return this.http.post<any>(

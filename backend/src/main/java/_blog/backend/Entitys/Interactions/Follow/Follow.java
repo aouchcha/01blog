@@ -13,6 +13,7 @@ public class Follow {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment in PostgreSQL
     @Column(nullable = false, unique = true)
     private Long id;
+    
     @ManyToOne
     @JoinColumn(name = "followed_id", nullable = false)
     private User followed;

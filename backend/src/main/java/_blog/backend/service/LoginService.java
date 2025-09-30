@@ -29,8 +29,8 @@ public class LoginService {
     }
 
     public ResponseEntity<?> signin(LoginRequest request) {
-        System.err.println(request.getUsername());
-        System.err.println(request.getPassword());
+        // System.err.println(request.getUsername());
+        // System.err.println(request.getPassword());
         // Optional<User> MaybeUser = userRepositry.findByUsername;
         if (!userRepositry.existsByUsername(request.getUsername())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("incorrect username");

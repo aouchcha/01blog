@@ -62,7 +62,7 @@ public class CommentsService {
         c.setUser(u);
         c.setPost(p.get());
         commentRepository.save(c);
-        System.out.println("count  "+commentRepository.countByPost_id(post_id));
+        // System.out.println("count  "+commentRepository.countByPost_id(post_id));
         p.get().setCommentsCount(commentRepository.countByPost_id(post_id));
         // p.get().setMedia("http://localhost:8080/uploads/" + p.get().getMedia());
         // p.get().setCommentsCount(commentRepository.countByPost_id(post_id));   

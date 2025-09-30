@@ -86,8 +86,7 @@
                 <div class="others" *ngFor="let user of others">
                     <div class="user">
                         <p (click)="ToProfile(user.username)" class="toprofile">{{user.username}}</p>
-                        <button (click)="Follow(user.id)" class="follow">{{ user.follow ? 'Unfollow' : 'Follow'
-                            }}</button>
+                        <button (click)="Follow(user.id)" class="follow">{{ user.follow ? 'Unfollow' : 'Follow'}}</button>
                     </div>
 
                 </div>

@@ -37,7 +37,7 @@ public class CreatePostService {
     public ResponseEntity<?> create(PostRequst postRequst, String token) {
         // System.err.println(header.getHeader());
         // jwtUtil.validateToken(header.getJwt())
-        System.err.println("|||||||||||||||||||||||||||||||||||||||||||||  " + token);
+        // System.err.println("|||||||||||||||||||||||||||||||||||||||||||||  " + token);
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "your token isn't valid"));
         }

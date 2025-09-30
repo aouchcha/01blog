@@ -128,14 +128,14 @@ span {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 18px;
-    align-items: start; /* <-- this is key: prevents equal-height rows */
+    align-items: start;
+    /* <-- this is key: prevents equal-height rows */
 }
 
 
 /* Post card */
 .post-card {
-       display: flex
-;
+    display: flex;
     flex-direction: column;
     /* width: 100%; */
     /* margin-bottom: 0; */
@@ -150,7 +150,7 @@ span {
 
 .post-card-header {
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     align-items: center;
     padding: 12px 14px;
     gap: 8px;
@@ -159,7 +159,9 @@ span {
 
 .author {
     display: flex;
+    justify-content: space-between;
     gap: 10px;
+    width: 100%;
     align-items: center;
 }
 
@@ -242,6 +244,7 @@ span {
     box-shadow: var(--shadow);
 }
 
+
 /* Responsive */
 @media (max-width: 760px) {
     .profile-header {
@@ -261,5 +264,122 @@ span {
 
     .posts-grid {
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+}
+
+.report-card {
+    position: absolute;
+    width: 60%;
+    height: 40%;
+    margin: 5% -8%;
+    padding: 4%;
+    background-color: darkcyan;
+    border-radius: 30px;
+    border: 1px solid white;
+}
+
+#report-input {
+    resize: none;
+    width: 87%;
+    height: 30%;
+    /* margin: 10% 0; */
+    /* padding: 2%; */
+
+}
+
+.group {
+    position: relative;
+    /* display: flex; */
+    margin: 5% 0;
+}
+
+.input {
+    font-size: 16px;
+    padding: 10px 10px 10px 5px;
+    display: block;
+    width: 200px;
+    border: none;
+    border-bottom: 1px solid #515151;
+    background: transparent;
+}
+
+.input:focus {
+    outline: none;
+}
+
+label {
+    color: #999;
+    font-size: 18px;
+    font-weight: normal;
+    position: absolute;
+    pointer-events: none;
+    left: 5px;
+    top: 10px;
+    transition: 0.2s ease all;
+    -moz-transition: 0.2s ease all;
+    -webkit-transition: 0.2s ease all;
+}
+
+.input:focus~label,
+.input:valid~label {
+    top: -20px;
+    font-size: 14px;
+    color: #5264AE;
+}
+
+.bar {
+    position: relative;
+    display: block;
+    width: 89%;
+}
+
+.bar:before,
+.bar:after {
+    content: '';
+    height: 2px;
+    width: 0;
+    bottom: 1px;
+    position: absolute;
+    background: #5264AE;
+    transition: 0.2s ease all;
+    -moz-transition: 0.2s ease all;
+    -webkit-transition: 0.2s ease all;
+}
+
+.bar:before {
+    left: 50%;
+}
+
+.bar:after {
+    right: 50%;
+}
+
+.input:focus~.bar:before,
+.input:focus~.bar:after {
+    width: 50%;
+}
+
+.highlight {
+    position: absolute;
+    height: 60%;
+    width: 100px;
+    top: 25%;
+    left: 0;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.input:focus~.highlight {
+    animation: inputHighlighter 0.3s ease;
+}
+
+@keyframes inputHighlighter {
+    from {
+        background: #5264AE;
+    }
+
+    to {
+        width: 0;
+        background: transparent;
     }
 }

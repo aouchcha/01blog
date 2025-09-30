@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { CheckToken } from '../../helpers/genarateHeader';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms'
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,16 +35,26 @@ export class Home implements OnInit {
   public mediaName: String | null = null;
   public media: File | null = null;
   public type: String = 'image';
-  constructor(private router: Router, private postsService: PostsService, private userServise: UserService) { }
+  public isBrowser = false;
+  constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object) {
+    this.isBrowser = isPlatformBrowser(platformId)
+  }
 
   ngOnInit(): void {
+    if (!this.isBrowser) {
+      return
+    }
+    this.setToken()
+    this.loadHome()
+
+  }
+
+  public setToken() {
     if (CheckToken() === null) {
       this.router.navigate(["login"]);
       return;
     }
     this.token = localStorage.getItem("JWT");
-    this.loadHome()
-
   }
 
   public loadHome(): void {
@@ -53,9 +63,9 @@ export class Home implements OnInit {
     this.getAllPosts();
   }
 
-  public getDescription(): String {
-    return this.description;
-  }
+  // public getDescription(): String {
+  //   return this.description;
+  // }
 
   public Cancel(): void {
     this.description = '';
@@ -78,10 +88,7 @@ export class Home implements OnInit {
   }
 
   public CreatePost(): void {
-    if (CheckToken() === null) {
-      this.router.navigate(["login"]);
-      return;
-    }
+    this.setToken();
     const data = new FormData();
     data.append("description", this.description);
     if (this.media) {
@@ -102,11 +109,9 @@ export class Home implements OnInit {
   }
 
   public getAllPosts(): void {
+    this.setToken();
     this.postsService.getAllPosts(this.token).subscribe({
       next: (res) => {
-        res.posts.forEach((p: any) => {
-          console.log(p);
-        });
         this.posts = res.posts;
       },
       error: (err) => {
@@ -148,6 +153,7 @@ export class Home implements OnInit {
   }
 
   public deletePost(post_id: number) {
+    this.setToken();
     this.postsService.deletePost(this.token, post_id).subscribe({
       next: (res) => {
         console.log(res);
@@ -160,6 +166,7 @@ export class Home implements OnInit {
   }
 
   public React(post_id: number): void {
+    this.setToken();
     console.log("post id ========= ", post_id);
     this.postsService.React(this.token, post_id).subscribe({
       next: (res) => {
@@ -174,7 +181,7 @@ export class Home implements OnInit {
 
   public Follow(user_id: number): void {
     console.log("zebbi");
-
+    this.setToken();
     this.userServise.Follow(user_id, this.token).subscribe({
       next: (res) => {
         console.log(res);

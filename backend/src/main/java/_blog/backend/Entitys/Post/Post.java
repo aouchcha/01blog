@@ -93,7 +93,7 @@ public class Post {
     }
 
     public void setMedia(String media) {
-        System.err.println("SETMEDIA ====================>   " + media);
+        // System.err.println("SETMEDIA ====================>   " + media);
         this.media = media;
     }
 

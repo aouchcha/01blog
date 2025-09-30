@@ -1,1 +1,27 @@
-<p>admin works!</p>
+<div class="dashboard">
+    <div class="header">
+        <h1>Dashboard</h1>
+        <div class="user">👤 Admin</div>
+    </div>
+
+    <h2>Users Activity</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Posts Published</th>
+                <th>Reports Received</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let u of usersStates">
+                <td class="user" (click)="ToProfile(u.username)">{{u.username}}</td>
+                <td>{{u.email}}</td>
+                <td>{{u.postCount}}</td>
+                <td class="reports">{{u.reportCount}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

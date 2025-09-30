@@ -1,12 +1,20 @@
 package _blog.backend.Entitys.User;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import _blog.backend.Entitys.Post.Post;
+import _blog.backend.Entitys.Report.ReportEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -33,6 +41,15 @@ public class User {
     private Role role;
 
     private boolean follow = false;
+
+    // Relations 👇
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("user") // avoid recursion
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "repported", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("repported") // avoid recursion
+    private List<ReportEntity> reports = new ArrayList<>();
 
     public User() {
     }

@@ -1,6 +1,9 @@
 package _blog.backend.hanndlers;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -11,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import _blog.backend.Entitys.Post.PostRequst;
 import _blog.backend.helpers.JwtUtil;
 import _blog.backend.service.CreatePostService;
@@ -34,7 +36,7 @@ public class PostsHandler {
     public ResponseEntity<?> getPosts(@RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer ", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
         return postsService.getPosts(token);
     }
@@ -45,7 +47,7 @@ public class PostsHandler {
             @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer ", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
         return postsService.getSinglePost(post_id, token);
     }
@@ -55,7 +57,7 @@ public class PostsHandler {
             @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
         return createPostService.create(postRequst, token);
     }
@@ -66,7 +68,7 @@ public class PostsHandler {
             @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer ", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
         return postsService.delete(post_id);
     }

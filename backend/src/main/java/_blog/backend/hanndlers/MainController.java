@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import _blog.backend.service.RegisterService;
 import _blog.backend.service.LoginService;
+import _blog.backend.service.AdminService;
 import _blog.backend.service.CommentsService;
 import _blog.backend.service.FollowService;
 import _blog.backend.service.ReactionService;
 import _blog.backend.service.UserService;
 import _blog.backend.Entitys.User.RegisterRequest;
+import _blog.backend.Entitys.User.ReportRequest;
 import _blog.backend.Entitys.User.LoginRequest;
 import _blog.backend.Entitys.Comment.CommentRequest;
 import _blog.backend.Entitys.Interactions.Follow.FollowRequest;
@@ -50,7 +52,6 @@ public class MainController {
     public ResponseEntity<?> signin(@RequestBody LoginRequest loginRequest) {
         return loginservice.signin(loginRequest);
     }
-    
 
     @Autowired
     private UserService userService;
@@ -73,12 +74,12 @@ public class MainController {
         return userService.getUsers(token);
     }
 
-
-    @Autowired 
+    @Autowired
     private ReactionService reactionService;
 
     @PostMapping("/react")
-    public ResponseEntity<?> ReactToPost(@RequestBody LikeRequest likeRequest, @RequestHeader("Authorization") String header) {
+    public ResponseEntity<?> ReactToPost(@RequestBody LikeRequest likeRequest,
+            @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
@@ -90,7 +91,8 @@ public class MainController {
     private FollowService followService;
 
     @PostMapping("/follow")
-    public ResponseEntity<?> Follow(@RequestBody FollowRequest followRequest, @RequestHeader("Authorization") String header) {
+    public ResponseEntity<?> Follow(@RequestBody FollowRequest followRequest,
+            @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
@@ -102,7 +104,8 @@ public class MainController {
     private CommentsService commentsService;
 
     @PostMapping("/comment")
-    public ResponseEntity<?> CreateComments(@RequestBody CommentRequest commentRequest, @RequestHeader("Authorization") String header) {
+    public ResponseEntity<?> CreateComments(@RequestBody CommentRequest commentRequest,
+            @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
@@ -110,13 +113,33 @@ public class MainController {
         return commentsService.create(commentRequest, token);
     }
 
-    @GetMapping("user/{username}")
+    @GetMapping("/user/{username}")
     public ResponseEntity<?> getProfile(@PathVariable String username, @RequestHeader("Authorization") String header) {
-         String token = header.replace("Bearer", "");
+        String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
-        return userService.getUSerProfile(username, token);
+        return userService.getUserProfile(username, token);
+    }
+
+    @PostMapping("/report")
+    public ResponseEntity<?> Report(@RequestBody ReportRequest reportRequest,
+            @RequestHeader("Authorization") String header) {
+        String token = header.replace("Bearer", "");
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        }
+        return userService.report(reportRequest, token);
+    }
+
+    @Autowired
+    private AdminService adminService;
+    @GetMapping("/admin")
+    public ResponseEntity<?> AdminBoardContent(@RequestHeader("Authorization") String header) {
+        String token = header.replace("Bearer", "");
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        }
+        return adminService.getBoard(token);
     }
 }
-

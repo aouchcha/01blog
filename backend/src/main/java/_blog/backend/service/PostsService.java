@@ -41,12 +41,7 @@ public class PostsService {
         }
 
         List<Post> posts = postRepository.findAllPostsByUserAndFollowedUsers(userRepository.findIdByUsername(username));
-        // posts = handleMedia.FixUrl(posts);
-        for (Post p : posts) {
-            System.err.println(p.getCommentsCount());
-            System.err.println(p.getLikeCount());
-            System.err.println(p.getId());
-        }
+    
         return ResponseEntity.ok().body(Map.of("posts", posts));
     }
 
@@ -62,9 +57,7 @@ public class PostsService {
         }
 
         Optional<Post> p = postRepository.findById(post_id);
-        // p.get().setMedia("http://localhost:8080/uploads/" + p.get().getMedia());
-        // p.get().setCommentsCount(commentRepository.countByPost_id(p.get().getId()));
-
+    
         List<Comment> comments = commentRepository.findAllByPost_id(post_id);
        return ResponseEntity.ok().body(Map.of("post", p.get(), "comments", comments));
 

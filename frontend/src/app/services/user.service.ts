@@ -42,4 +42,15 @@ export class UserService {
             generateHeader(token)
         )
     }
+
+    public Report(reportted_username: String,discription: String, token: String | null) {
+        return this.http.post<any>(
+            generateURL("report"),
+            {
+                "reportted_username": reportted_username,
+                "discription": discription
+            },
+            generateHeader(token)
+        )
+    }
 }
