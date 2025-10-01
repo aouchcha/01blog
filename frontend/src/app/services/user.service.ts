@@ -43,13 +43,20 @@ export class UserService {
         )
     }
 
-    public Report(reportted_username: String,discription: String, token: String | null) {
+    public Report(reportted_username: String,discription: String, token: String | null): Observable<any> {
         return this.http.post<any>(
             generateURL("report"),
             {
                 "reportted_username": reportted_username,
                 "discription": discription
             },
+            generateHeader(token)
+        )
+    }
+
+    public RemoveUser(username: String, token: String | null): Observable<any> {
+        return this.http.delete(
+            generateURL(`user/${username}`),
             generateHeader(token)
         )
     }

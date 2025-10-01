@@ -9,7 +9,8 @@
 
           <!-- Follow / Unfollow button: show follow if not following -->
           <div>
-            <button class="btn btn-edit" *ngIf="user.username !== me.username && me.role !== 'Admin'" (click)="Follow()">
+            <button class="btn btn-edit" *ngIf="user.username !== me.username && me.role !== 'Admin'"
+              (click)="Follow()">
               {{ user.follow ? 'Unfollow' : 'Follow' }}
             </button>
 
@@ -20,14 +21,14 @@
             <button class="btn btn-edit" *ngIf="me.role !== 'Admin'" (click)="Home()">
               Home
             </button>
-             <button class="btn btn-edit" *ngIf="me.role === 'Admin'" (click)="ToDashBoard()">
+            <button class="btn btn-edit" *ngIf="me.role === 'Admin'" (click)="ToDashBoard()">
               To DashBoard
             </button>
             <button class="btn btn-edit" *ngIf="user.id != me.id && me.role !== 'Admin'" (click)="OpenReportSection()">
               Report
             </button>
-             <button class="btn btn-edit" *ngIf="me.role === 'Admin'" (click)="ToDashBoard()">
-              REmove The USer
+            <button class="btn btn-edit" *ngIf="me.role === 'Admin'" (click)="RemoveUser()">
+              Remove The User
             </button>
           </div>
         </div>
@@ -39,7 +40,6 @@
             <span class="bar"></span>
             <label>Name</label>
           </div>
-          <!-- <textarea [(ngModel)]="description" id="report-input" placeholder="What is your reason"></textarea> -->
           <button class="btn btn-edit" *ngIf="user.username !== me?.username" (click)="Report()">
             Submit
           </button>
@@ -47,7 +47,6 @@
             Cancel
           </button>
         </div>
-        <!-- <p>DEBUG: {{ description }}</p> -->
         <!-- <p class="bio" *ngIf="user.bio">{{ me.bio }}</p> -->
 
         <div class="stats">
@@ -89,7 +88,8 @@
               <div class="time">{{ post.createdAt | date:'short' }}</div>
             </div>
             <div class="post-actions">
-              <button *ngIf="post.user.username === me?.username || me?.role === 'Admin'" class="icon-btn">🗑</button>
+              <button *ngIf="post.user.username === me?.username || me?.role === 'Admin'" class="icon-btn"
+                (click)="deletePost(post.id)">🗑</button>
             </div>
           </div>
 
@@ -120,4 +120,13 @@
       </article>
     </div>
   </section>
+  <!-- POPUP MESSAGE -->
+  <div class="popup-overlay" *ngIf="showPopup">
+    <div class="popup">
+      <h3>Message</h3>
+      <p>{{ popupMessage }}</p>
+      <button class="btn btn-close" (click)="closePopup()">Close</button>
+    </div>
+  </div>
+
 </div>

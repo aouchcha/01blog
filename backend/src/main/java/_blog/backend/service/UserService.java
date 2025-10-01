@@ -57,7 +57,6 @@ public class UserService {
             } else {
                 u.setFollow(false);
             }
-            // System.err.println(u.getEmail());
         }
         users = users.stream()
                 .sorted(Comparator.comparing(User::getId))
@@ -116,5 +115,19 @@ public class UserService {
         r.setRepported(repported);
         reportRepository.save(r);
         return ResponseEntity.ok().body(Map.of("message", "reported succesfuuly"));
+    }
+
+    public ResponseEntity<?> Remove(String username, String token) {
+        if (!userRepository.existsByUsername(username)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user u wanna to remove doesnt exist"));
+        }
+
+        if (!userRepository.existsByUsername(jwtUtil.getUsername(token))) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "you doesnt exist"));
+        }
+
+        final User u = userRepository.findByUsername(username);
+        userRepository.delete(u);
+        return ResponseEntity.ok().body(Map.of("message", "User "+u+" Removed with success"));
     }
 }

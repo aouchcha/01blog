@@ -70,6 +70,6 @@ public class PostsHandler {
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
-        return postsService.delete(post_id);
+        return postsService.delete(token, post_id);
     }
 }

@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
+import { PostsService } from '../../services/posts.service';
 
 @Component({
   selector: 'app-profile',
@@ -35,8 +36,10 @@ export class Profile implements OnInit {
   public DoYouWantReport: boolean = false;
   public description: string = "";
   public isBrowser = false;
+  public popupMessage: String = '';
+  public showPopup: boolean = false;
 
-  constructor(private router: Router, private route: ActivatedRoute, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object) {
+  constructor(private router: Router, private route: ActivatedRoute, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object, private postService: PostsService) {
     this.isBrowser = isPlatformBrowser(platformId)
   }
 
@@ -126,5 +129,37 @@ export class Profile implements OnInit {
         console.log(err);
       }
     })
+  }
+
+  public deletePost(post_id: number) {
+    this.postService.deletePost(this.token, post_id).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.popupMessage =  res.message;
+        this.showPopup = true;
+        this.LoadProfile()
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
+
+  public RemoveUser() {
+    console.log("hanni");
+    
+    this.userService.RemoveUser(this.user.username, this.token).subscribe({
+      next: (res) => {
+        console.log(res);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
+
+  public closePopup() {
+    this.showPopup = false;
+    this.popupMessage = '';
   }
 }

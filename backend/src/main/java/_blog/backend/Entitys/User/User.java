@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import _blog.backend.Entitys.Interactions.Follow.Follow;
 import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.Report.ReportEntity;
 import jakarta.persistence.CascadeType;
@@ -49,7 +50,19 @@ public class User {
 
     @OneToMany(mappedBy = "repported", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("repported") // avoid recursion
-    private List<ReportEntity> reports = new ArrayList<>();
+    private List<ReportEntity> reports_against_me_list = new ArrayList<>();
+
+    @OneToMany(mappedBy = "repporter", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("repporter") // avoid recursion
+    private List<ReportEntity> reports_from_me = new ArrayList<>();
+
+    @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("followed")
+    private List<Follow> followers_list = new ArrayList<>();
+
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("follower")
+    private List<Follow> followeds_list = new ArrayList<>();
 
     public User() {
     }

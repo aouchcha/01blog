@@ -14,6 +14,7 @@ import _blog.backend.Repos.PostRepository;
 import _blog.backend.Repos.UserRepository;
 import _blog.backend.Entitys.Comment.Comment;
 import _blog.backend.Entitys.Post.Post;
+import _blog.backend.Entitys.User.User;
 import _blog.backend.helpers.JwtUtil;
 
 @Service
@@ -63,12 +64,21 @@ public class PostsService {
 
     }
 
-    public ResponseEntity<?> delete(Long post_id) {
+    public ResponseEntity<?> delete(String token, Long post_id) {
+        final String username = jwtUtil.getUsername(token);
+        if (!userRepository.existsByUsername(username)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalid user"));
+        }
+
+        final User u = userRepository.findByUsername(username);
+        final List<Post> posts = postRepository.findByUser(u);
+
         if (!postRepository.existsById(post_id)) {
             return ResponseEntity.badRequest().body(null);
         }
+
         Optional<Post> p = postRepository.findById(post_id);
         postRepository.delete(p.get());
-        return ResponseEntity.ok().body(Map.of("message", "post removed"));
+        return ResponseEntity.ok().body(Map.of("message", "post removed", "posts", posts));
     }
 }

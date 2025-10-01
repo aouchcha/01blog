@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -120,6 +121,15 @@ public class MainController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
         return userService.getUserProfile(username, token);
+    }
+
+    @DeleteMapping("/user/{username}")
+    public ResponseEntity<?> RemoveUser(@PathVariable String username, @RequestHeader("Authorization") String header) {
+        String token = header.replace("Bearer", "");
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        }
+        return userService.Remove(username, token);
     }
 
     @PostMapping("/report")

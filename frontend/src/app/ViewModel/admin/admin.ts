@@ -8,7 +8,7 @@ import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-admin',
-  standalone: true, 
+  standalone: true,
   imports: [
     CommonModule
   ],
@@ -49,8 +49,18 @@ export class Admin implements OnInit {
   }
 
   public ToProfile(username: String) {
-    console.log({username});
-    
+    console.log({ username });
+
     this.router.navigate([`/${username}`])
+  }
+
+  public Home() {
+    this.router.navigate([''])
+  }
+
+  public Logout() {
+    localStorage.removeItem("JWT");
+    this.token = null;
+    this.router.navigate(["login"])
   }
 }
