@@ -57,6 +57,6 @@ public class ReactionService {
             reactionRepository.delete(l);
         }
         p.get().setLikeCount(reactionRepository.countByPost_id(post_id));   
-        return ResponseEntity.ok().body(Map.of("message","post "+status+" with success"));
+        return ResponseEntity.ok().body(Map.of("message","post "+status+" with success", "post", p.get()));
     }
 }

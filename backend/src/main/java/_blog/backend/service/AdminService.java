@@ -7,9 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import _blog.backend.Entitys.User.Role;
+import _blog.backend.Entitys.Report.ReportEntity;
+import _blog.backend.Entitys.User.UserStatsDTO;
+import _blog.backend.Repos.ReportRepository;
 import _blog.backend.Repos.UserRepository;
-import _blog.backend.helpers.JwtUtil;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -20,14 +21,16 @@ public class AdminService {
     private UserRepository userRepository;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private ReportRepository reportRepository;
 
     public ResponseEntity<?> getBoard(String token) {
-        System.out.println(jwtUtil.getRole(token));
-        // if (jwtUtil.getRole(token) != Role.Admin) {
-
-        // }
-        List<?> users= userRepository.findUsersStates();
+        List<UserStatsDTO> users = userRepository.findUsersStates();
         return ResponseEntity.ok().body(Map.of("users", users));
+    }
+
+    public ResponseEntity<?> loadReports() {
+        List<ReportEntity> r = reportRepository.findAll();
+        return ResponseEntity.ok().body(Map.of("reports", r));
+
     }
 }

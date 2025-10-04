@@ -123,7 +123,7 @@ export class Profile implements OnInit {
     this.userService.Report(this.user.username, this.description, this.token).subscribe({
       next: (res) => {
         console.log(res);
-        this.description = '';
+        this.Cancel();
       },
       error: (err) => {
         console.log(err);

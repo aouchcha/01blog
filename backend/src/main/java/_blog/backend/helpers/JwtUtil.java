@@ -8,6 +8,8 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
+import _blog.backend.Entitys.User.Role;
+
 @Component
 public class JwtUtil {
 
@@ -15,7 +17,7 @@ public class JwtUtil {
     private final long expirationMs = 3600000; // 1 hour
 
     // Generate JWT
-    public String generateToken(String username, String role) {
+    public String generateToken(String username, Role role) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role", role) // custom claim

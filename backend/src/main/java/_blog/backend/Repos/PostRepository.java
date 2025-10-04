@@ -8,11 +8,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import _blog.backend.Entitys.Post.Post;
-import _blog.backend.Entitys.User.User;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
-    List<Post> findByUser(User user);
+    // List<Post> findByUser(User user);
 
     List<Post> findByUserId(Long userId);
 
@@ -22,11 +21,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     SELECT f.followed.id FROM Follow f WHERE f.follower.id = :userId
                 )
                 OR p.user.id = :userId
+                ORDER BY p.createdAt DESC
             """)
     List<Post> findAllPostsByUserAndFollowedUsers(@Param("userId") Long userId);
 
     @SuppressWarnings("null")
     boolean existsById(Long id);
 
-    List<Post> findAllByUser_Id(Long userId);
+    // List<Post> findAllByUser_Id(Long userId);
 }

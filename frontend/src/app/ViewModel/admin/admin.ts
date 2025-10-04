@@ -51,7 +51,7 @@ export class Admin implements OnInit {
   public ToProfile(username: String) {
     console.log({ username });
 
-    this.router.navigate([`/${username}`])
+    this.router.navigate([`user/${username}`])
   }
 
   public Home() {
@@ -62,5 +62,11 @@ export class Admin implements OnInit {
     localStorage.removeItem("JWT");
     this.token = null;
     this.router.navigate(["login"])
+  }
+
+  public ShowReports() {
+    console.log({"toreport":""});
+    
+    this.router.navigate(["reports"])
   }
 }

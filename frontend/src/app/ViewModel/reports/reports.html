@@ -1,0 +1,24 @@
+<div class="reports-container">
+  <h2>Reports</h2>
+
+  <div *ngFor="let report of reports" class="report-card">
+    <div class="report-header">
+      <span class="reporter">
+        <strong>Reporter:</strong> {{ report.repporter.username }}
+      </span>
+      <span class="reported">
+        <strong>Reported:</strong> {{ report.repported.username }}
+      </span>
+    </div>
+
+    <div class="report-body">
+      <p class="description">
+        <strong>Description:</strong> {{ report.description }}
+      </p>
+    </div>
+
+    <!-- <div class="report-footer">
+      <small>Created: {{ report.createdAt | date:'medium' }}</small>
+    </div> -->
+  </div>
+</div>

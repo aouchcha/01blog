@@ -1,0 +1,40 @@
+.reports-container {
+  max-width: 800px;
+  margin: 20px auto;
+  font-family: Arial, sans-serif;
+}
+
+.report-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.report-body {
+  margin-bottom: 10px;
+}
+
+.description {
+  background: #f9f9f9;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #444;
+}
+
+.report-footer {
+  font-size: 12px;
+  color: #888;
+  text-align: right;
+}

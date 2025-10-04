@@ -10,8 +10,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PostsService } from '../../services/posts.service';
 import { UserService } from '../../services/user.service';
-import { User } from '../../models/User'; 
-import { Post } from '../../models/Post'; 
+import { User } from '../../models/User';
+import { Post } from '../../models/Post';
 import { FormsModule } from '@angular/forms';
 // import { Comment } from '../helpers/Comments';
 
@@ -37,6 +37,10 @@ export class SinglePost implements OnInit {
   public me: User = new User();
   public content: String = "";
   public comments: any = [];
+  public update: boolean = false;
+  // public post_id: number | null = null;
+  public updatedMediaName: String | null = null;
+  public updateMedia: File | null = null;
 
   constructor(private router: Router, private http: HttpClient, private postsService: PostsService, private route: ActivatedRoute, private userService: UserService) {
     this.postsService = postsService
@@ -81,7 +85,7 @@ export class SinglePost implements OnInit {
   }
 
   public Comment() {
-   this.postsService.CreateComment(this.content, this.post_id, this.token).subscribe({
+    this.postsService.CreateComment(this.content, this.post_id, this.token).subscribe({
       next: (res) => {
         this.getPost()
         this.content = '';
@@ -92,7 +96,7 @@ export class SinglePost implements OnInit {
     })
   }
   public updatePost(post_id: number) {
-    this.postsService.updatePost(this.token, post_id)
+    // this.postsService.updatePost(this.token, post_id)
   }
 
   public deletePost(post_id: number) {
@@ -104,7 +108,7 @@ export class SinglePost implements OnInit {
         console.log(err);
       }
     })
-    
+
   }
   public React(post_id: number) {
     console.log(post_id);

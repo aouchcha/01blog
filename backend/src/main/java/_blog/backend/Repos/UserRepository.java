@@ -37,6 +37,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 FROM User u
                 LEFT JOIN u.posts p
                 LEFT JOIN u.reports_against_me_list r
+                WHERE u.role <> 0
                 GROUP BY u.id, u.username, u.email
             """)
     List<UserStatsDTO> findUsersStates();

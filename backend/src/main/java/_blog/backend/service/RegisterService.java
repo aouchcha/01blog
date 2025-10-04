@@ -8,6 +8,7 @@ import _blog.backend.Entitys.User.RegisterRequest;
 import _blog.backend.Entitys.User.Role;
 import _blog.backend.Entitys.User.User;
 import _blog.backend.Repos.UserRepository;
+import _blog.backend.helpers.PasswordUtils;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -36,7 +37,8 @@ public class RegisterService {
         }
 
         try {
-            User u = new User(request.getUsername(), request.getEmail(), request.getPassword(), Role.User);
+            String hashedPassword = PasswordUtils.hashPassword(request.getPassword());
+            User u = new User(request.getUsername(), request.getEmail(), hashedPassword, Role.User);
             userRepositry.save(u);
             return ResponseEntity.status(HttpStatus.CREATED).body(u);
         }catch(Exception e) {

@@ -57,11 +57,11 @@ public class User {
     private List<ReportEntity> reports_from_me = new ArrayList<>();
 
     @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("followed")
+    @JsonIgnoreProperties("followed") // avoid recursion
     private List<Follow> followers_list = new ArrayList<>();
 
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("follower")
+    @JsonIgnoreProperties("follower") // avoid recursion
     private List<Follow> followeds_list = new ArrayList<>();
 
     public User() {

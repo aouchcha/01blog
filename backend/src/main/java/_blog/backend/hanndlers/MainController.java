@@ -147,9 +147,18 @@ public class MainController {
     @GetMapping("/admin")
     public ResponseEntity<?> AdminBoardContent(@RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
-        if (!jwtUtil.validateToken(token)) {
+        if (!jwtUtil.validateToken(token) || !jwtUtil.getRole(token).equals("Admin")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
         return adminService.getBoard(token);
+    }
+
+    @GetMapping("/admin/reports")
+    public ResponseEntity<?> LoadReports(@RequestHeader("Authorization") String header) {
+         String token = header.replace("Bearer", "");
+        if (!jwtUtil.validateToken(token) || !jwtUtil.getRole(token).equals("Admin")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        }
+        return adminService.loadReports();
     }
 }

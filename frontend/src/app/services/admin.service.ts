@@ -17,5 +17,10 @@ export class AdminService {
         )
     }
 
-    
+    public loadReports(token: String | null) : Observable<any> {
+        return this.http.get(
+            generateURL("admin/reports"),
+            generateHeader(token)
+        )
+    }
 }

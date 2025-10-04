@@ -21,7 +21,7 @@
                 <label for="Media" class="button">
                     Select Media
                 </label>
-                <input type="file" id="Media" (change)="setMedia($event)" class="Media" accept="image/*, video/*">
+                <input type="file" id="Media" (change)="setMedia($event, 'create')" class="Media" accept="image/*, video/*">
                 <button (click)="CreatePost()">Share</button>
                 <button (click)="Cancel()">Cancel</button>
             </div>
@@ -31,14 +31,14 @@
             <div class="post-card" *ngFor="let post of posts">
                 <div class="post-header">
                     <div class="icons">
-                        <img [src]="post.user.avatarUrl || 'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'"
+                        <img [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'"
                             alt="User Avatar" class="avatar" (click)="ToProfile(post.user.username)">
                         <button mat-icon-button [matMenuTriggerFor]="optionsMenu" matTooltip="Options"
                             *ngIf="post.user.username === me.username" class="optionsMenu">
                             <mat-icon class="optionsMenu">more_vert</mat-icon>
                         </button>
                         <mat-menu #optionsMenu="matMenu" class="optionsMenu">
-                            <button mat-menu-item (click)="updatePost(post.id)" class="optionsMenu">
+                            <button mat-menu-item (click)="ShowUpdate(post.id)" class="optionsMenu">
                                 <mat-icon>edit</mat-icon>
                                 <span>Update</span>
                             </button>
@@ -56,11 +56,13 @@
                 </div>
                 <div class="post-content">
                     <p>{{ post.description }}</p>
-                    <div class="post-containt" *ngIf="!post.mediaUrl?.endsWith('null')">
+                    <div class="post-containt" *ngIf="post.media">
                         <ng-container [ngSwitch]="post.mediaUrl?.split('.').pop()">
                             <img *ngSwitchCase="'jpg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                            <img *ngSwitchCase="'JPG'" [src]="post.mediaUrl" alt="Post image" class="post-media">
                             <img *ngSwitchCase="'jpeg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
                             <img *ngSwitchCase="'png'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                            <img *ngSwitchCase="'webp'" [src]="post.mediaUrl" alt="Post image" class="post-media">
                             <video *ngSwitchCase="'mp4'" [src]="post.mediaUrl" controls class="post-media"
                                 preload="metadata"></video>
                         </ng-container>
@@ -75,6 +77,30 @@
                     </button>
                 </div>
             </div>
+            <!-- Update Post Modal -->
+            <div class="modal" *ngIf="update">
+                <div class="modal-content">
+                    <span class="close" (click)="Cancel()">&times;</span>
+                    <h2>Update Post</h2>
+
+                    <!-- Description -->
+                    <textarea [(ngModel)]="updatedDescription" placeholder="Update your description..."></textarea>
+
+
+                    <!-- File Input -->
+                    <label for="UpdateMedia" class="button">Select Media</label>
+                    <input type="file" id="UpdateMedia" (change)="setMedia($event, 'update')" class="Media"
+                        accept="image/*, video/*">
+                    <p class="MediaContainer" *ngIf="updateMedia !== null"><b>Link To Upload : {{updatedMediaName}}</b></p>
+
+
+                    <!-- Buttons -->
+                    <div class="modal-actions">
+                        <button class="save" (click)="UpdatePost()">Save</button>
+                        <button class="cancel" (click)="Cancel()">Cancel</button>
+                    </div>
+                </div>
+            </div>
 
 
         </div>
@@ -86,7 +112,8 @@
                 <div class="others" *ngFor="let user of others">
                     <div class="user">
                         <p (click)="ToProfile(user.username)" class="toprofile">{{user.username}}</p>
-                        <button (click)="Follow(user.id)" class="follow">{{ user.follow ? 'Unfollow' : 'Follow'}}</button>
+                        <button (click)="Follow(user.id)" class="follow">{{ user.follow ? 'Unfollow' :
+                            'Follow'}}</button>
                     </div>
 
                 </div>

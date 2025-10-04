@@ -73,12 +73,16 @@ public class UserService {
         User me = userRepository.findByUsername(myName);
 
         User ProfileInfos = userRepository.findByUsername(username);
+
+        if (ProfileInfos.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "you are trying to get sensitive data"));
+        }
         if (followRepositry.existsByFollower_IdAndFollowed_Id(me.getId(), ProfileInfos.getId())) {
             ProfileInfos.setFollow(true);
         } else {
             ProfileInfos.setFollow(false);
         }
-        List<Post> posts = postRepository.findAllByUser_Id(ProfileInfos.getId());
+        List<Post> posts = postRepository.findByUserId(ProfileInfos.getId());
 
         return ResponseEntity.ok(Map.of("user", ProfileInfos, "posts", posts, "followers",
                 followRepositry.countByFollowed_Id(ProfileInfos.getId()), "followings",

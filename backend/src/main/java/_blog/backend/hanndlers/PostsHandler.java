@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import _blog.backend.Entitys.Post.PostRequst;
@@ -35,7 +37,7 @@ public class PostsHandler {
     @GetMapping
     public ResponseEntity<?> getPosts(@RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer ", "");
-        if (!jwtUtil.validateToken(token)) {
+        if (!jwtUtil.validateToken(token) || jwtUtil.getRole(token).equals("Admin")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
         return postsService.getPosts(token);
@@ -71,5 +73,15 @@ public class PostsHandler {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
         return postsService.delete(token, post_id);
+    }
+
+    @PutMapping("/{post_id}")
+    public ResponseEntity<?> Update(@PathVariable Long post_id, @ModelAttribute PostRequst postRequst,
+            @RequestHeader("Authorization") String header) {
+        String token = header.replace("Bearer ", "");
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        }
+        return postsService.update(post_id, postRequst, token);
     }
 }

@@ -44,8 +44,12 @@ export class PostsService {
         )
     }
 
-    public updatePost(token: String | null, post_id: number) {
-        // console.log('Update', post);
+    public updatePost(token: String | null, post_id: number | null, data: FormData): Observable<any> {
+        return this.http.put(
+            generateURL(`post/${post_id}`),
+            data,
+            generateHeader(token)
+        )
     }
 
     public deletePost(token: String | null, post_id: number): Observable<any> {

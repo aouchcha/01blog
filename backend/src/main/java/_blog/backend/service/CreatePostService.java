@@ -35,9 +35,6 @@ public class CreatePostService {
     private PostRepository postRepository;
 
     public ResponseEntity<?> create(PostRequst postRequst, String token) {
-        // System.err.println(header.getHeader());
-        // jwtUtil.validateToken(header.getJwt())
-        // System.err.println("|||||||||||||||||||||||||||||||||||||||||||||  " + token);
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "your token isn't valid"));
         }
@@ -53,13 +50,6 @@ public class CreatePostService {
         }
         final String description = postRequst.getDescription();
 
-        // System.err.println("Orginale name " +
-        // postRequst.getMedia().getOriginalFilename());
-        // System.err.println("Name " + postRequst.getMedia().getName());
-        // System.err.println("IsEmpty " + postRequst.getMedia().isEmpty());
-        // System.err.println("Size "+postRequst.getMedia().getSize());
-        // System.err.println("Content Type " + postRequst.getMedia().getContentType());
-
         if (!userRepository.existsByUsername(username)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
         }
@@ -67,17 +57,12 @@ public class CreatePostService {
         Post newpost = new Post();
         newpost.setDescription(description);
         newpost.setCreatedAt(LocalDateTime.now());
-        if (postRequst.getMedia() != null) {
 
-            newpost.setMedia(MediaUtils.Rename(postRequst.getMedia().getOriginalFilename()));
-            File uploads = MediaUtils.createFolder("/home/aouchcha/Desktop/01blog/backend/uploads");
-            Path dest = Paths.get(uploads.getAbsolutePath(), newpost.getMedia());
-            try {
-                postRequst.getMedia().transferTo(dest);
-            } catch (Exception e) {
-               return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Internal Server Error"));
-            }
+        if (!MediaUtils.save(newpost, postRequst)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Internal Server Error"));
         }
+
         newpost.setUser(u);
 
         postRepository.save(newpost);

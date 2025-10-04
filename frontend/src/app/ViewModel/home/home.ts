@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { CheckToken } from '../../helpers/genarateHeader';
@@ -10,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PostsService } from '../../services/posts.service';
 import { UserService } from '../../services/user.service';
+import { Post } from '../../models/Post';
 
 
 @Component({
@@ -28,14 +28,19 @@ import { UserService } from '../../services/user.service';
 })
 export class Home implements OnInit {
   public description: string = '';
+  public updatedDescription: string = '';
   private token: String | null = '';
   public posts: any = [];
   public me: any = {};
   public others: any = [];
   public mediaName: String | null = null;
   public media: File | null = null;
-  public type: String = 'image';
-  public isBrowser = false;
+  public update: boolean = false;
+  public post_id: number | null = null;
+  public updatedMediaName: String | null = null;
+  public updateMedia: File | null = null;
+  public isBrowser: boolean = false;
+
   constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId)
   }
@@ -71,6 +76,11 @@ export class Home implements OnInit {
     this.description = '';
     this.mediaName = null;
     this.media = null;
+    this.update = false;
+    this.updatedDescription = '';
+    this.updateMedia = null;
+    this.updatedMediaName = null;
+    this.post_id = null;
   }
 
   public Logout(): void {
@@ -79,11 +89,16 @@ export class Home implements OnInit {
     this.router.navigate(["login"])
   }
 
-  public setMedia(event: Event): void {
+  public setMedia(event: Event, helper: String): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.media = input.files[0];  // store the file itself
-      this.mediaName = input.files[0].name;
+      if (helper === 'create') {
+        this.media = input.files[0];  // store the file itself
+        this.mediaName = input.files[0].name;
+      } else if (helper === 'update') {
+        this.updateMedia = input.files[0];
+        this.updatedMediaName = input.files[0].name;
+      }
     }
   }
 
@@ -112,6 +127,8 @@ export class Home implements OnInit {
     this.setToken();
     this.postsService.getAllPosts(this.token).subscribe({
       next: (res) => {
+        console.log(res.posts);
+        
         this.posts = res.posts;
       },
       error: (err) => {
@@ -148,8 +165,32 @@ export class Home implements OnInit {
     })
   }
 
-  public updatePost(post_id: number) {
-    this.postsService.updatePost(this.token, post_id)
+  public ShowUpdate(post_id: number): void {
+    console.log("hanni");
+
+    this.update = true;
+    this.post_id = post_id;
+  }
+
+  public UpdatePost() {
+    this.setToken();
+    if (!this.post_id) return;
+    const data = new FormData();
+    data.append("description", this.updatedDescription);
+    if (this.updateMedia) {
+      data.append("media", this.updateMedia)
+    }
+    this.postsService.updatePost(this.token, this.post_id, data).subscribe({
+      next: (res) => {
+        console.log(res.post);
+        let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
+        this.posts[index] = res.post;
+        this.Cancel()
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
   }
 
   public deletePost(post_id: number) {
@@ -157,21 +198,24 @@ export class Home implements OnInit {
     this.postsService.deletePost(this.token, post_id).subscribe({
       next: (res) => {
         console.log(res);
+        let index = this.posts.findIndex((p: Post) => p.id === post_id)
+        this.posts.splice(index, 1)
       },
       error: (err) => {
         console.log(err);
       }
     })
-    
+
   }
 
   public React(post_id: number): void {
     this.setToken();
-    console.log("post id ========= ", post_id);
     this.postsService.React(this.token, post_id).subscribe({
       next: (res) => {
         console.log(res);
-        this.getAllPosts()
+        let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
+        this.posts[index] = res.post;
+        // this.getAllPosts()
       },
       error: (err) => {
         console.log(err);
@@ -199,6 +243,6 @@ export class Home implements OnInit {
 
   public ToProfile(username: String) {
     console.log({ username });
-    this.router.navigate([`/${username}`])
+    this.router.navigate([`user/${username}`])
   }
 }

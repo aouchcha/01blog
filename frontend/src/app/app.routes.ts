@@ -5,12 +5,14 @@ import { Home } from './ViewModel/home/home';
 import { SinglePost } from './ViewModel/single-post/single-post';
 import { Profile } from './ViewModel/profile/profile';
 import { Admin } from './ViewModel/admin/admin';
+import { Reports } from './ViewModel/reports/reports';
 
 export const routes: Routes = [
-    { path: "login", component: Login },
     { path: "register", component: Register },
+    { path: "login", component: Login },
     { path: "", component: Home },
-    { path: 'post/:id', component: SinglePost },
     { path: 'admin', component: Admin },
-    { path: ':username', component: Profile },
+    { path: 'post/:id', component: SinglePost },
+    { path: 'user/:username', component: Profile },
+    { path: 'reports', component: Reports }
 ];
