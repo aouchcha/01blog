@@ -14,6 +14,7 @@ import _blog.backend.Entitys.Report.ReportEntity;
 import _blog.backend.Entitys.User.ReportRequest;
 import _blog.backend.Entitys.User.Role;
 import _blog.backend.Repos.FollowRepositry;
+import _blog.backend.Repos.NotificationRepository;
 import _blog.backend.Repos.PostRepository;
 import _blog.backend.Repos.ReportRepository;
 import _blog.backend.Repos.UserRepository;
@@ -34,13 +35,18 @@ public class UserService {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+
     public ResponseEntity<?> getData(String token) {
         final String username = jwtUtil.getUsername(token);
         if (!userRepository.existsByUsername(username)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalide user"));
         }
         User u = userRepository.findByUsername(username);
-        return ResponseEntity.ok().body(Map.of("me", u));
+        int count = notificationRepository.countByRecipient_IdAndSeenFalse(u.getId());
+
+        return ResponseEntity.ok().body(Map.of("me", u, "notifCount", count));
     }
 
     public ResponseEntity<?> getUsers(String token) {

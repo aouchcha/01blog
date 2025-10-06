@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthModel } from '../../services/auth.service';
+import { authService } from '../../services/auth.service';
+import { NotificationsService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,7 @@ export class Login {
   username : string = '';
   password : string = '';
   error : string = '';
-  constructor(private router : Router, private stateup: ChangeDetectorRef, private authModel: AuthModel){};
+  constructor(private router : Router, private stateup: ChangeDetectorRef, private authService: authService, private notifService: NotificationsService){};
  
   public setUsername(username: string): void {
     this.username = username;
@@ -34,7 +35,7 @@ export class Login {
       "password" : this.password
     }
 
-    this.authModel.Login(body).subscribe({
+    this.authService.Login(body).subscribe({
       next: (res) => {
         console.log('log in successful !', res.user.role, res);
         // this.res = res;

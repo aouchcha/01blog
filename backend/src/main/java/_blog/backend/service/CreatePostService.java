@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import _blog.backend.Entitys.Post.PostRequst;
+import _blog.backend.Repos.FollowRepositry;
 import _blog.backend.Repos.PostRepository;
 import _blog.backend.Repos.UserRepository;
 import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.User.User;
+import _blog.backend.Entitys.Interactions.Follow.Follow;
+
 
 import _blog.backend.helpers.JwtUtil;
 import _blog.backend.helpers.HandleMedia;
@@ -33,6 +37,12 @@ public class CreatePostService {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private FollowRepositry followRepositry;
+
+    @Autowired
+    private NotificationService notificationService;
 
     public ResponseEntity<?> create(PostRequst postRequst, String token) {
         if (!jwtUtil.validateToken(token)) {
@@ -66,6 +76,14 @@ public class CreatePostService {
         newpost.setUser(u);
 
         postRepository.save(newpost);
+
+        List<Follow> followers = followRepositry.findByFollowed_Id(u.getId());
+
+        for (Follow f : followers) {
+            notificationService.sendNotification(f.getFollower(), u);
+        }
+
+
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "post created with success"));
     }
 }

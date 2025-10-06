@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthModel } from '../../services/auth.service';
+import { authService } from '../../services/auth.service';
 @Component({
   selector: 'app-register',
   imports: [],
@@ -14,7 +14,7 @@ export class Register {
   error: String = '';
   // sss: ChangeDetectorRef;
 
-  constructor(private router: Router, private authModel: AuthModel, private stateup: ChangeDetectorRef) { };
+  constructor(private router: Router, private authService: authService, private stateup: ChangeDetectorRef) { };
 
   public setUsername(username: string): void {
     this.username = username;
@@ -41,7 +41,7 @@ export class Register {
       "email": this.email
     }
 
-    this.authModel.Register(user).subscribe({
+    this.authService.Register(user).subscribe({
       next: (response) => {
         console.log('Registration successful:', response);
         // Redirect to login on success

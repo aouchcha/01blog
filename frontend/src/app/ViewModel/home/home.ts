@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PostsService } from '../../services/posts.service';
 import { UserService } from '../../services/user.service';
+import { NotificationsService } from '../../services/notification.service';
 import { Post } from '../../models/Post';
 
 
@@ -40,8 +41,9 @@ export class Home implements OnInit {
   public updatedMediaName: String | null = null;
   public updateMedia: File | null = null;
   public isBrowser: boolean = false;
+  public notifsCount: number = 0;
 
-  constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object) {
+  constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object, private notifService: NotificationsService) {
     this.isBrowser = isPlatformBrowser(platformId)
   }
 
@@ -49,8 +51,22 @@ export class Home implements OnInit {
     if (!this.isBrowser) {
       return
     }
+
     this.setToken()
     this.loadHome()
+
+    this.notifService.notifications$.subscribe((notif) => {
+      if (notif) {
+        this.notifsCount = notif.count;
+      }
+    })
+
+    this.notifService.reactionsObservable.subscribe((react) => {
+      if (react) {
+        let index = this.posts.findIndex((p: Post) => p.id === react.post.id)
+        this.posts[index] = react.post;
+      }
+    })
 
   }
 
@@ -86,6 +102,7 @@ export class Home implements OnInit {
   public Logout(): void {
     localStorage.removeItem("JWT");
     this.token = null;
+    this.notifService.disconnect();
     this.router.navigate(["login"])
   }
 
@@ -128,7 +145,7 @@ export class Home implements OnInit {
     this.postsService.getAllPosts(this.token).subscribe({
       next: (res) => {
         console.log(res.posts);
-        
+
         this.posts = res.posts;
       },
       error: (err) => {
@@ -146,6 +163,8 @@ export class Home implements OnInit {
       next: (res) => {
         console.log(res);
         this.me = res.me;
+        this.notifService.connect(this.me.id)
+        this.notifsCount = res.notifCount;
       },
       error: (err) => {
         console.log(err);
@@ -213,8 +232,8 @@ export class Home implements OnInit {
     this.postsService.React(this.token, post_id).subscribe({
       next: (res) => {
         console.log(res);
-        let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
-        this.posts[index] = res.post;
+        // let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
+        // this.posts[index] = res.post;
         // this.getAllPosts()
       },
       error: (err) => {

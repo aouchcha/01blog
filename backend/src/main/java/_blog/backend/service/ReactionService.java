@@ -1,5 +1,6 @@
 package _blog.backend.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -8,10 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import _blog.backend.Entitys.Interactions.Follow.Follow;
 import _blog.backend.Entitys.Interactions.Reactions.Like;
 import _blog.backend.Entitys.Interactions.Reactions.LikeRequest;
 import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.User.User;
+import _blog.backend.Repos.FollowRepositry;
 import _blog.backend.Repos.PostRepository;
 import _blog.backend.Repos.ReactionRepository;
 import _blog.backend.Repos.UserRepository;
@@ -30,8 +33,14 @@ public class ReactionService {
     @Autowired
     private ReactionRepository reactionRepository;
 
-    @Autowired 
+    @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private FollowRepositry followRepositry;
 
     public ResponseEntity<?> react(LikeRequest likeRequest, String token) {
         final String username = jwtUtil.getUsername(token);
@@ -44,19 +53,25 @@ public class ReactionService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "post not found"));
         }
         final Optional<Post> p = postRepository.findById(post_id);
+        final User u = userRepository.findByUsername(username);
+        Like l;
         if (!reactionRepository.existsByPost_IdAndUser_Username(post_id, username)) {
             status = "Liked";
-            final Like l = new Like();
-            final User u = userRepository.findByUsername(username);
+            l = new Like();
             l.setUser(u);
             l.setPost(p.get());
             reactionRepository.save(l);
-        }else {
+        } else {
             status = "UnLiked";
-            final Like l = reactionRepository.findByPost_IdAndUser_Username(post_id, username);
+            l = reactionRepository.findByPost_IdAndUser_Username(post_id, username);
             reactionRepository.delete(l);
         }
-        p.get().setLikeCount(reactionRepository.countByPost_id(post_id));   
-        return ResponseEntity.ok().body(Map.of("message","post "+status+" with success", "post", p.get()));
+        p.get().setLikeCount(reactionRepository.countByPost_id(post_id));
+        List<Follow> followers = followRepositry.findByFollowed_Id(p.get().getUser().getId());
+        for (Follow f: followers) {
+            notificationService.sendReaction(f.getFollower().getId(), l);
+        }
+        notificationService.sendReaction(p.get().getUser().getId(), l);
+        return ResponseEntity.ok().body(Map.of("message", "post " + status + " with success", "post", p.get()));
     }
 }
