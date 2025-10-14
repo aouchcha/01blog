@@ -1,8 +1,5 @@
 package _blog.backend.service;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import _blog.backend.Entitys.Post.PostRequst;
 import _blog.backend.Repos.FollowRepositry;
@@ -26,11 +24,12 @@ import _blog.backend.helpers.HandleMedia;
 
 @Service
 public class CreatePostService {
+
     @Autowired
     private JwtUtil jwtUtil;
 
     @Autowired
-    private HandleMedia MediaUtils;
+    private HandleMedia mediaUtils;
 
     @Autowired
     private UserRepository userRepository;
@@ -44,46 +43,66 @@ public class CreatePostService {
     @Autowired
     private NotificationService notificationService;
 
-    public ResponseEntity<?> create(PostRequst postRequst, String token) {
+    @Autowired
+    private RateLimiterService rateLimiterService;
+
+    public ResponseEntity<?> create(PostRequst postRequest, String token) {
+
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "your token isn't valid"));
-        }
-        final String username = jwtUtil.getUsername(token);
-        if (postRequst.getDescription().trim().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "the description field should not be empty"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "your token isn't valid"));
         }
 
-        if (postRequst.getDescription().length() > 250) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "the description should not be more than 250 letter"));
-        }
-        final String description = postRequst.getDescription();
+        String username = jwtUtil.getUsername(token);
 
-        if (!userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
+         if (!rateLimiterService.isAllowed(username)) {
+            return ResponseEntity.status(429).body(Map.of("message", "Rate limit exceeded. Try again later."));
         }
+
+        if (postRequest.getDescription().trim().isEmpty() ||
+            postRequest.getDescription().length() > 250) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Description is invalid"));
+        }
+
         User u = userRepository.findByUsername(username);
-        Post newpost = new Post();
-        newpost.setDescription(description);
-        newpost.setCreatedAt(LocalDateTime.now());
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "the user is not valid"));
+        }
 
-        if (!MediaUtils.save(newpost, postRequst)) {
+        Post newPost = new Post();
+        newPost.setDescription(postRequest.getDescription());
+        newPost.setCreatedAt(LocalDateTime.now());
+        newPost.setUser(u);
+
+        if (!mediaUtils.save(newPost, postRequest)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Internal Server Error"));
         }
+        
+        PostCreationResult pr = savePostAndGetFollowers(newPost, u.getId());
 
-        newpost.setUser(u);
+        pr.followers.forEach(f -> notificationService.sendNotification(f.getFollower(), u));
 
-        postRepository.save(newpost);
+        return ResponseEntity.ok(Map.of("message", "post created successfully"));
+    }
 
-        List<Follow> followers = followRepositry.findByFollowed_Id(u.getId());
+    @Transactional
+    private PostCreationResult savePostAndGetFollowers(Post post, Long userId) {
+        postRepository.save(post);
+        List<Follow> followers = followRepositry.findByFollowed_Id(userId);
+        
+        return new PostCreationResult(post, followers);
+    }
 
-        for (Follow f : followers) {
-            notificationService.sendNotification(f.getFollower(), u);
+    private static class PostCreationResult {
+        Post post;
+        List<Follow> followers;
+        
+        PostCreationResult(Post post, List<Follow> followers) {
+            this.post = post;
+            this.followers = followers;
         }
-
-
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "post created with success"));
     }
 }

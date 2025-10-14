@@ -25,4 +25,10 @@ public class NotificationsController {
             @RequestHeader(value = "Last-Event-ID", required = false) String lastEventId) {
         return notificationService.connect(userId, lastEventId);
     }
+
+    @GetMapping("/disconnect/{userId}")
+    public void disconnect(@PathVariable Long userId) {
+        notificationService.disconnect(userId);
+    }
+
 }

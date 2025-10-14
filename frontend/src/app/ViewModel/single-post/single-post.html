@@ -1,72 +1,111 @@
-<div class="parent">
-    <div class="post-card">
-        <div class="post-header">
-            <div class="icons">
-                <img [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" alt="User Avatar"
-                    class="avatar">
-                <button mat-icon-button [matMenuTriggerFor]="optionsMenu" matTooltip="Options"
-                    *ngIf="post.user.username === me.username" class="optionsMenu">
-                    <mat-icon class="optionsMenu">more_vert</mat-icon>
+<div class="single-post-container">
+    <div class="post-wrapper">
+        <!-- Back to Home Button -->
+        <button class="back-button" (click)="Home()">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 10H5M5 10l4-4M5 10l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Back to Home
+        </button>
+
+        <!-- Post Card -->
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-user">
+                    <img [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" 
+                         alt="User Avatar" 
+                         class="user-avatar">
+                    <div class="user-info">
+                        <strong>{{ post.user.username }}</strong>
+                        <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
+                    </div>
+                </div>
+
+                <button mat-icon-button 
+                        [matMenuTriggerFor]="optionsMenu" 
+                        matTooltip="Options"
+                        *ngIf="post.user.username === me.username" 
+                        class="options-btn">
+                    <mat-icon>more_vert</mat-icon>
                 </button>
-                <mat-menu #optionsMenu="matMenu" class="optionsMenu">
-                    <button mat-menu-item (click)="updatePost(post.id)" class="optionsMenu">
+                <mat-menu #optionsMenu="matMenu">
+                    <button mat-menu-item (click)="updatePost(post.id)">
                         <mat-icon>edit</mat-icon>
                         <span>Update</span>
                     </button>
-                    <button mat-menu-item (click)="deletePost(post.id)" class="optionsMenu">
+                    <button mat-menu-item (click)="deletePost(post.id)">
                         <mat-icon>delete</mat-icon>
                         <span>Delete</span>
                     </button>
                 </mat-menu>
             </div>
 
-            <div>
-                <strong>{{ post.user.username }}</strong> ·
-                  <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
-            </div>
-        </div>
-        <div class="post-content">
-            <p>{{ post.description }}</p>
-            <div class="post-containt" *ngIf="!post.mediaUrl?.endsWith('null')">
-                <ng-container [ngSwitch]="post.mediaUrl ? post.mediaUrl.split('.').pop()?.toLowerCase() : ''">
-                    <img *ngSwitchCase="'jpg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
-                    <img *ngSwitchCase="'jpeg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
-                    <img *ngSwitchCase="'png'" [src]="post.mediaUrl" alt="Post image" class="post-media">
-                    <video *ngSwitchCase="'mp4'" [src]="post.mediaUrl" controls class="post-media"
-                        preload="metadata"></video>
-                </ng-container>
-            </div>
-        </div>
-        <div class="post-actions">
-            <button class="interactions" (click)="React(post.id)">
-                ❤️ {{ post.likeCount || 0 }}
-            </button>
-            <button class="interactions">
-                💬 {{ post.commentsCount || 0 }}
-            </button>
-
-            <button (click)="Home()">Home</button>
-        </div>
-    </div>
-    <div class="comment-card">
-        <div class="creation">
-            <textarea [(ngModel)]="content" placeholder="Enter a comment"></textarea>
-            <button (click)="Comment()">Comment</button>
-        </div>
-        <div class="comments" *ngFor="let c of comments">
-            <div class="comment-header">
-                <div class="icons">
-                    <img [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" alt="User Avatar"
-                        class="avatar">
-                </div>
-
-                <div>
-                    <strong>{{ c.user.username }}</strong> ·
-                  <span class="timestamp">{{ c.createdAt | date:'short' }}</span>
+            <div class="post-content">
+                <p>{{ post.description }}</p>
+                <div class="post-media-container" *ngIf="!post.mediaUrl?.endsWith('null')">
+                    <ng-container [ngSwitch]="post.mediaUrl ? post.mediaUrl.split('.').pop()?.toLowerCase() : ''">
+                        <img *ngSwitchCase="'jpg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                        <img *ngSwitchCase="'jpeg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                        <img *ngSwitchCase="'png'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                        <img *ngSwitchCase="'webp'" [src]="post.mediaUrl" alt="Post image" class="post-media">
+                        <video *ngSwitchCase="'mp4'" [src]="post.mediaUrl" controls class="post-media" preload="metadata"></video>
+                    </ng-container>
                 </div>
             </div>
-            <div class="content">
-                {{c.content}}
+
+            <div class="post-actions">
+                <button class="action-btn" (click)="React(post.id)">
+                    ❤️ {{ post.likeCount || 0 }}
+                </button>
+                <button class="action-btn">
+                    💬 {{ post.commentsCount || 0 }}
+                </button>
+            </div>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h2 class="comments-title">Comments</h2>
+
+            <!-- Add Comment -->
+            <div class="add-comment-card">
+                <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" 
+                     alt="Your Avatar" 
+                     class="comment-avatar">
+                <div class="comment-input-wrapper">
+                    <textarea [(ngModel)]="content" 
+                              placeholder="Write a comment..." 
+                              class="comment-textarea"></textarea>
+                    <button class="comment-submit-btn" (click)="Comment()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 2L9 11M18 2l-6 16-3-7-7-3 16-6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Comment
+                    </button>
+                </div>
+            </div>
+
+            <!-- Comments List -->
+            <div class="comments-list">
+                <div class="comment-item" *ngFor="let c of comments">
+                    <img [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" 
+                         alt="User Avatar" 
+                         class="comment-avatar">
+                    <div class="comment-content">
+                        <div class="comment-header">
+                            <strong>{{ c.user.username }}</strong>
+                            <span class="comment-timestamp">{{ c.createdAt | date:'short' }}</span>
+                        </div>
+                        <p class="comment-text">{{ c.content }}</p>
+                    </div>
+                </div>
+
+                <div class="empty-comments" *ngIf="!comments || comments.length === 0">
+                    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M56 28c0 13.255-10.745 24-24 24-2.85 0-5.582-.497-8.123-1.406L16 54l3.406-7.877A23.863 23.863 0 018 28c0-13.255 10.745-24 24-24s24 10.745 24 24z" stroke="#ccc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p>No comments yet. Be the first to comment!</p>
+                </div>
             </div>
         </div>
     </div>

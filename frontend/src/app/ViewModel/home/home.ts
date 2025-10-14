@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { CheckToken } from '../../helpers/genarateHeader';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -11,6 +11,7 @@ import { PostsService } from '../../services/posts.service';
 import { UserService } from '../../services/user.service';
 import { NotificationsService } from '../../services/notification.service';
 import { Post } from '../../models/Post';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
@@ -42,8 +43,9 @@ export class Home implements OnInit {
   public updateMedia: File | null = null;
   public isBrowser: boolean = false;
   public notifsCount: number = 0;
+  public ShowNotifs: boolean = false;
 
-  constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object, private notifService: NotificationsService) {
+  constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object, private notifService: NotificationsService, private http: HttpClient, private state: ChangeDetectorRef) {
     this.isBrowser = isPlatformBrowser(platformId)
   }
 
@@ -102,8 +104,10 @@ export class Home implements OnInit {
   public Logout(): void {
     localStorage.removeItem("JWT");
     this.token = null;
-    this.notifService.disconnect();
-    this.router.navigate(["login"])
+    this.http.get(`http://localhost:8080/api/notifications/disconnect/${this.me.id}`).subscribe({
+      next: () => this.notifService.disconnect(),
+      complete: () => this.router.navigate(["login"])
+    });
   }
 
   public setMedia(event: Event, helper: String): void {
@@ -142,6 +146,7 @@ export class Home implements OnInit {
 
   public getAllPosts(): void {
     this.setToken();
+    this.ShowNotifs = false;
     this.postsService.getAllPosts(this.token).subscribe({
       next: (res) => {
         console.log(res.posts);
@@ -263,5 +268,34 @@ export class Home implements OnInit {
   public ToProfile(username: String) {
     console.log({ username });
     this.router.navigate([`user/${username}`])
+  }
+
+  public ShowNotif() {
+    this.ShowNotifs = true;
+  }
+
+  public CloseNotif() {
+    this.ShowNotifs = false;
+    // this.state.detectChanges();
+  }
+
+  // Add these properties to your component class
+  leftMenuOpen = false;
+  rightMenuOpen = false;
+
+  // Add these methods to your component class
+  toggleLeftMenu() {
+    this.leftMenuOpen = !this.leftMenuOpen;
+    this.rightMenuOpen = false;
+  }
+
+  toggleRightMenu() {
+    this.rightMenuOpen = !this.rightMenuOpen;
+    this.leftMenuOpen = false;
+  }
+
+  closeMenus() {
+    this.leftMenuOpen = false;
+    this.rightMenuOpen = false;
   }
 }

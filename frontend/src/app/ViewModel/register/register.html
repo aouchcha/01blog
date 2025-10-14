@@ -1,29 +1,69 @@
-<div class="register">
-    <div class="main">
-        <div class="comp">
-            <div class="ii">
-                <img src="../../assets/icons/Manhattan drink!.jpeg" alt="" class="i">
+<div class="register-container">
+    <div class="register-content">
+        <!-- Left Side - Image/Branding -->
+        <div class="register-image-section">
+            <div class="branding">
+                <div class="logo-icon"></div>
+                <h2 class="brand-name">O1Blog</h2>
             </div>
-            <div class="card">
-                <div class="head">
+            <div class="image-wrapper">
+                <img src="../../assets/icons/Manhattan drink!.jpeg" alt="Register" class="register-image">
+            </div>
+        </div>
+
+        <!-- Right Side - Register Form -->
+        <div class="register-form-section">
+            <div class="form-card">
+                <div class="form-header">
                     <h1>Register</h1>
-                    <br>
-                    <p>if you have an account already? <a (click)="ToLogin()"> Sign in</a></p>
+                    <p class="subtitle">
+                        If you have an account already? 
+                        <a class="login-link" (click)="ToLogin()">Sign in</a>
+                    </p>
                 </div>
-                <div class="inps">
-                    <p class="elems">Email :</p>
-                    <input type="email" placeholder="Enter your email" (input)="setEmail($event.target.value)"
-                        [value]="email" required>
-                    <p class="elems">Username :</p>
-                    <input type="text" placeholder="Enter your username" (input)="setUsername($event.target.value)"
-                        [value]="username" required>
-                    <p class="elems">Password :</p>
-                    <input type="password" name="" id="" placeholder="Enter your password"
-                        (input)="setPassword($event.target.value)" required>
-                    <br>
-                    <button class="butt" (click)="SignUp()">Log in</button>
-                </div>
-                <p class="err">{{error}}</p>
+
+                <form class="register-form">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input 
+                            type="email" 
+                            class="form-input" 
+                            placeholder="Enter your email" 
+                            (input)="setEmail($event.target.value)"
+                            [value]="email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            placeholder="Enter your username" 
+                            (input)="setUsername($event.target.value)"
+                            [value]="username"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input 
+                            type="password" 
+                            class="form-input" 
+                            placeholder="Enter your password" 
+                            (input)="setPassword($event.target.value)"
+                            required
+                        >
+                    </div>
+
+                    <button type="button" class="submit-btn" (click)="SignUp()">
+                        Sign Up
+                    </button>
+
+                    <p class="error-message" *ngIf="error">{{error}}</p>
+                </form>
             </div>
         </div>
     </div>

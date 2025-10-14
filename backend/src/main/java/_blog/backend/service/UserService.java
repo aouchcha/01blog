@@ -51,18 +51,16 @@ public class UserService {
 
     public ResponseEntity<?> getUsers(String token) {
         final String username = jwtUtil.getUsername(token);
-        if (!userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalide user"));
+        User me = userRepository.findByUsername(username);
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "invalid user"));
         }
         List<User> users = userRepository.findByUsernameNotAndRoleNot(username, Role.Admin);
-        User me = userRepository.findByUsername(username);
+        Set<Long> followedUserIds = followRepositry.findFollowedUserIds(me.getId());
 
         for (User u : users) {
-            if (followRepositry.existsByFollower_IdAndFollowed_Id(me.getId(), u.getId())) {
-                u.setFollow(true);
-            } else {
-                u.setFollow(false);
-            }
+            u.setFollow(followedUserIds.contains(u.getId()));
         }
         users = users.stream()
                 .sorted(Comparator.comparing(User::getId))
@@ -73,15 +71,17 @@ public class UserService {
 
     public ResponseEntity<?> getUserProfile(String username, String token) {
         final String myName = jwtUtil.getUsername(token);
-        if (!userRepository.existsByUsername(username) || !userRepository.existsByUsername(myName)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalid user"));
-        }
         User me = userRepository.findByUsername(myName);
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "invalid user"));
+        }
 
         User ProfileInfos = userRepository.findByUsername(username);
 
         if (ProfileInfos.getRole().equals(Role.Admin)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "you are trying to get sensitive data"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "you are trying to get sensitive data"));
         }
         if (followRepositry.existsByFollower_IdAndFollowed_Id(me.getId(), ProfileInfos.getId())) {
             ProfileInfos.setFollow(true);
@@ -102,7 +102,7 @@ public class UserService {
 
         if (reportRequest.getDiscription().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "No Description Found"));
-        } 
+        }
 
         final String myName = jwtUtil.getUsername(token);
 
@@ -110,7 +110,7 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalid user"));
         }
 
-        // final String reportted_name = 
+        // final String reportted_name =
 
         if (!userRepository.existsByUsername(reportRequest.getReportted_username())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalid user to report"));
@@ -129,7 +129,8 @@ public class UserService {
 
     public ResponseEntity<?> Remove(String username, String token) {
         if (!userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user u wanna to remove doesnt exist"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "the user u wanna to remove doesnt exist"));
         }
 
         if (!userRepository.existsByUsername(jwtUtil.getUsername(token))) {
@@ -138,6 +139,6 @@ public class UserService {
 
         final User u = userRepository.findByUsername(username);
         userRepository.delete(u);
-        return ResponseEntity.ok().body(Map.of("message", "User "+u+" Removed with success"));
+        return ResponseEntity.ok().body(Map.of("message", "User " + u + " Removed with success"));
     }
 }

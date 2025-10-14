@@ -12,12 +12,10 @@ public class NotificationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // The user who created the notification
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
-    // The user who should receive the notification
     @ManyToOne
     @JoinColumn(name = "recipient_id", nullable = false)
     private User recipient;
@@ -26,7 +24,6 @@ public class NotificationEntity {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Getters and setters
     public Long getId() {
         return id;
     }

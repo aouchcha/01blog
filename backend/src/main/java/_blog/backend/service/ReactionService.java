@@ -1,5 +1,6 @@
 package _blog.backend.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,20 +43,43 @@ public class ReactionService {
     @Autowired
     private FollowRepositry followRepositry;
 
+    @Autowired
+    private RateLimiterService rateLimiterService;
+
     public ResponseEntity<?> react(LikeRequest likeRequest, String token) {
         final String username = jwtUtil.getUsername(token);
+
+        if (!rateLimiterService.isAllowed(username)) {
+            return ResponseEntity.status(429).body(Map.of("message", "Rate limit exceeded. Try again later."));
+        }
         final Long post_id = likeRequest.getPost_id();
-        String status = "";
         if (!userRepository.existsByUsername(username)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "user not found"));
         }
         if (!postRepository.existsById(post_id)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "post not found"));
         }
+
+        ReactionSaveResult rr = SaveReactEntity(post_id, username);
+
+        for (Follow f : rr.followers) {
+            notificationService.sendReaction(f.getFollower().getId(), rr.l);
+        }
+        notificationService.sendReaction(rr.p.getUser().getId(), rr.l);
+        return ResponseEntity.ok().body(Map.of("message", "post " + rr.status + " with success", "post", rr.p));
+    }
+
+    @Transactional
+    public ReactionSaveResult SaveReactEntity(Long post_id, String username) {
+        String status = "";
+
         final Optional<Post> p = postRepository.findById(post_id);
         final User u = userRepository.findByUsername(username);
         Like l;
-        if (!reactionRepository.existsByPost_IdAndUser_Username(post_id, username)) {
+
+        List<Like> existingReactions = reactionRepository.findAllByPost_IdAndUser_Username(post_id, username);
+
+        if (existingReactions.isEmpty()) {
             status = "Liked";
             l = new Like();
             l.setUser(u);
@@ -63,15 +87,29 @@ public class ReactionService {
             reactionRepository.save(l);
         } else {
             status = "UnLiked";
-            l = reactionRepository.findByPost_IdAndUser_Username(post_id, username);
-            reactionRepository.delete(l);
+            l = existingReactions.get(0); // pick first to return
+            reactionRepository.deleteAll(existingReactions);
         }
+
         p.get().setLikeCount(reactionRepository.countByPost_id(post_id));
+
         List<Follow> followers = followRepositry.findByFollowed_Id(p.get().getUser().getId());
-        for (Follow f: followers) {
-            notificationService.sendReaction(f.getFollower().getId(), l);
+
+        return new ReactionSaveResult(l, followers, status, p.get());
+    }
+
+    private class ReactionSaveResult {
+        List<Follow> followers = new ArrayList<>();
+        Like l;
+        String status;
+        Post p;
+
+        public ReactionSaveResult(Like l, List<Follow> followers, String status, Post p) {
+            this.l = l;
+            this.followers = followers;
+            this.status = status;
+            this.p = p;
         }
-        notificationService.sendReaction(p.get().getUser().getId(), l);
-        return ResponseEntity.ok().body(Map.of("message", "post " + status + " with success", "post", p.get()));
+
     }
 }
