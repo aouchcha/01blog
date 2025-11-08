@@ -87,7 +87,7 @@ public class ReactionService {
             reactionRepository.save(l);
         } else {
             status = "UnLiked";
-            l = existingReactions.get(0); // pick first to return
+            l = existingReactions.get(0);
             reactionRepository.deleteAll(existingReactions);
         }
 

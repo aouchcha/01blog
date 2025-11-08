@@ -1,5 +1,5 @@
 export function generateHeader(token: String | null): Object {
-  console.log({token});
+  // console.log({token});
   
   return { headers: { Authorization: `Bearer ${token}` } }
 }

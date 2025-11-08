@@ -1,0 +1,113 @@
+2025-10-15 01:18:28.865 GMT [390294] LOG:  starting PostgreSQL 16.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-10-15 01:18:28.866 GMT [390294] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-10-15 01:18:28.868 GMT [390294] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-10-15 01:18:28.870 GMT [390297] LOG:  database system was interrupted; last known up at 2025-10-15 00:32:48 GMT
+2025-10-15 01:18:28.916 GMT [390297] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-10-15 01:18:28.918 GMT [390297] LOG:  redo starts at 0/1D851A0
+2025-10-15 01:18:28.918 GMT [390297] LOG:  invalid record length at 0/1D85288: expected at least 24, got 0
+2025-10-15 01:18:28.918 GMT [390297] LOG:  redo done at 0/1D85250 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-10-15 01:18:28.923 GMT [390295] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-10-15 01:18:28.931 GMT [390295] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.002 s, total=0.010 s; sync files=3, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/1D85288, redo lsn=0/1D85288
+2025-10-15 01:18:28.932 GMT [390294] LOG:  database system is ready to accept connections
+2025-10-15 01:23:29.031 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 01:23:29.843 GMT [390295] LOG:  checkpoint complete: wrote 9 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.803 s, sync=0.002 s, total=0.813 s; sync files=8, longest=0.002 s, average=0.001 s; distance=2 kB, estimate=2 kB; lsn=0/1D85E40, redo lsn=0/1D85E08
+2025-10-15 01:28:29.943 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 01:28:30.054 GMT [390295] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.102 s, sync=0.003 s, total=0.112 s; sync files=2, longest=0.003 s, average=0.002 s; distance=0 kB, estimate=2 kB; lsn=0/1D86068, redo lsn=0/1D86030
+2025-10-15 01:33:29.154 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 01:33:30.372 GMT [390295] LOG:  checkpoint complete: wrote 13 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.204 s, sync=0.005 s, total=1.218 s; sync files=9, longest=0.004 s, average=0.001 s; distance=1 kB, estimate=2 kB; lsn=0/1D86808, redo lsn=0/1D867D0
+2025-10-15 01:38:29.471 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 01:38:30.284 GMT [390295] LOG:  checkpoint complete: wrote 9 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.803 s, sync=0.002 s, total=0.813 s; sync files=9, longest=0.002 s, average=0.001 s; distance=25 kB, estimate=25 kB; lsn=0/1D8CC70, redo lsn=0/1D8CC38
+2025-10-15 01:48:29.473 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 01:48:29.582 GMT [390295] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.102 s, sync=0.002 s, total=0.109 s; sync files=2, longest=0.002 s, average=0.001 s; distance=0 kB, estimate=22 kB; lsn=0/1D8D068, redo lsn=0/1D8D030
+2025-10-15 02:03:29.740 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 02:03:30.151 GMT [390295] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.003 s, total=0.411 s; sync files=5, longest=0.002 s, average=0.001 s; distance=2 kB, estimate=20 kB; lsn=0/1D8DA88, redo lsn=0/1D8DA50
+2025-10-15 02:08:29.250 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 02:08:29.760 GMT [390295] LOG:  checkpoint complete: wrote 6 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.504 s, sync=0.002 s, total=0.511 s; sync files=6, longest=0.002 s, average=0.001 s; distance=2 kB, estimate=18 kB; lsn=0/1D8E380, redo lsn=0/1D8E348
+2025-10-15 02:53:30.516 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 02:53:30.831 GMT [390295] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.302 s, sync=0.005 s, total=0.315 s; sync files=3, longest=0.005 s, average=0.002 s; distance=2 kB, estimate=17 kB; lsn=0/1D8EDD8, redo lsn=0/1D8EDA0
+2025-10-15 03:08:31.053 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 03:08:31.267 GMT [390295] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.202 s, sync=0.005 s, total=0.214 s; sync files=2, longest=0.005 s, average=0.003 s; distance=2 kB, estimate=15 kB; lsn=0/1D8F6A8, redo lsn=0/1D8F670
+2025-10-15 03:13:31.367 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 03:13:32.594 GMT [390295] LOG:  checkpoint complete: wrote 15 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.214 s, sync=0.006 s, total=1.227 s; sync files=12, longest=0.004 s, average=0.001 s; distance=5 kB, estimate=14 kB; lsn=0/1D90AC0, redo lsn=0/1D90A88
+2025-10-15 03:18:31.691 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 03:18:32.808 GMT [390295] LOG:  checkpoint complete: wrote 14 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.107 s, sync=0.005 s, total=1.117 s; sync files=11, longest=0.003 s, average=0.001 s; distance=9 kB, estimate=14 kB; lsn=0/1D93080, redo lsn=0/1D93048
+2025-10-15 03:23:31.895 GMT [390295] LOG:  checkpoint starting: time
+2025-10-15 03:23:32.308 GMT [390295] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.003 s, total=0.414 s; sync files=5, longest=0.002 s, average=0.001 s; distance=2 kB, estimate=12 kB; lsn=0/1D93960, redo lsn=0/1D93928
+2025-10-18 13:37:21.863 GMT [314120] LOG:  starting PostgreSQL 16.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-10-18 13:37:21.863 GMT [314120] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-10-18 13:37:21.865 GMT [314120] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-10-18 13:37:21.868 GMT [314123] LOG:  database system was interrupted; last known up at 2025-10-15 03:23:32 GMT
+2025-10-18 13:37:21.920 GMT [314123] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-10-18 13:37:21.922 GMT [314123] LOG:  redo starts at 0/1D93928
+2025-10-18 13:37:21.922 GMT [314123] LOG:  invalid record length at 0/1D93A10: expected at least 24, got 0
+2025-10-18 13:37:21.922 GMT [314123] LOG:  redo done at 0/1D939D8 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-10-18 13:37:21.927 GMT [314121] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-10-18 13:37:21.935 GMT [314121] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.002 s, total=0.010 s; sync files=3, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/1D93A10, redo lsn=0/1D93A10
+2025-10-18 13:37:21.936 GMT [314120] LOG:  database system is ready to accept connections
+2025-10-18 13:37:21.953 GMT [314128] FATAL:  database "blogdb" does not exist
+2025-10-18 13:37:36.517 GMT [314167] FATAL:  lock file "postmaster.pid" already exists
+2025-10-18 13:37:36.517 GMT [314167] HINT:  Is another postmaster (PID 314120) running in data directory "/home/aouchcha/pgsql/data"?
+2025-10-18 13:37:36.618 GMT [314169] FATAL:  database "Blog02" does not exist
+2025-10-18 13:38:30.185 GMT [314120] LOG:  received fast shutdown request
+2025-10-18 13:38:30.187 GMT [314120] LOG:  aborting any active transactions
+2025-10-18 13:38:30.187 GMT [314120] LOG:  background worker "logical replication launcher" (PID 314126) exited with exit code 1
+2025-10-18 13:38:30.187 GMT [314121] LOG:  shutting down
+2025-10-18 13:38:30.188 GMT [314121] LOG:  checkpoint starting: shutdown immediate
+2025-10-18 13:38:30.193 GMT [314121] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.006 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=0 kB; lsn=0/1D93AC0, redo lsn=0/1D93AC0
+2025-10-18 13:38:30.194 GMT [314120] LOG:  database system is shut down
+2025-10-18 13:38:43.477 GMT [318620] FATAL:  lock file "postmaster.pid" already exists
+2025-10-18 13:38:43.477 GMT [318620] HINT:  Is another postmaster (PID 318575) running in data directory "/home/aouchcha/pgsql/data"?
+2025-10-18 13:39:17.638 GMT [318687] FATAL:  lock file "postmaster.pid" already exists
+2025-10-18 13:39:17.638 GMT [318687] HINT:  Is another postmaster (PID 318575) running in data directory "/home/aouchcha/pgsql/data"?
+2025-10-18 13:39:57.589 GMT [323057] FATAL:  lock file "postmaster.pid" already exists
+2025-10-18 13:39:57.589 GMT [323057] HINT:  Is another postmaster (PID 322986) running in data directory "/home/aouchcha/pgsql/data"?
+2025-10-24 01:52:04.445 GMT [1267400] LOG:  starting PostgreSQL 16.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-10-24 01:52:04.446 GMT [1267400] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-10-24 01:52:04.448 GMT [1267400] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-10-24 01:52:04.451 GMT [1267403] LOG:  database system was interrupted; last known up at 2025-10-20 03:42:10 GMT
+2025-10-24 01:52:04.497 GMT [1267403] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-10-24 01:52:04.499 GMT [1267403] LOG:  redo starts at 0/18DA8E8
+2025-10-24 01:52:04.499 GMT [1267403] LOG:  invalid record length at 0/18DA9D0: expected at least 24, got 0
+2025-10-24 01:52:04.499 GMT [1267403] LOG:  redo done at 0/18DA998 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-10-24 01:52:04.501 GMT [1267401] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-10-24 01:52:04.509 GMT [1267401] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.001 s, total=0.009 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/18DA9D0, redo lsn=0/18DA9D0
+2025-10-24 01:52:04.510 GMT [1267400] LOG:  database system is ready to accept connections
+2025-10-24 01:57:04.608 GMT [1267401] LOG:  checkpoint starting: time
+2025-10-24 01:57:07.028 GMT [1267401] LOG:  checkpoint complete: wrote 25 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.408 s, sync=0.005 s, total=2.420 s; sync files=18, longest=0.004 s, average=0.001 s; distance=8 kB, estimate=8 kB; lsn=0/18DCD70, redo lsn=0/18DCD38
+2025-10-24 02:02:04.118 GMT [1267401] LOG:  checkpoint starting: time
+2025-10-24 02:02:04.231 GMT [1267401] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.102 s, sync=0.003 s, total=0.113 s; sync files=2, longest=0.002 s, average=0.002 s; distance=1 kB, estimate=8 kB; lsn=0/18DD4E8, redo lsn=0/18DD4B0
+2025-10-25 16:56:49.744 GMT [1379958] LOG:  starting PostgreSQL 16.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-10-25 16:56:49.744 GMT [1379958] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-10-25 16:56:49.746 GMT [1379958] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-10-25 16:56:49.749 GMT [1379961] LOG:  database system was interrupted; last known up at 2025-10-24 02:02:04 GMT
+2025-10-25 16:56:49.794 GMT [1379961] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-10-25 16:56:49.795 GMT [1379961] LOG:  redo starts at 0/18DD4B0
+2025-10-25 16:56:49.795 GMT [1379961] LOG:  invalid record length at 0/18DD598: expected at least 24, got 0
+2025-10-25 16:56:49.795 GMT [1379961] LOG:  redo done at 0/18DD560 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-10-25 16:56:49.798 GMT [1379959] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-10-25 16:56:49.806 GMT [1379959] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.001 s, total=0.009 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/18DD598, redo lsn=0/18DD598
+2025-10-25 16:56:49.807 GMT [1379958] LOG:  database system is ready to accept connections
+2025-10-28 03:52:49.951 GMT [374865] LOG:  starting PostgreSQL 16.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-10-28 03:52:49.951 GMT [374865] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-10-28 03:52:49.953 GMT [374865] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-10-28 03:52:49.957 GMT [374868] LOG:  database system was interrupted; last known up at 2025-10-25 18:13:52 GMT
+2025-10-28 03:52:50.006 GMT [374868] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-10-28 03:52:50.008 GMT [374868] LOG:  redo starts at 0/18DE680
+2025-10-28 03:52:50.008 GMT [374868] LOG:  invalid record length at 0/18DE768: expected at least 24, got 0
+2025-10-28 03:52:50.008 GMT [374868] LOG:  redo done at 0/18DE730 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-10-28 03:52:50.010 GMT [374866] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-10-28 03:52:50.018 GMT [374866] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.001 s, total=0.009 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/18DE768, redo lsn=0/18DE768
+2025-10-28 03:52:50.019 GMT [374865] LOG:  database system is ready to accept connections
+2025-11-06 15:49:55.156 GMT [1345868] LOG:  starting PostgreSQL 16.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-11-06 15:49:55.156 GMT [1345868] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-06 15:49:55.158 GMT [1345868] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-11-06 15:49:55.161 GMT [1345871] LOG:  database system was interrupted; last known up at 2025-10-28 03:52:50 GMT
+2025-11-06 15:49:55.205 GMT [1345871] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-11-06 15:49:55.206 GMT [1345871] LOG:  redo starts at 0/18DE7E0
+2025-11-06 15:49:55.206 GMT [1345871] LOG:  invalid record length at 0/18DE818: expected at least 24, got 0
+2025-11-06 15:49:55.206 GMT [1345871] LOG:  redo done at 0/18DE7E0 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-11-06 15:49:55.209 GMT [1345869] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-11-06 15:49:55.217 GMT [1345869] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.001 s, total=0.009 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/18DE818, redo lsn=0/18DE818
+2025-11-06 15:49:55.219 GMT [1345868] LOG:  database system is ready to accept connections
+2025-11-06 16:14:55.620 GMT [1345869] LOG:  checkpoint starting: time
+2025-11-06 16:14:56.337 GMT [1345869] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.704 s, sync=0.006 s, total=0.718 s; sync files=8, longest=0.005 s, average=0.001 s; distance=5 kB, estimate=5 kB; lsn=0/18E0018, redo lsn=0/18DFFC8

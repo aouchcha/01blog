@@ -38,7 +38,7 @@ public class RegisterService {
 
         try {
             String hashedPassword = PasswordUtils.hashPassword(request.getPassword());
-            User u = new User(request.getUsername(), request.getEmail(), hashedPassword, Role.User);
+            User u = new User(request.getUsername(), request.getEmail(), hashedPassword, Role.Admin);
             userRepositry.save(u);
             return ResponseEntity.status(HttpStatus.CREATED).body(u);
         }catch(Exception e) {

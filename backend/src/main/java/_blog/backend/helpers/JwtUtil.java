@@ -29,6 +29,7 @@ public class JwtUtil {
 
     // Validate JWT
     public boolean validateToken(String token) {
+        if (token == null || token.isEmpty()) return false;
         try {
             Jwts.parserBuilder()
                 .setSigningKey(secretKey)

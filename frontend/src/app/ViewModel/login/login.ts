@@ -1,8 +1,9 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { authService } from '../../services/auth.service';
 import { NotificationsService } from '../../services/notification.service';
 import { CommonModule } from '@angular/common';
+import { CheckToken } from '../../helpers/genarateHeader';
 
 @Component({
   selector: 'app-login',
@@ -12,11 +13,17 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login {
+export class Login implements OnInit{
   username : string = '';
   password : string = '';
   error : string | null = null;
   constructor(private router : Router, private stateup: ChangeDetectorRef, private authService: authService, private notifService: NotificationsService){};
+
+  ngOnInit(): void {
+      if (CheckToken() !== null) {
+        this.router.navigate([""]);
+      }
+  }
  
   public setUsername(username: string): void {
     this.username = username;

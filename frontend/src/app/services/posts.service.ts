@@ -26,7 +26,7 @@ export class PostsService {
     }
 
     public getSinglePost(token: String | null, post_id: number) {
-        console.log({ token });
+        // console.log({ token });
 
         return this.http.get<any>(
             generateURL(`post/${post_id}`),
@@ -52,7 +52,7 @@ export class PostsService {
         )
     }
 
-    public deletePost(token: String | null, post_id: number): Observable<any> {
+    public deletePost(token: String | null, post_id: number | null): Observable<any> {
         return this.http.delete(
             generateURL(`post/${post_id}`),
             generateHeader(token)

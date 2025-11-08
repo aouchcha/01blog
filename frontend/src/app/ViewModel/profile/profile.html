@@ -1,132 +1,208 @@
-<div class="container">
-  <section class="profile-wrap">
-    <div class="profile-header">
-      <img class="avatar" [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" alt="Avatar">
+<div class="profile-container">
+  <!-- Profile Header Section -->
+  <section class="profile-header-section">
+    <div class="profile-header-content">
+      <!-- Avatar -->
+      <div class="avatar-wrapper">
+        <img class="profile-avatar" 
+             [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" 
+             alt="Avatar">
+      </div>
 
-      <div class="profile-info">
-        <div class="row">
-          <h1 class="username">{{ user.username }}</h1>
+      <!-- Profile Info -->
+      <div class="profile-info-wrapper">
+        <div class="profile-top">
+          <h1 class="profile-username">{{ user.username }}</h1>
 
-          <!-- Follow / Unfollow button: show follow if not following -->
-          <div>
-            <button class="btn btn-edit" *ngIf="user.username !== me.username && me.role !== 'Admin'"
-              (click)="Follow()">
+          <!-- Action Buttons -->
+          <div class="profile-actions">
+            <!-- Follow/Unfollow Button -->
+            <button class="action-btn primary-btn" 
+                    *ngIf="user.username !== me.username && me.role !== 'Admin'"
+                    (click)="Follow()">
               {{ user.follow ? 'Unfollow' : 'Follow' }}
             </button>
 
-            <!-- Edit profile button (only owner) -->
-            <button class="btn btn-edit" *ngIf="user.username === me?.username">
+            <!-- Edit Profile Button -->
+            <button class="action-btn secondary-btn" 
+                    *ngIf="user.username === me?.username">
               Edit profile
             </button>
-            <button class="btn btn-edit" *ngIf="me.role !== 'Admin'" (click)="Home()">
+
+            <!-- Home Button -->
+            <button class="action-btn secondary-btn" 
+                    *ngIf="me.role !== 'Admin'" 
+                    (click)="Home()">
               Home
             </button>
-            <button class="btn btn-edit" *ngIf="me.role === 'Admin'" (click)="ToDashBoard()">
-              To DashBoard
+
+            <!-- Dashboard Button (Admin) -->
+            <button class="action-btn secondary-btn" 
+                    *ngIf="me.role === 'Admin'" 
+                    (click)="ToDashBoard()">
+              To Dashboard
             </button>
-            <button class="btn btn-edit" *ngIf="user.id != me.id && me.role !== 'Admin'" (click)="OpenReportSection()">
+
+            <!-- Report Button -->
+            <button class="action-btn warning-btn" 
+                    *ngIf="user.id != me.id && me.role !== 'Admin'" 
+                    (click)="OpenReportSection()">
               Report
             </button>
-            <button class="btn btn-edit" *ngIf="me.role === 'Admin'" (click)="RemoveUser()">
-              Remove The User
+
+            <!-- Remove User Button (Admin) -->
+            <button class="action-btn danger-btn" 
+                    *ngIf="me.role === 'Admin'" 
+                    (click)="RemoveUser()">
+              Remove User
             </button>
           </div>
         </div>
 
-        <div class="report-card" *ngIf="DoYouWantReport">
-          <div class="group">
-            <textarea [(ngModel)]="description" required="true" id="report-input" type="text" class="input"></textarea>
-            <span class="highlight"></span>
-            <span class="bar"></span>
-            <label>Name</label>
+        <!-- Report Section -->
+        <div class="report-section" *ngIf="DoYouWantReport">
+          <div class="report-card">
+            <h3>Report User</h3>
+            <div class="form-group">
+              <textarea [(ngModel)]="description" 
+                        required 
+                        class="report-textarea" 
+                        placeholder="Describe the issue..."></textarea>
+            </div>
+            <div class="report-actions">
+              <button class="action-btn primary-btn" (click)="Report()">
+                Submit Report
+              </button>
+              <button class="action-btn secondary-btn" (click)="Cancel()">
+                Cancel
+              </button>
+            </div>
           </div>
-          <button class="btn btn-edit" *ngIf="user.username !== me?.username" (click)="Report()">
-            Submit
-          </button>
-          <button class="btn btn-edit" (click)="Cancel()">
-            Cancel
-          </button>
         </div>
-        <!-- <p class="bio" *ngIf="user.bio">{{ me.bio }}</p> -->
 
-        <div class="stats">
-          <div class="stat">
+        <!-- Stats -->
+        <div class="profile-stats">
+          <div class="stat-item">
             <strong>{{ posts?.length || 0 }}</strong>
             <span>Posts</span>
           </div>
-          <div class="stat">
-            <strong>{{followers || 0}}</strong>
+          <div class="stat-item">
+            <strong>{{ followers || 0 }}</strong>
             <span>Followers</span>
           </div>
-          <div class="stat">
-            <strong>{{followings || 0}}</strong>
+          <div class="stat-item">
+            <strong>{{ followings || 0 }}</strong>
             <span>Following</span>
           </div>
         </div>
 
-        <div class="meta">
-          <span *ngIf="user.email">📍 {{ user.email }}</span>
-          <!-- <span *ngIf="user.joinedAt"> · Joined {{ user.joinedAt | date:'mediumDate' }}</span> -->
+        <!-- Meta Info -->
+        <div class="profile-meta" *ngIf="user.email">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 6.667l-6 4-6-4M2.667 3.333h10.666c.737 0 1.334.597 1.334 1.334v6.666c0 .737-.597 1.334-1.334 1.334H2.667a1.333 1.333 0 01-1.334-1.334V4.667c0-.737.597-1.334 1.334-1.334z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>{{ user.email }}</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- POSTS GRID -->
-  <section class="posts-wrap">
-    <div *ngIf="!posts || posts.length === 0" class="empty">
+  <!-- Posts Section -->
+  <section class="posts-section">
+    <div class="section-header">
+      <h2>Posts</h2>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!posts || posts.length === 0">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 8v48M8 32h48" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="32" cy="32" r="28" stroke="#ccc" stroke-width="4"/>
+      </svg>
       <p>No posts yet.</p>
     </div>
 
+    <!-- Posts Grid -->
     <div class="posts-grid" *ngIf="posts && posts.length > 0">
       <article class="post-card" *ngFor="let post of posts">
-        <header class="post-card-header">
-          <div class="author">
-            <img class="avatar-sm" [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" alt="author">
-            <div>
+        <!-- Post Header -->
+        <header class="post-header">
+          <div class="post-author">
+            <img class="author-avatar" 
+                 [src]="'assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg'" 
+                 alt="author">
+            <div class="author-info">
               <strong>{{ post.user.username }}</strong>
-              <div class="time">{{ post.createdAt | date:'short' }}</div>
-            </div>
-            <div class="post-actions">
-              <button *ngIf="post.user.username === me?.username || me?.role === 'Admin'" class="icon-btn"
-                (click)="deletePost(post.id)">🗑</button>
+              <span class="post-time">{{ post.createdAt | date:'short' }}</span>
             </div>
           </div>
 
-          <!-- show edit/delete only for owner -->
-
+          <!-- Delete Button -->
+          <button class="delete-btn" 
+                  *ngIf="post.user.username === me?.username || me?.role === 'Admin'" 
+                  (click)="deletePost(post.id)">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.5 5h15M8.333 9.167v5M11.667 9.167v5M3.333 5l.834 11.667c0 .916.75 1.666 1.666 1.666h8.334c.916 0 1.666-.75 1.666-1.666L16.667 5M7.5 5V3.333c0-.916.75-1.666 1.667-1.666h1.666c.917 0 1.667.75 1.667 1.666V5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </header>
 
-        <!-- Media (image or video) -->
-        <div class="media-area" *ngIf="!post.mediaUrl?.endsWith('null')">
+        <!-- Media -->
+        <div class="post-media-wrapper" *ngIf="!post.mediaUrl?.endsWith('null')">
           <ng-container [ngSwitch]="post.mediaUrl ? post.mediaUrl.split('.').pop()?.toLowerCase() : ''">
-            <img *ngSwitchCase="'jpg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
-            <img *ngSwitchCase="'jpeg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
-            <img *ngSwitchCase="'png'" [src]="post.mediaUrl" alt="Post image" class="post-media">
-            <video *ngSwitchCase="'mp4'" [src]="post.mediaUrl" controls class="post-media" preload="metadata"></video>
+            <img *ngSwitchCase="'jpg'" [src]="post.mediaUrl" alt="Post image" class="post-media-img">
+            <img *ngSwitchCase="'jpeg'" [src]="post.mediaUrl" alt="Post image" class="post-media-img">
+            <img *ngSwitchCase="'png'" [src]="post.mediaUrl" alt="Post image" class="post-media-img">
+            <img *ngSwitchCase="'webp'" [src]="post.mediaUrl" alt="Post image" class="post-media-img">
+            <video *ngSwitchCase="'mp4'" [src]="post.mediaUrl" controls class="post-media-video" preload="metadata"></video>
           </ng-container>
         </div>
 
-        <div class="post-body">
-          <p class="description">{{ post.description }}</p>
+        <!-- Post Content -->
+        <div class="post-content">
+          <p class="post-description">{{ post.description }}</p>
 
+          <!-- Post Footer -->
           <div class="post-footer">
-            <div class="reactions">
-              <button class="reaction">❤️ {{ post.likeCount || 0 }}</button>
-              <button class="reaction comment-btn">💬 {{ post.commentsCount || 0 }}</button>
-            </div>
+            <button class="reaction-btn">
+              ❤️ {{ post.likeCount || 0 }}
+            </button>
+            <button class="reaction-btn">
+              💬 {{ post.commentsCount || 0 }}
+            </button>
           </div>
         </div>
       </article>
     </div>
   </section>
-  <!-- POPUP MESSAGE -->
+
+  <!-- Popup Message -->
   <div class="popup-overlay" *ngIf="showPopup">
-    <div class="popup">
-      <h3>Message</h3>
-      <p>{{ popupMessage }}</p>
-      <button class="btn btn-close" (click)="closePopup()">Close</button>
+    <div class="popup-modal">
+      <div class="popup-header">
+        <h3>{{ popupMessage }}</h3>
+      </div>
+      <div class="popup-actions">
+        <button class="action-btn primary-btn" (click)="closePopup()">Close</button>
+      </div>
     </div>
   </div>
 
+  <!-- Confirmation Modal -->
+  <div class="popup-overlay" *ngIf="showConfirmation">
+    <div class="confirmation-modal" (click)="$event.stopPropagation()">
+      <div class="confirmation-icon">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="22" stroke="#d32f2f" stroke-width="3"/>
+          <path d="M24 14v14M24 34v.5" stroke="#d32f2f" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>{{confirmationTitle}}</h3>
+      <p>{{confirmationMessage}}</p>
+      <div class="confirmation-actions">
+        <button class="confirm-btn danger" (click)="ConfirmAction()">Yes, {{confirmationAction}}</button>
+        <button class="confirm-btn cancel" (click)="CancelConfirmation()">Cancel</button>
+      </div>
+    </div>
+  </div>
 </div>

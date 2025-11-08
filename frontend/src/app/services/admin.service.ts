@@ -18,6 +18,8 @@ export class AdminService {
     }
 
     public loadReports(token: String | null) : Observable<any> {
+        // console.log({token});
+        
         return this.http.get(
             generateURL("admin/reports"),
             generateHeader(token)

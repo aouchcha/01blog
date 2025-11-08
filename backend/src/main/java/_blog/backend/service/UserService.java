@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import _blog.backend.Entitys.Post.Post;
@@ -123,6 +124,7 @@ public class UserService {
         r.setDescription(reportRequest.getDiscription());
         r.setRepporter(me);
         r.setRepported(repported);
+        r.setCreatedAt(LocalDateTime.now());
         reportRepository.save(r);
         return ResponseEntity.ok().body(Map.of("message", "reported succesfuuly"));
     }

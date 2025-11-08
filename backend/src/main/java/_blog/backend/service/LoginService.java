@@ -26,12 +26,12 @@ public class LoginService {
         User user = userRepository.findByUsername(request.getUsername());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "incorrect username"));
+                    .body(Map.of("message", "Ivalid Cridential"));
         }
 
         if (!PasswordUtils.checkPassword(request.getPassword(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "incorrect password"));
+                    .body(Map.of("message", "Invalid Cridential"));
         }
 
         String token = jwtUtils.generateToken(user.getUsername(), user.getRole());

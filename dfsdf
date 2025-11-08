@@ -1,0 +1,104 @@
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity // 1. Enable method-level security like @PreAuthorize
+public class JwtSecurityConfig {
+
+    private final UserDetailsService userDetailsService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint; // Custom class to handle 401s
+
+    // 2. Inject our custom components
+    public JwtSecurityConfig(UserDetailsService userDetailsService, 
+                             JwtTokenProvider jwtTokenProvider,
+                             JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+        this.userDetailsService = userDetailsService;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+    }
+
+    // 3. PasswordEncoder is still needed to check passwords at the /login endpoint
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // 4. Expose the AuthenticationManager as a bean for our /login endpoint
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    // 5. The main filter chain configuration
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            // 6. Disable CSRF (not needed for stateless, token-based APIs)
+            .csrf(csrf -> csrf.disable())
+            
+            // 7. Handle auth exceptions with our custom entry point
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+            
+            // 8. Make the session policy STATELESS
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            // 9. Define authorization rules
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/login").permitAll()  // Login endpoint is public
+                .requestMatchers("/api/public/**").permitAll() // Other public endpoints
+                .anyRequest().authenticated()                    // All other API routes require a valid token
+            )
+            
+            // 10. Add our custom JWT filter *before* the standard UsernamePassword filter
+            .addFilterBefore(
+                new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService), 
+                UsernamePasswordAuthenticationFilter.class
+            );
+
+        return http.build();
+    }
+}
+
+// 11. The custom filter to read the JWT
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    // (Constructor and helper methods omitted for brevity)
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, 
+                                    HttpServletResponse response, 
+                                    FilterChain filterChain) throws ServletException, IOException {
+        
+        String token = jwtTokenProvider.resolveToken(request); // Get "Bearer <token>" from header
+
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            // Token is valid, get username from it
+            String username = jwtTokenProvider.getUsername(token);
+            
+            // Load user details from DB (this is where you might cache!)
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            
+            // Create a *new* Authentication object (now authenticated)
+            UsernamePasswordAuthenticationToken authentication = 
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            
+            // 12. CRITICAL: Set the authenticated user in the SecurityContextHolder
+            // This is what makes @PreAuthorize and requestMatchers work
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        filterChain.doFilter(request, response); // Continue the chain
+    }
+}
+
+// 13. A secured controller method
+@RestController
+@RequestMapping("/api/projects")
+public class ProjectController {
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @projectSecurityService.isMember(#id, authentication.name)")
+    public ResponseEntity<Project> getProjectById(@PathVariable Long id) {
+        // This code only runs if the user is an ADMIN
+        // OR if a custom bean "projectSecurityService" confirms they are a member
+        // This is the power of SpEL (Spring Expression Language)
+    }
+}

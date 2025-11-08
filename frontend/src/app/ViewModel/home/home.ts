@@ -44,6 +44,11 @@ export class Home implements OnInit {
   public isBrowser: boolean = false;
   public notifsCount: number = 0;
   public ShowNotifs: boolean = false;
+  public showConfirmation: boolean = false;
+  public confirmationTitle: string = 'Delete Post?';
+  public confirmationMessage: string = 'Are you sure you want to delete this post? This action cannot be undone.';
+  public confirmationAction: string = 'Delete';
+  // public deletedPostId: number = 0;
 
   constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object, private notifService: NotificationsService, private http: HttpClient, private state: ChangeDetectorRef) {
     this.isBrowser = isPlatformBrowser(platformId)
@@ -156,7 +161,7 @@ export class Home implements OnInit {
       error: (err) => {
         console.log(err);
         if (err.status == 401) {
-          this.router.navigate(["login"])
+          this.Logout()
         }
 
       }
@@ -218,18 +223,8 @@ export class Home implements OnInit {
   }
 
   public deletePost(post_id: number) {
-    this.setToken();
-    this.postsService.deletePost(this.token, post_id).subscribe({
-      next: (res) => {
-        console.log(res);
-        let index = this.posts.findIndex((p: Post) => p.id === post_id)
-        this.posts.splice(index, 1)
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    })
-
+    this.showConfirmation = true;
+    this.post_id = post_id;
   }
 
   public React(post_id: number): void {
@@ -276,14 +271,11 @@ export class Home implements OnInit {
 
   public CloseNotif() {
     this.ShowNotifs = false;
-    // this.state.detectChanges();
   }
 
-  // Add these properties to your component class
   leftMenuOpen = false;
   rightMenuOpen = false;
 
-  // Add these methods to your component class
   toggleLeftMenu() {
     this.leftMenuOpen = !this.leftMenuOpen;
     this.rightMenuOpen = false;
@@ -298,4 +290,31 @@ export class Home implements OnInit {
     this.leftMenuOpen = false;
     this.rightMenuOpen = false;
   }
+
+  // deletePostConfirm(postId: number) {
+  //   this.pendingAction = () => this.deletePost(postId);
+  // }
+
+  ConfirmAction() {
+    console.log(this.post_id);
+    
+     this.setToken();
+    this.postsService.deletePost(this.token, this.post_id).subscribe({
+      next: (res) => {
+        console.log(res);
+        let index = this.posts.findIndex((p: Post) => p.id === this.post_id)
+        this.posts.splice(index, 1)
+        this.CancelConfirmation()
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
+
+  CancelConfirmation() {
+    this.showConfirmation = false;
+    this.post_id = null;
+  }
+
 }

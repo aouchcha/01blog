@@ -218,6 +218,24 @@
                 </div>
             </div>
         </div>
+
+        <!-- Confirmation Modal -->
+        <div class="modal-overlay" *ngIf="showConfirmation" (click)="CancelConfirmation()">
+            <div class="confirmation-modal" (click)="$event.stopPropagation()">
+                <div class="confirmation-icon">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="24" r="22" stroke="#d32f2f" stroke-width="3"/>
+                        <path d="M24 14v14M24 34v.5" stroke="#d32f2f" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h3 style="color: black;">{{confirmationTitle}}</h3>
+                <p style="color: black;">{{confirmationMessage}}</p>
+                <div class="confirmation-actions">
+                    <button class="confirm-btn danger" (click)="ConfirmAction()">Yes, {{confirmationAction}}</button>
+                    <button class="confirm-btn cancel" (click)="CancelConfirmation()">Cancel</button>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Right Sidebar - Suggestions -->

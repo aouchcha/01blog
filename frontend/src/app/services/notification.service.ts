@@ -42,7 +42,7 @@ export class NotificationsService {
     });
 
     this.eventSource.onerror = (err) => {
-      console.warn('⚠️ SSE disconnected. Browser will auto-reconnect...', err);
+      console.log('⚠️ SSE disconnected. Browser will auto-reconnect...', err);
     };
   }
 

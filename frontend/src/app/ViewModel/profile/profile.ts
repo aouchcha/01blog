@@ -10,6 +10,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { PostsService } from '../../services/posts.service';
+import { Post } from '../../models/Post';
+
 
 @Component({
   selector: 'app-profile',
@@ -38,6 +40,12 @@ export class Profile implements OnInit {
   public isBrowser = false;
   public popupMessage: String = '';
   public showPopup: boolean = false;
+  public ShowNotifs: boolean = false;
+  public showConfirmation: boolean = false;
+  public confirmationTitle: string = 'Delete Post?';
+  public confirmationMessage: string = 'Are you sure you want to delete this post? This action cannot be undone.';
+  public confirmationAction: string = 'Delete';
+  public post_id: number | null = null;
 
   constructor(private router: Router, private route: ActivatedRoute, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object, private postService: PostsService) {
     this.isBrowser = isPlatformBrowser(platformId)
@@ -56,7 +64,7 @@ export class Profile implements OnInit {
 
     this.userService.getMe(this.token).subscribe({
       next: (res) => {
-        console.log({res});
+        // console.log({ res });
 
         this.me = res.me;
       },
@@ -132,22 +140,24 @@ export class Profile implements OnInit {
   }
 
   public deletePost(post_id: number) {
-    this.postService.deletePost(this.token, post_id).subscribe({
-      next: (res) => {
-        console.log(res);
-        this.popupMessage =  res.message;
-        this.showPopup = true;
-        this.LoadProfile()
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    })
+    // this.postService.deletePost(this.token, post_id).subscribe({
+    //   next: (res) => {
+    //     console.log(res);
+    //     this.popupMessage = res.message;
+    //     this.showPopup = true;
+    //     this.LoadProfile()
+    //   },
+    //   error: (err) => {
+    //     console.log(err);
+    //   }
+    // })
+    this.post_id = post_id;
+    this.showConfirmation = true;
   }
 
   public RemoveUser() {
     console.log("hanni");
-    
+
     this.userService.RemoveUser(this.user.username, this.token).subscribe({
       next: (res) => {
         console.log(res);
@@ -161,5 +171,35 @@ export class Profile implements OnInit {
   public closePopup() {
     this.showPopup = false;
     this.popupMessage = '';
+  }
+
+    public setToken() {
+    if (CheckToken() === null) {
+      this.router.navigate(["login"]);
+      return;
+    }
+    this.token = localStorage.getItem("JWT");
+  }
+
+  ConfirmAction() {
+    console.log(this.post_id);
+
+    this.setToken();
+    this.postService.deletePost(this.token, this.post_id).subscribe({
+      next: (res) => {
+        console.log(res);
+        let index = this.posts.findIndex((p: Post) => p.id === this.post_id)
+        this.posts.splice(index, 1)
+        this.CancelConfirmation()
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
+
+  CancelConfirmation() {
+    this.showConfirmation = false;
+    this.post_id = null;
   }
 }

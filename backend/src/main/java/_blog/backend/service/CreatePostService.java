@@ -20,13 +20,14 @@ import _blog.backend.Entitys.Interactions.Follow.Follow;
 
 
 import _blog.backend.helpers.JwtUtil;
+import _blog.backend.helpers.ContextHelpers;
 import _blog.backend.helpers.HandleMedia;
 
 @Service
 public class CreatePostService {
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private ContextHelpers contextHelpers;
 
     @Autowired
     private HandleMedia mediaUtils;
@@ -46,14 +47,14 @@ public class CreatePostService {
     @Autowired
     private RateLimiterService rateLimiterService;
 
-    public ResponseEntity<?> create(PostRequst postRequest, String token) {
+    public ResponseEntity<?> create(PostRequst postRequest) {
 
-        if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "your token isn't valid"));
-        }
+        // if (!jwtUtil.validateToken(token)) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        //             .body(Map.of("message", "your token isn't valid"));
+        // }
 
-        String username = jwtUtil.getUsername(token);
+        final String username = contextHelpers.getUsername();   
 
          if (!rateLimiterService.isAllowed(username)) {
             return ResponseEntity.status(429).body(Map.of("message", "Rate limit exceeded. Try again later."));

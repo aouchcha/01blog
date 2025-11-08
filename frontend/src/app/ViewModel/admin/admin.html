@@ -65,7 +65,7 @@
         </nav>
 
         <div class="user-profile">
-            <img src="avatar-placeholder.jpg" alt="User" class="profile-avatar">
+            <!-- <img src="avatar-placeholder.jpg" alt="User" class="profile-avatar"> -->
             <div class="profile-info">
                 <div class="profile-name">Achraf ouchchate</div>
                 <div class="profile-email">s.ferguson@gmail.com</div>
@@ -89,7 +89,7 @@
     <main class="main-content">
         <!-- Search Bar -->
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="search...">
+            <input type="text" class="search-input" [(ngModel)]="search" placeholder="search..." (input)="Filter()">
             <button class="search-btn">
                 <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -111,11 +111,11 @@
                         <th>Email</th>
                         <th>Published Posts</th>
                         <th>Reporte Count</th>
-                        <th>Recent activity</th>
+                        <!-- <th>Recent activity</th> -->
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let u of usersStates" (click)="ToProfile(u.username)">
+                    <tr *ngFor="let u of filtredUsers" (click)="ToProfile(u.username)">
                         <td class="user-cell">
                             <!-- <img src="avatar-placeholder.jpg" alt="User" class="user-avatar"> -->
                             <span class="user-name">{{u.username}}</span>
@@ -123,7 +123,7 @@
                         <td class="email-cell">{{u.email}}</td>
                         <td class="post-count">{{u.postCount}}</td>
                         <td class="report-cell">{{u.reportCount}}</td>
-                        <td class="activity-cell">5 Minutes ago</td>
+                        <!-- <td class="activity-cell">5 Minutes ago</td> -->
                     </tr>
                 </tbody>
             </table>

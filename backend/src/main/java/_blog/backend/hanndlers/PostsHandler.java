@@ -35,22 +35,22 @@ public class PostsHandler {
 
     @GetMapping
     public ResponseEntity<?> getPosts(@RequestHeader("Authorization") String header) {
-        String token = header.replace("Bearer ", "");
-        if (!jwtUtil.validateToken(token) || jwtUtil.getRole(token).equals("Admin")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
-        }
-        return postsService.getPosts(token);
+        // String token = header.replace("Bearer ", "");
+        // if (!jwtUtil.validateToken(token) || jwtUtil.getRole(token).equals("Admin")) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        // }
+        return postsService.getPosts();
     }
 
     @GetMapping("/{post_id}")
     public ResponseEntity<?> getSinglePost(
             @PathVariable Long post_id,
             @RequestHeader("Authorization") String header) {
-        String token = header.replace("Bearer ", "");
-        if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
-        }
-        return postsService.getSinglePost(post_id, token);
+        // String token = header.replace("Bearer ", "");
+        // if (!jwtUtil.validateToken(token)) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        // }
+        return postsService.getSinglePost(post_id);
     }
 
     @PostMapping
@@ -60,27 +60,27 @@ public class PostsHandler {
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
-        return createPostService.create(postRequst, token);
+        return createPostService.create(postRequst);
     }
 
     @DeleteMapping("/{post_id}")
     public ResponseEntity<?> deletePost(
             @PathVariable Long post_id,
             @RequestHeader("Authorization") String header) {
-        String token = header.replace("Bearer ", "");
-        if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
-        }
-        return postsService.delete(token, post_id);
+        // String token = header.replace("Bearer ", "");
+        // if (!jwtUtil.validateToken(token)) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        // }
+        return postsService.delete(post_id);
     }
 
     @PutMapping("/{post_id}")
     public ResponseEntity<?> Update(@PathVariable Long post_id, @ModelAttribute PostRequst postRequst,
             @RequestHeader("Authorization") String header) {
-        String token = header.replace("Bearer ", "");
-        if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
-        }
-        return postsService.update(post_id, postRequst, token);
+        // String token = header.replace("Bearer ", "");
+        // if (!jwtUtil.validateToken(token)) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        // }
+        return postsService.update(post_id, postRequst);
     }
 }

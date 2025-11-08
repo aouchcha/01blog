@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import _blog.backend.Repos.CommentRepository;
 import _blog.backend.Repos.PostRepository;
@@ -20,6 +22,7 @@ import _blog.backend.Entitys.Comment.Comment;
 import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.Post.PostRequst;
 import _blog.backend.Entitys.User.User;
+import _blog.backend.helpers.ContextHelpers;
 import _blog.backend.helpers.HandleMedia;
 import _blog.backend.helpers.JwtUtil;
 
@@ -30,7 +33,8 @@ public class PostsService {
     private PostRepository postRepository;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    // private JwtUtil jwtUtil;
+    private ContextHelpers contextHelpers;
 
     @Autowired
     private UserRepository userRepository;
@@ -38,31 +42,34 @@ public class PostsService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public ResponseEntity<?> getPosts(String token) {
-        if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "your token isn't valid"));
-        }
-        final String username = jwtUtil.getUsername(token);
+    public ResponseEntity<?> getPosts() {
+        // if (!jwtUtil.validateToken(token)) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "your token isn't valid"));
+        final String username = contextHelpers.getUsername();
+        // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\Authenticated user: " + auth.getName());
+        // System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\Authorities: " + auth.getAuthorities().toString());
+        // System.out.println(auth.isAuthenticated());
 
-        if (!userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
-        }
+        // if (!userRepository.existsByUsername("username")) {
+        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
+        // }
 
         List<Post> posts = postRepository.findAllPostsByUserAndFollowedUsers(userRepository.findIdByUsername(username));
 
         return ResponseEntity.ok().body(Map.of("posts", posts));
     }
 
-    public ResponseEntity<?> getSinglePost(Long post_id, String token) {
-        if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "your token isn't valid"));
-        }
+    public ResponseEntity<?> getSinglePost(Long post_id) {
+        // if (!jwtUtil.validateToken(token)) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "your token isn't valid"));
+        // }
 
-        final String username = jwtUtil.getUsername(token);
+        // final String username = contextHelpers.getUsername();
 
-        if (!userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
-        }
+        // if (!userRepository.existsByUsername(username)) {
+        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
+        // }
 
         Optional<Post> p = postRepository.findById(post_id);
 
@@ -71,11 +78,11 @@ public class PostsService {
 
     }
 
-    public ResponseEntity<?> delete(String token, Long post_id) {
-        final String username = jwtUtil.getUsername(token);
-        if (!userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalid user"));
-        }
+    public ResponseEntity<?> delete(Long post_id) {
+        final String username = contextHelpers.getUsername();
+        // if (!userRepository.existsByUsername(username)) {
+        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalid user"));
+        // }
 
         final User u = userRepository.findByUsername(username);
         final List<Post> posts = postRepository.findByUserId(u.getId());
@@ -100,7 +107,7 @@ public class PostsService {
     @Autowired
     private HandleMedia MediaUtils;
 
-    public ResponseEntity<?> update(Long post_id, PostRequst postRequst, String token) {
+    public ResponseEntity<?> update(Long post_id, PostRequst postRequst) {
         if (!postRepository.existsById(post_id)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalid post id"));
         }
