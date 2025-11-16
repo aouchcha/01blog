@@ -81,11 +81,12 @@ public class SecurityConfig {
             .requestMatchers("/api/register").permitAll()
             .requestMatchers("/api/login").permitAll()
             // These URLs are public. No token is required. Let them pass.
+            .requestMatchers("/api/notifications/**").permitAll()
             
             .requestMatchers("/uploads/**").permitAll()
             // Your static files are also public.
             
-            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            .requestMatchers("/api/admin/**").hasRole("Admin")
             // To access *any* URL starting with /api/admin/, the user *must*
             // have the 'ADMIN' role. (This check runs *after* our token filter).
             

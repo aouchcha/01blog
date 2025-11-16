@@ -39,6 +39,7 @@ public class HandleMedia {
     }
 
     public boolean save(Post p, PostRequst postRequst) {
+        // System.out.println("HaNNI F SAVE");
         if (postRequst.getMedia() != null) {
             p.setMedia(Rename(postRequst.getMedia().getOriginalFilename()));
             File uploads = createFolder("/home/aouchcha/Desktop/01blog/backend/uploads");

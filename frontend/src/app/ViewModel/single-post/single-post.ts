@@ -13,6 +13,7 @@ import { UserService } from '../../services/user.service';
 import { User } from '../../models/User';
 import { Post } from '../../models/Post';
 import { FormsModule } from '@angular/forms';
+import { Comment } from '../../models/Comments';
 // import { Comment } from '../helpers/Comments';
 
 @Component({
@@ -103,6 +104,7 @@ export class SinglePost implements OnInit {
     this.postsService.deletePost(this.token, post_id).subscribe({
       next: (res) => {
         console.log(res);
+        this.router.navigate([""])
       },
       error: (err) => {
         console.log(err);
@@ -124,6 +126,22 @@ export class SinglePost implements OnInit {
         console.log(err);
       }
     })
+  }
+
+   public deleteComment(comment_id: number) {
+    this.postsService.DeleteComment(this.token, comment_id).subscribe({
+      next: (res) => {
+        console.log(res);
+        let index = this.comments.findIndex((c: Comment) => c.id === comment_id)
+        this.comments.splice(index, 1)
+        this.post.commentsCount -= 1;
+        // this.router.navigate([""])
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+
   }
 
 

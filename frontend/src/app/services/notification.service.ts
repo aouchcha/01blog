@@ -1,5 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, NgZone } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { generateHeader, generateURL } from '../helpers/genarateHeader';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationsService {
@@ -11,12 +13,14 @@ export class NotificationsService {
   private reactionsSubject = new BehaviorSubject<any>(null);
   public reactionsObservable = this.reactionsSubject.asObservable();
 
-  constructor(private zone: NgZone) { }
+  constructor(private zone: NgZone, private http: HttpClient) { }
+    
+
 
   connect(userId: number) {
     if (this.eventSource && this.eventSource.readyState !== EventSource.CLOSED) {
       console.log("wwwwwwwwww");
-      
+
       return; // already connected
     }
 
@@ -49,5 +53,12 @@ export class NotificationsService {
   disconnect() {
     this.eventSource?.close();
     this.eventSource = undefined;
+  }
+
+  public getNotifs(token: String | null): Observable<any> {
+    return this.http.get<any>(
+      generateURL("notifications"),
+      generateHeader(token)
+    );
   }
 }

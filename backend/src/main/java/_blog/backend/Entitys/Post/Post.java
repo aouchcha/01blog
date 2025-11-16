@@ -16,6 +16,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import _blog.backend.Entitys.Comment.Comment;
 import _blog.backend.Entitys.Interactions.Reactions.Like;
+import _blog.backend.Entitys.Notifications.NotificationEntity;
 import _blog.backend.Entitys.User.User;
 
 import java.util.*;
@@ -26,8 +27,10 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment in PostgreSQL
     @Column(unique = true, nullable = false)
-    @Nonnull
     private Long id;
+
+    @Column(nullable = false)
+    private String title;
 
     @Column(nullable = false)
     private String description;
@@ -53,6 +56,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NotificationEntity> notifs;
+
     public Post() {
     };
 
@@ -62,6 +68,14 @@ public class Post {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {

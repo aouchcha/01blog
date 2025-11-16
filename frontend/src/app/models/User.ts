@@ -1,6 +1,7 @@
 export class User {
     email: String = "";
     follow: boolean = false;
+    isBaned: boolean = false;
     id: number = 0;
     role: String = "";
     username: String = "";

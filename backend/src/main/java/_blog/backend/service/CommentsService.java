@@ -5,9 +5,10 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+// import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+// import org.springframework.transaction.annotation.Transactional;
 
 import _blog.backend.Entitys.Comment.Comment;
 import _blog.backend.Entitys.Comment.CommentRequest;
@@ -16,13 +17,15 @@ import _blog.backend.Entitys.User.User;
 import _blog.backend.Repos.CommentRepository;
 import _blog.backend.Repos.PostRepository;
 import _blog.backend.Repos.UserRepository;
-import _blog.backend.helpers.JwtUtil;
+import _blog.backend.helpers.ContextHelpers;
+// import _blog.backend.helpers.JwtUtil;
 
 @Service
 public class CommentsService {
 
     @Autowired
-    private JwtUtil jwtUtil;
+    // private JwtUtil jwtUtil;
+    private ContextHelpers contextHelpers;
 
     @Autowired
     private UserRepository userRepository;
@@ -33,12 +36,16 @@ public class CommentsService {
     @Autowired
     private CommentRepository commentRepository;
 
-    @Transactional
-    public ResponseEntity<?> create(CommentRequest request, String token) {
+    // @Transactional
+    public ResponseEntity<?> create(CommentRequest request) {
 
-        User u = userRepository.findByUsername(jwtUtil.getUsername(token));
+        final String username = contextHelpers.getUsername();
+
+
+        User u = userRepository.findByUsername(username);
+
         if (u == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "invalid user"));
         }
 
@@ -53,6 +60,7 @@ public class CommentsService {
         }
 
         Post p = postRepository.findById(request.getPost_id()).orElse(null);
+
         if (p == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "invalid post_id"));
@@ -69,5 +77,28 @@ public class CommentsService {
         postRepository.save(p);
 
         return ResponseEntity.ok(Map.of("message", "comment added successfully", "post", p));
+    }
+
+    public ResponseEntity<?> delete(Long comment_id) {
+
+        Comment comment = commentRepository.findById(comment_id).orElse(null);
+
+        if (comment == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "comment doesn't removed"));
+        }
+
+        commentRepository.delete(comment);
+
+        Post p = postRepository.findById(comment.getPost().getId()).orElse(null);
+
+        if (p == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "comment doesn't removed"));
+        }
+
+        p.setCommentsCount(p.getCommentsCount() - 1);
+
+        postRepository.save(p);
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "comment removed with success"));
     }
 }

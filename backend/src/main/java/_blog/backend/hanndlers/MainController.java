@@ -8,8 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -107,11 +109,22 @@ public class MainController {
     @PostMapping("/comment")
     public ResponseEntity<?> CreateComments(@RequestBody CommentRequest commentRequest,
             @RequestHeader("Authorization") String header) {
-        String token = header.replace("Bearer", "");
-        if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
-        }
-        return commentsService.create(commentRequest, token);
+        // String token = header.replace("Bearer", "");
+        // if (!jwtUtil.validateToken(token)) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        // }
+        return commentsService.create(commentRequest);
+    }
+
+    @DeleteMapping("/comment/{comment_id}")
+    public ResponseEntity<?> deletePost(
+            @PathVariable Long comment_id,
+            @RequestHeader("Authorization") String header) {
+        // String token = header.replace("Bearer ", "");
+        // if (!jwtUtil.validateToken(token)) {
+        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        // }
+        return commentsService.delete(comment_id);
     }
 
     @GetMapping("/user/{username}")
@@ -130,6 +143,15 @@ public class MainController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
         return userService.Remove(username, token);
+    }
+
+    @PutMapping("/user/{username}")
+     public ResponseEntity<?> BanUser(@PathVariable String username, @RequestHeader("Authorization") String header) {
+        String token = header.replace("Bearer", "");
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        }
+        return userService.Ban(username, token);
     }
 
     @PostMapping("/report")

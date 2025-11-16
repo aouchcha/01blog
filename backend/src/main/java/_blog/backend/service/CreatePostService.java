@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+// import org.springframework.transaction.annotation.Transactional;
 
 import _blog.backend.Entitys.Post.PostRequst;
 import _blog.backend.Repos.FollowRepositry;
@@ -19,7 +19,7 @@ import _blog.backend.Entitys.User.User;
 import _blog.backend.Entitys.Interactions.Follow.Follow;
 
 
-import _blog.backend.helpers.JwtUtil;
+// import _blog.backend.helpers.JwtUtil;
 import _blog.backend.helpers.ContextHelpers;
 import _blog.backend.helpers.HandleMedia;
 
@@ -60,8 +60,14 @@ public class CreatePostService {
             return ResponseEntity.status(429).body(Map.of("message", "Rate limit exceeded. Try again later."));
         }
 
+         if (postRequest.getTitle().trim().isEmpty() ||
+            postRequest.getTitle().length() > 100) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Description is invalid"));
+        }
+
         if (postRequest.getDescription().trim().isEmpty() ||
-            postRequest.getDescription().length() > 250) {
+            postRequest.getDescription().length() > 1000) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "Description is invalid"));
         }
@@ -74,6 +80,7 @@ public class CreatePostService {
 
         Post newPost = new Post();
         newPost.setDescription(postRequest.getDescription());
+        newPost.setTitle(postRequest.getTitle());
         newPost.setCreatedAt(LocalDateTime.now());
         newPost.setUser(u);
 
@@ -82,28 +89,30 @@ public class CreatePostService {
                     .body(Map.of("message", "Internal Server Error"));
         }
         
-        PostCreationResult pr = savePostAndGetFollowers(newPost, u.getId());
+        // PostCreationResult pr = savePostAndGetFollowers(newPost, u.getId());
 
-        pr.followers.forEach(f -> notificationService.sendNotification(f.getFollower(), u));
+        Post p = postRepository.save(newPost);
+        List<Follow> followers = followRepositry.findByFollowed_Id(u.getId());
+        followers.forEach(f -> notificationService.sendNotification(f.getFollower(), u, p));
 
         return ResponseEntity.ok(Map.of("message", "post created successfully"));
     }
 
-    @Transactional
-    private PostCreationResult savePostAndGetFollowers(Post post, Long userId) {
-        postRepository.save(post);
-        List<Follow> followers = followRepositry.findByFollowed_Id(userId);
+    // @Transactional
+    // private PostCreationResult savePostAndGetFollowers(Post post, Long userId) {
+    //     postRepository.save(post);
+    //     List<Follow> followers = followRepositry.findByFollowed_Id(userId);
         
-        return new PostCreationResult(post, followers);
-    }
+    //     return new PostCreationResult(post, followers);
+    // }
 
-    private static class PostCreationResult {
-        Post post;
-        List<Follow> followers;
+    // private static class PostCreationResult {
+    //     Post post;
+    //     List<Follow> followers;
         
-        PostCreationResult(Post post, List<Follow> followers) {
-            this.post = post;
-            this.followers = followers;
-        }
-    }
+    //     PostCreationResult(Post post, List<Follow> followers) {
+    //         this.post = post;
+    //         this.followers = followers;
+    //     }
+    // }
 }

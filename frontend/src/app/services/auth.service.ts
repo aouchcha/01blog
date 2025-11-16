@@ -10,6 +10,8 @@ export class authService {
     public constructor(private http: HttpClient) {}
 
     public Login(body: Object) : Observable<any> {
+        console.log(body);
+        
         return this.http.post<any>(
             'http://localhost:8080/api/login', 
             body

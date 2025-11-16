@@ -20,9 +20,9 @@ export class Login implements OnInit{
   constructor(private router : Router, private stateup: ChangeDetectorRef, private authService: authService, private notifService: NotificationsService){};
 
   ngOnInit(): void {
-      if (CheckToken() !== null) {
-        this.router.navigate([""]);
-      }
+      // if (CheckToken() !== null) {
+      //   this.router.navigate([""]);
+      // }
   }
  
   public setUsername(username: string): void {
@@ -46,13 +46,16 @@ export class Login implements OnInit{
     }
 
     this.authService.Login(body).subscribe({
+      
       next: (res) => {
         console.log('log in successful !', res.user.role, res);
         // this.res = res;
         localStorage.setItem("JWT", res.token);
         if (res.user.role == "User") {
+          
           this.router.navigate([""]);
         }else {
+          console.log("wesh wesh");
           this.router.navigate(["admin"])
         }
       },

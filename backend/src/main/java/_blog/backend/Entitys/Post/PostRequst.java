@@ -3,8 +3,17 @@ package _blog.backend.Entitys.Post;
 import org.springframework.web.multipart.MultipartFile;
 
 public class PostRequst {
+    private String title;
     private String description;
     private MultipartFile media;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getDescription() {
         return description;

@@ -22,7 +22,7 @@ import _blog.backend.Repos.UserRepository;
 import _blog.backend.helpers.JwtUtil;
 
 @Service
-@Transactional
+// @Transactional
 public class UserService {
     @Autowired
     private UserRepository userRepository;
@@ -142,5 +142,16 @@ public class UserService {
         final User u = userRepository.findByUsername(username);
         userRepository.delete(u);
         return ResponseEntity.ok().body(Map.of("message", "User " + u + " Removed with success"));
+    }
+
+    @Transactional
+    public ResponseEntity<?> Ban(String username, String token) {
+        System.out.println("HAAAAAAAAAAAAAAAAAAAAAANNNNNNNNNNNIIIIIIIIIIIIIII");
+        User u = userRepository.findByUsername(username);
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user u wanna to ban doesnt exist"));
+        }
+        u.setIsBaned(!u.getIsBaned());
+        return ResponseEntity.ok().body(Map.of("message", "User " + u + " Banned with success"));
     }
 }

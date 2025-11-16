@@ -13,6 +13,8 @@ import _blog.backend.Repos.UserRepository;
 import _blog.backend.helpers.JwtUtil;
 import _blog.backend.helpers.PasswordUtils;
 
+import _blog.backend.Entitys.User.UserResponse;
+
 @Service
 public class LoginService {
 
@@ -23,7 +25,9 @@ public class LoginService {
     private JwtUtil jwtUtils;
 
     public ResponseEntity<?> signin(LoginRequest request) {
-        User user = userRepository.findByUsername(request.getUsername());
+        // System.out.println(request.getUsername());
+        // System.out.println(request.getPassword());
+        final User user = userRepository.findByUsername(request.getUsername());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "Ivalid Cridential"));
@@ -34,8 +38,19 @@ public class LoginService {
                     .body(Map.of("message", "Invalid Cridential"));
         }
 
+        if (user.getIsBaned()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You are banned"));
+        }
+
         String token = jwtUtils.generateToken(user.getUsername(), user.getRole());
-        return ResponseEntity.ok(Map.of("token", token, "user", user));
+        UserResponse UserDto = new UserResponse();
+        UserDto.setEmail(user.getEmail());
+        UserDto.setFollow(user.getFollow());
+        UserDto.setId(user.getId());
+        UserDto.setRole(user.getRole());
+        UserDto.setUsername(user.getUsername());
+        return ResponseEntity.ok(Map.of("token", token, "user", UserDto));
     }
 }
 

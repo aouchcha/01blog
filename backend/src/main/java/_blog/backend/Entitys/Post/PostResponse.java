@@ -6,6 +6,7 @@ import _blog.backend.Entitys.User.UserResponse;
 
 public class PostResponse {
     private Long id;
+    private String title;
     private String description;
     private String media;
     private LocalDateTime createdAt;
@@ -20,6 +21,14 @@ public class PostResponse {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {

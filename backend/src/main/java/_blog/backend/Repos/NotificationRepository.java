@@ -14,4 +14,6 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
     List<NotificationEntity> findByCreator_Id(Long userId);
 
     int countByRecipient_IdAndSeenFalse(Long recipientId);
+
+    List<NotificationEntity> findByRecipient_IdAndSeenFalse(Long recipientId);
 }

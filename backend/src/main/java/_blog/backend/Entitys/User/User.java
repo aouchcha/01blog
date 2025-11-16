@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import _blog.backend.Entitys.Interactions.Follow.Follow;
+import _blog.backend.Entitys.Notifications.NotificationEntity;
 import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.Report.ReportEntity;
 import jakarta.persistence.CascadeType;
@@ -41,7 +42,9 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-    private boolean follow = false;
+    private boolean follow;
+
+    private boolean IsBaned;
 
     // Relations 👇
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -64,6 +67,16 @@ public class User {
     @JsonIgnoreProperties("follower") // avoid recursion
     private List<Follow> followeds_list = new ArrayList<>();
 
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("creator") // avoid recursion
+    private List<NotificationEntity> created_byme_list = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("recipient") // avoid recursion
+    private List<NotificationEntity> Follows_Forme_list = new ArrayList<>();
+
+    
+
     public User() {
     }
 
@@ -75,7 +88,7 @@ public class User {
     }
 
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public void setPassword(String password) {
@@ -84,7 +97,7 @@ public class User {
 
     // Getters and setters
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -92,7 +105,7 @@ public class User {
     }
 
     public String getUsername() {
-        return username;
+        return this.username;
     }
 
     public void setUsername(String username) {
@@ -100,7 +113,7 @@ public class User {
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public void setEmail(String email) {
@@ -116,11 +129,18 @@ public class User {
     }
 
     public boolean getFollow() {
-        return follow;
+        return this.follow;
     }
 
     public void setFollow(boolean follow) {
         this.follow = follow;
     }
 
+    public boolean getIsBaned() {
+        return this.IsBaned;
+    }
+
+    public void setIsBaned(boolean isBaned) {
+        IsBaned = isBaned;
+    }
 }

@@ -11,6 +11,10 @@ export class PostsService {
     constructor(private http: HttpClient) { }
 
     public CreatePost(token: String | null, data: FormData): Observable<any> {
+        // console.log({});
+        // console.log({token});
+        
+        
         return this.http.post<any>(
             generateURL("post"),
             data,
@@ -68,5 +72,12 @@ export class PostsService {
             },
             generateHeader(token)
         )
+    }
+
+    public DeleteComment(token: String | null, comment_id: number | null) : Observable<any> {
+        return this.http.delete(
+            generateURL(`comment/${comment_id}`),
+            generateHeader(token)
+        );
     }
 }

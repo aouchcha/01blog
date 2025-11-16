@@ -1,8 +1,11 @@
 package _blog.backend.Entitys.Notifications;
 
+import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.User.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "notifications")
@@ -19,6 +22,12 @@ public class NotificationEntity {
     @ManyToOne
     @JoinColumn(name = "recipient_id", nullable = false)
     private User recipient;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "post_id")
+    private Post post;
+
 
     private boolean seen = false;
 
@@ -59,5 +68,12 @@ public class NotificationEntity {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-}
 
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+}

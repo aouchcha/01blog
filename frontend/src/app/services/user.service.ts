@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { Router } from "@angular/router";
 import { generateURL, generateHeader } from "../helpers/genarateHeader";
 import { Observable } from 'rxjs';
-import { User } from '../models/User';
 
 @Injectable({
     providedIn: 'root'
@@ -55,8 +53,22 @@ export class UserService {
     }
 
     public RemoveUser(username: String, token: String | null): Observable<any> {
+        console.log(token);
+        
         return this.http.delete(
             generateURL(`user/${username}`),
+            generateHeader(token)
+        )
+    }
+
+    public BanUserr(username: String, token: String | null): Observable<any> {
+        console.log({token});
+        console.log("BAAAAAN");
+        
+        
+        return this.http.put(
+            generateURL(`user/${username}`),
+            null,
             generateHeader(token)
         )
     }

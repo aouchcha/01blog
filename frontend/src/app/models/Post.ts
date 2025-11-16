@@ -2,11 +2,12 @@ import { User } from "./User"
 
 export class Post {
     createdAt: string = "";
-    description: String = "";
+    title: string = "";
+    description: string = "";
     id: number = 0;
-    likeCount: Number = 0;
-    commentsCount: Number = 0;
-    media: String = "";
-    mediaUrl: String = ""
+    likeCount: number = 0;
+    commentsCount: number = 0;
+    media: File | null = null;
+    mediaUrl: string = ""
     user: User = new User();
 }

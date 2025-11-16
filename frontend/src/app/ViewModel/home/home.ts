@@ -12,6 +12,7 @@ import { UserService } from '../../services/user.service';
 import { NotificationsService } from '../../services/notification.service';
 import { Post } from '../../models/Post';
 import { HttpClient } from '@angular/common/http';
+import { Confirmation } from '../confirmation/confirmation';
 
 
 @Component({
@@ -23,32 +24,32 @@ import { HttpClient } from '@angular/common/http';
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    FormsModule
+    FormsModule,
+    Confirmation
   ],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
 export class Home implements OnInit {
+  public title: string = '';
   public description: string = '';
+  public updatedTitle: string = '';
   public updatedDescription: string = '';
-  private token: String | null = '';
+  public token: String | null = '';
   public posts: any = [];
   public me: any = {};
   public others: any = [];
-  public mediaName: String | null = null;
+  public mediaName: string | null = null;
   public media: File | null = null;
   public update: boolean = false;
   public post_id: number | null = null;
-  public updatedMediaName: String | null = null;
+  public updatedMediaName: string | null = null;
   public updateMedia: File | null = null;
   public isBrowser: boolean = false;
+  public Notifs: any = [];
   public notifsCount: number = 0;
   public ShowNotifs: boolean = false;
   public showConfirmation: boolean = false;
-  public confirmationTitle: string = 'Delete Post?';
-  public confirmationMessage: string = 'Are you sure you want to delete this post? This action cannot be undone.';
-  public confirmationAction: string = 'Delete';
-  // public deletedPostId: number = 0;
 
   constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object, private notifService: NotificationsService, private http: HttpClient, private state: ChangeDetectorRef) {
     this.isBrowser = isPlatformBrowser(platformId)
@@ -78,10 +79,10 @@ export class Home implements OnInit {
   }
 
   public setToken() {
-    if (CheckToken() === null) {
-      this.router.navigate(["login"]);
-      return;
-    }
+    // if (CheckToken() === null) {
+    //   this.router.navigate(["login"]);
+    //   return;
+    // }
     this.token = localStorage.getItem("JWT");
   }
 
@@ -91,15 +92,13 @@ export class Home implements OnInit {
     this.getAllPosts();
   }
 
-  // public getDescription(): String {
-  //   return this.description;
-  // }
-
   public Cancel(): void {
+    this.title = '';
     this.description = '';
     this.mediaName = null;
     this.media = null;
     this.update = false;
+    this.updatedTitle = '';
     this.updatedDescription = '';
     this.updateMedia = null;
     this.updatedMediaName = null;
@@ -109,10 +108,11 @@ export class Home implements OnInit {
   public Logout(): void {
     localStorage.removeItem("JWT");
     this.token = null;
-    this.http.get(`http://localhost:8080/api/notifications/disconnect/${this.me.id}`).subscribe({
-      next: () => this.notifService.disconnect(),
-      complete: () => this.router.navigate(["login"])
-    });
+    this.router.navigate(["login"]);
+    // this.http.get(`http://localhost:8080/api/notifications/disconnect/${this.me.id}`).subscribe({
+    //   next: () => this.notifService.disconnect(),
+    //   complete: () => this.router.navigate(["login"])
+    // });
   }
 
   public setMedia(event: Event, helper: String): void {
@@ -131,10 +131,12 @@ export class Home implements OnInit {
   public CreatePost(): void {
     this.setToken();
     const data = new FormData();
+    data.append("title", this.title);
     data.append("description", this.description);
     if (this.media) {
       data.append("media", this.media)
     }
+
     this.postsService.CreatePost(this.token, data).subscribe({
       next: () => {
         this.Cancel()
@@ -199,12 +201,21 @@ export class Home implements OnInit {
 
     this.update = true;
     this.post_id = post_id;
+    const post: Post = this.posts.find((p: Post) => p.id === post_id);
+
+    if (!post) return; // avoid undefined errors
+
+    this.updatedTitle = post.title;
+    this.updatedDescription = post.description;
+    this.updateMedia = post.media;
+    this.updatedMediaName = post.mediaUrl.substring(30);
   }
 
   public UpdatePost() {
     this.setToken();
     if (!this.post_id) return;
     const data = new FormData();
+    data.append("title", this.updatedTitle);
     data.append("description", this.updatedDescription);
     if (this.updateMedia) {
       data.append("media", this.updateMedia)
@@ -222,10 +233,47 @@ export class Home implements OnInit {
     })
   }
 
-  public deletePost(post_id: number) {
-    this.showConfirmation = true;
+  public confirmationTitle: string = 'Delete Post?';
+  public confirmationMessage: string = 'Are you sure you want to delete this post? This action cannot be undone.';
+  public confirmationAction: string = 'Delete';
+
+  CheckConfirmation(post_id: number) {
+    console.log(post_id)
     this.post_id = post_id;
+    this.showConfirmation = true;
   }
+
+  public deletePost() {
+    this.setToken();
+    this.postsService.deletePost(this.token, this.post_id).subscribe({
+      next: (res) => {
+        console.log(res);
+        let index = this.posts.findIndex((p: Post) => p.id === this.post_id)
+        this.posts.splice(index, 1)
+        this.CancelAction()
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
+
+  CancelAction() {
+    this.showConfirmation = false;
+    this.post_id = null;
+  }
+
+  HandleAction(value: boolean) {
+    if (!value) {
+      console.log("hanni");
+      this.CancelAction()
+    } else {
+      
+      this.deletePost()
+    }
+  }
+
+
 
   public React(post_id: number): void {
     this.setToken();
@@ -266,7 +314,16 @@ export class Home implements OnInit {
   }
 
   public ShowNotif() {
-    this.ShowNotifs = true;
+    this.notifService.getNotifs(this.token).subscribe({
+      next: (res) => {
+        console.log({ res });
+        this.Notifs = res.notifs;
+        this.ShowNotifs = true;
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
   }
 
   public CloseNotif() {
@@ -289,32 +346,6 @@ export class Home implements OnInit {
   closeMenus() {
     this.leftMenuOpen = false;
     this.rightMenuOpen = false;
-  }
-
-  // deletePostConfirm(postId: number) {
-  //   this.pendingAction = () => this.deletePost(postId);
-  // }
-
-  ConfirmAction() {
-    console.log(this.post_id);
-    
-     this.setToken();
-    this.postsService.deletePost(this.token, this.post_id).subscribe({
-      next: (res) => {
-        console.log(res);
-        let index = this.posts.findIndex((p: Post) => p.id === this.post_id)
-        this.posts.splice(index, 1)
-        this.CancelConfirmation()
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    })
-  }
-
-  CancelConfirmation() {
-    this.showConfirmation = false;
-    this.post_id = null;
   }
 
 }

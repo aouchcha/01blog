@@ -21,6 +21,10 @@ public class RegisterService {
         if (request.getUsername().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The username is required");
         }
+
+        if (!isValidName(request.getUsername().trim())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The username is malformed");
+        }
         if (request.getEmail().trim().isEmpty() || !isValidEmail(request.getEmail())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The email is required or malformed");
         }
@@ -38,7 +42,7 @@ public class RegisterService {
 
         try {
             String hashedPassword = PasswordUtils.hashPassword(request.getPassword());
-            User u = new User(request.getUsername(), request.getEmail(), hashedPassword, Role.Admin);
+            User u = new User(request.getUsername(), request.getEmail(), hashedPassword, Role.User);
             userRepositry.save(u);
             return ResponseEntity.status(HttpStatus.CREATED).body(u);
         }catch(Exception e) {
@@ -49,5 +53,10 @@ public class RegisterService {
     public boolean isValidEmail(String email) {
         String emailRegex = "[a-zA-W0-9_-]+@[a-zA-Z]+.[a-zA-Z]+";
         return email.matches(emailRegex);
+    }
+
+    public boolean isValidName(String username) {
+        String UsernameRegex = "[a-zA-Z]+";
+        return username.matches(UsernameRegex);
     }
 }

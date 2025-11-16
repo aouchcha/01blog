@@ -1,9 +1,12 @@
 package _blog.backend.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 // import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -11,8 +14,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import _blog.backend.Entitys.Interactions.Reactions.Like;
 import _blog.backend.Entitys.Notifications.NotificationDTO;
 import _blog.backend.Entitys.Notifications.NotificationEntity;
+import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.User.User;
 import _blog.backend.Repos.NotificationRepository;
+import _blog.backend.Repos.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -42,8 +47,8 @@ public class NotificationService {
     }
 
     // @Async
-    public void sendNotification(User recipient, User creator) {
-        final NotificationDTO data = SaveNotif(recipient, creator);
+    public void sendNotification(User recipient, User creator, Post p) {
+        final NotificationDTO data = SaveNotif(recipient, creator, p);
 
         SseEmitter emitter = emitters.get(recipient.getId());
         if (emitter != null)
@@ -51,10 +56,11 @@ public class NotificationService {
     }
 
     @Transactional
-    public NotificationDTO SaveNotif(User recipient, User creator) {
+    public NotificationDTO SaveNotif(User recipient, User creator, Post p) {
         NotificationEntity notif = new NotificationEntity();
         notif.setRecipient(recipient);
         notif.setCreator(creator);
+        notif.setPost(p);
         NotificationEntity saved = repo.save(notif);
 
         int count = repo.countByRecipient_IdAndSeenFalse(recipient.getId());
@@ -105,5 +111,17 @@ public class NotificationService {
         if (emitter != null) {
             emitter.complete();
         }
+    }
+
+    @Autowired UserRepository userRepository;
+
+    public ResponseEntity<?> getNotifs(String username) {
+        User u = userRepository.findByUsername(username);
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Ivalid Cridential"));
+        }
+        List<NotificationEntity> notifs = repo.findByRecipient_IdAndSeenFalse(u.getId());
+        return ResponseEntity.ok(Map.of("notifs", notifs));
     }
 }

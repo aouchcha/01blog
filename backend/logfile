@@ -111,3 +111,16 @@
 2025-11-06 15:49:55.219 GMT [1345868] LOG:  database system is ready to accept connections
 2025-11-06 16:14:55.620 GMT [1345869] LOG:  checkpoint starting: time
 2025-11-06 16:14:56.337 GMT [1345869] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.704 s, sync=0.006 s, total=0.718 s; sync files=8, longest=0.005 s, average=0.001 s; distance=5 kB, estimate=5 kB; lsn=0/18E0018, redo lsn=0/18DFFC8
+2025-11-14 10:51:34.580 GMT [254452] LOG:  starting PostgreSQL 16.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-11-14 10:51:34.580 GMT [254452] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-14 10:51:34.583 GMT [254452] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-11-14 10:51:34.586 GMT [254455] LOG:  database system was interrupted; last known up at 2025-11-13 18:17:18 GMT
+2025-11-14 10:51:34.631 GMT [254455] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-11-14 10:51:34.633 GMT [254455] LOG:  redo starts at 0/18DE588
+2025-11-14 10:51:34.633 GMT [254455] LOG:  invalid record length at 0/18DE670: expected at least 24, got 0
+2025-11-14 10:51:34.633 GMT [254455] LOG:  redo done at 0/18DE638 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-11-14 10:51:34.636 GMT [254453] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-11-14 10:51:34.643 GMT [254453] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.001 s, total=0.009 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/18DE670, redo lsn=0/18DE670
+2025-11-14 10:51:34.645 GMT [254452] LOG:  database system is ready to accept connections
+2025-11-15 14:55:36.302 GMT [442030] FATAL:  lock file "postmaster.pid" already exists
+2025-11-15 14:55:36.302 GMT [442030] HINT:  Is another postmaster (PID 393820) running in data directory "/home/aouchcha/pgsql/data"?

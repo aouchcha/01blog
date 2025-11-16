@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { PostsService } from '../../services/posts.service';
 import { Post } from '../../models/Post';
+import { Confirmation } from '../confirmation/confirmation';
 
 
 @Component({
@@ -22,7 +23,8 @@ import { Post } from '../../models/Post';
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    FormsModule
+    FormsModule,
+    Confirmation
   ],
   templateUrl: './profile.html',
   styleUrl: './profile.css'
@@ -38,14 +40,15 @@ export class Profile implements OnInit {
   public DoYouWantReport: boolean = false;
   public description: string = "";
   public isBrowser = false;
-  public popupMessage: String = '';
+  // public popupMessage: String = '';
   public showPopup: boolean = false;
   public ShowNotifs: boolean = false;
   public showConfirmation: boolean = false;
   public confirmationTitle: string = 'Delete Post?';
   public confirmationMessage: string = 'Are you sure you want to delete this post? This action cannot be undone.';
-  public confirmationAction: string = 'Delete';
+  public confirmationAction: string | undefined = 'Delete';
   public post_id: number | null = null;
+  public confirmationParams: any = {};
 
   constructor(private router: Router, private route: ActivatedRoute, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object, private postService: PostsService) {
     this.isBrowser = isPlatformBrowser(platformId)
@@ -74,6 +77,31 @@ export class Profile implements OnInit {
     })
     this.LoadProfile()
   }
+
+  // handleConfirmation(event: { action: string; params: any }) {
+
+  //   this.showConfirmation = false;
+
+  //   switch (event.action) {
+
+  //     case "delete-post":
+  //       this.deletePost(event.params.postId);
+  //       break;
+
+  //     case "report-user":
+  //       this.Report();
+  //       break;
+
+  //     // case "ban-user":
+  //     //   this.banUser(event.params.userId);
+  //     //   break;
+
+  //     case "remove-user":
+  //       this.RemoveUser();
+  //       break;
+  //   }
+  // }
+
 
   public LoadProfile() {
     this.userService.getProfile(this.username, this.token).subscribe({
@@ -115,11 +143,36 @@ export class Profile implements OnInit {
 
   public OpenReportSection() {
     this.DoYouWantReport = true;
+    this.confirmationAction = "Report";
+    this.confirmationMessage = "Are you sure you want to report this user? This action cannot be undone."
+    this.confirmationTitle = `Report User: ${this.user.username} ?`;
+  }
+
+  public CheckBeforeRemoving() {
+    this.showConfirmation = true;
+    this.confirmationAction = "Remove";
+    this.confirmationMessage = "Are you sure you want to remove this user? This action cannot be undone."
+    this.confirmationTitle = `Remove User: ${this.user.username} ?`;
+  }
+
+    public CheckBeforeBan() {
+    this.showConfirmation = true;
+    this.confirmationAction = "Ban";
+    this.confirmationMessage = "Are you sure you want to Ban this user? This action cannot be undone."
+    this.confirmationTitle = `Ban User: ${this.user.username} ?`;
+  }
+
+  public CheckReport() {
+    this.showConfirmation = true;
+    this.DoYouWantReport = false;
   }
 
   public Cancel() {
     this.DoYouWantReport = false;
     this.description = '';
+    this.confirmationTitle = 'Delete Post?';
+    this.confirmationMessage = 'Are you sure you want to delete this post? This action cannot be undone.';
+    this.confirmationAction = 'Delete';
   }
 
   // public setDescription(description: string) : void {
@@ -139,26 +192,59 @@ export class Profile implements OnInit {
     })
   }
 
-  public deletePost(post_id: number) {
-    // this.postService.deletePost(this.token, post_id).subscribe({
-    //   next: (res) => {
-    //     console.log(res);
-    //     this.popupMessage = res.message;
-    //     this.showPopup = true;
-    //     this.LoadProfile()
-    //   },
-    //   error: (err) => {
-    //     console.log(err);
-    //   }
-    // })
+  CheckDeletePost(post_id: number) {
     this.post_id = post_id;
+    this.confirmationTitle = "Delete Post?";
+    this.confirmationMessage = "Are you sure you want to delete this post?";
+    this.confirmationAction = "Delete";
     this.showConfirmation = true;
   }
+
+  CancelAction() {
+    this.showConfirmation = false;
+    this.post_id = null;
+  }
+
+   HandleAction(value: boolean) {
+    if (!value) {
+      this.CancelAction()
+    } else {
+      if (this.confirmationAction === "Delete") {
+        this.deletePost()
+      }else if (this.confirmationAction === "Report") {
+        this.Report()
+        this.Cancel()
+        this.CancelAction()
+      }else if (this.confirmationAction === "Remove") {
+        this.RemoveUser()
+        this.Cancel()
+        this.CancelAction()
+      }else if (this.confirmationAction === "Ban") {
+        this.BanUser()
+        this.Cancel()
+        this.CancelAction()
+      }
+    }
+  }
+
 
   public RemoveUser() {
     console.log("hanni");
 
     this.userService.RemoveUser(this.user.username, this.token).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.router.navigate(["admin"])
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
+
+  public BanUser() {
+    this.setToken()
+    this.userService.BanUserr(this.user.username, this.token).subscribe({
       next: (res) => {
         console.log(res);
       },
@@ -168,12 +254,12 @@ export class Profile implements OnInit {
     })
   }
 
-  public closePopup() {
-    this.showPopup = false;
-    this.popupMessage = '';
-  }
+  // public closePopup() {
+  //   this.showPopup = false;
+  //   // this.popupMessage = '';
+  // }
 
-    public setToken() {
+  public setToken() {
     if (CheckToken() === null) {
       this.router.navigate(["login"]);
       return;
@@ -181,7 +267,7 @@ export class Profile implements OnInit {
     this.token = localStorage.getItem("JWT");
   }
 
-  ConfirmAction() {
+  public deletePost() {
     console.log(this.post_id);
 
     this.setToken();
@@ -190,7 +276,7 @@ export class Profile implements OnInit {
         console.log(res);
         let index = this.posts.findIndex((p: Post) => p.id === this.post_id)
         this.posts.splice(index, 1)
-        this.CancelConfirmation()
+        this.CancelAction()
       },
       error: (err) => {
         console.log(err);
@@ -198,8 +284,5 @@ export class Profile implements OnInit {
     })
   }
 
-  CancelConfirmation() {
-    this.showConfirmation = false;
-    this.post_id = null;
-  }
+
 }
