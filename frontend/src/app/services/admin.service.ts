@@ -25,4 +25,11 @@ export class AdminService {
             generateHeader(token)
         )
     }
+
+    public RemoveReport(token: String|null, report_id: number|null) : Observable<any> {
+        return this.http.delete(
+            generateURL(`admin/reports/${report_id}`),
+            generateHeader(token)
+        )
+    }
 }

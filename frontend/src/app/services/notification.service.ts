@@ -61,4 +61,12 @@ export class NotificationsService {
       generateHeader(token)
     );
   }
+
+  public markAsRead(token: String | null, notification_id: number): Observable<any> {
+    return this.http.put<any>(
+      generateURL(`notifications/${notification_id}`),
+      {},
+      generateHeader(token)
+    );
+  }
 }

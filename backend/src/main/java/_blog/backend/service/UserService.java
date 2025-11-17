@@ -151,7 +151,7 @@ public class UserService {
         if (u == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user u wanna to ban doesnt exist"));
         }
-        u.setIsBaned(!u.getIsBaned());
+        u.setisbaned(!u.getisbaned());
         return ResponseEntity.ok().body(Map.of("message", "User " + u + " Banned with success"));
     }
 }

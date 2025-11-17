@@ -106,8 +106,10 @@ export class Profile implements OnInit {
   public LoadProfile() {
     this.userService.getProfile(this.username, this.token).subscribe({
       next: (res) => {
-        console.log(res);
+        console.log({res});
         this.user = res.user;
+        console.log({"ussssss":this.user});
+        
         this.posts = res.posts;
         this.followers = res.followers
         this.followings = res.followings
@@ -246,6 +248,7 @@ export class Profile implements OnInit {
     this.setToken()
     this.userService.BanUserr(this.user.username, this.token).subscribe({
       next: (res) => {
+        this.user.isbaned = !this.user.isbaned;
         console.log(res);
       },
       error: (err) => {

@@ -17,12 +17,12 @@ export class Confirmation {
   // cancelled = output<void>();
 
   onConfirm() {
-    console.log("Confirm");
+    // console.log("Confirm");
     this.confirmed.emit(true);
   }
 
   onCancel() {
-    console.log("Cancel");
+    // console.log("Cancel");
     this.confirmed.emit(false);
   }
 }

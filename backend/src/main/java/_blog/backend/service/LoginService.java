@@ -38,7 +38,7 @@ public class LoginService {
                     .body(Map.of("message", "Invalid Cridential"));
         }
 
-        if (user.getIsBaned()) {
+        if (user.getisbaned()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("message", "You are banned"));
         }

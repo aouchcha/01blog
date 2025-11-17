@@ -20,12 +20,14 @@ import { FormsModule } from '@angular/forms';
 export class Admin implements OnInit {
   public token: String | null = null;
   public search: string = '';
+  public admin: User = new User();
   public usersStates: User[] = [];
   public OriginaleUsers : User[] = [];
-  public filtredUsers : User[] = [];
+  public filtredUsers : any = [];
   public isBrowser: boolean = false;
+  public report_count: number = 0;
 
-  public constructor(private router: Router, private adminService: AdminService, @Inject(PLATFORM_ID) platformId: Object) { 
+  public constructor(private router: Router, private adminService: AdminService, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object) { 
     this.isBrowser = isPlatformBrowser(platformId)
   }
 
@@ -39,8 +41,25 @@ export class Admin implements OnInit {
       return
     }
     this.token = CheckToken();
+    this.getAdminInfo()
     this.getDashboard()
 
+  }
+
+  public getAdminInfo() {
+    this.userService.getMe(this.token).subscribe({
+      next: (res) => {
+        
+        this.admin = res.me;
+        console.log({"Admin":this.admin});
+      },
+      error: (err) => {
+        if (err.status == 401) {
+          this.router.navigate(["login"])
+        }
+        // console.log(err);
+      }
+    })
   }
 
   public getDashboard() {
@@ -49,7 +68,8 @@ export class Admin implements OnInit {
         this.OriginaleUsers = res.users;
         this.usersStates = this.OriginaleUsers;
         this.filtredUsers = this.OriginaleUsers;
-        console.log(this.filtredUsers);
+        this.report_count = res.reportsCount;
+        console.log({"FFFFFFFFFFFF": res});
 
       },
       error: (err) => {
@@ -92,7 +112,7 @@ export class Admin implements OnInit {
       this.filtredUsers = this.OriginaleUsers;
     }
     this.filtredUsers = this.usersStates.filter((u) => {
-      return u.username.startsWith(this.search)
+      return u.username?.startsWith(this.search)
     })
     console.log(this.OriginaleUsers);
     

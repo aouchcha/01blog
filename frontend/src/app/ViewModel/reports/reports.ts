@@ -3,11 +3,14 @@ import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { AdminService } from '../../services/admin.service';
 import { CheckToken } from '../../helpers/genarateHeader';
 import { Router } from '@angular/router';
+import { Confirmation } from '../confirmation/confirmation';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-reports',
   imports: [
-    CommonModule
+    CommonModule,
+    Confirmation
   ],
   templateUrl: './reports.html',
   styleUrl: './reports.css'
@@ -15,14 +18,21 @@ import { Router } from '@angular/router';
 export class Reports implements OnInit {
   public token: String | null = null;
   public reports: any = [];
-    public isBrowser: boolean = false;
+  public isBrowser: boolean = false;
+  public username: string | null = null;
+  public report_id: number | null = null;
+
+  public showConfirmation: boolean = false;
+  public confirmationTitle: string = 'Delete Report?';
+  public confirmationMessage: string = 'Are you sure you want to delete this Report? This action cannot be undone.';
+  public confirmationAction: string = 'Delete';
 
 
-  public constructor(private adminService: AdminService, private router: Router, @Inject(PLATFORM_ID) platformId: Object) { 
+  public constructor(private adminService: AdminService, private router: Router, @Inject(PLATFORM_ID) platformId: Object, private userService: UserService) {
     this.isBrowser = isPlatformBrowser(platformId)
   }
   ngOnInit(): void {
-     if (!this.isBrowser) {
+    if (!this.isBrowser) {
       return
     }
     this.setToken();
@@ -66,11 +76,79 @@ export class Reports implements OnInit {
     this.showDetailsModal = false;
   }
 
-  DeleteReport(id: number) {
-    console.log(id);
+  HandleAction(value: boolean) {
+    if (!value) {
+      console.log("Cancel");
+
+      this.CancelAction()
+    } else {
+      if (this.confirmationAction === "Delete") {
+        this.DeleteReport()
+        // this.CancelAction();
+      } else if (this.confirmationAction === "Ban") {
+        this.BanUser()
+        this.DeleteReport()
+      }
+      this.CancelAction()
+    }
   }
 
-  ResolveReport(id: number) {
-    console.log(id);
+  CheckBanUser(username: string, report_id: number) {
+    this.showConfirmation = true;
+    this.username = username;
+    this.report_id = report_id;
+    console.log(report_id);
+    console.log(username);
+    
+    
+    this.confirmationAction = "Ban";
+    this.confirmationMessage = "Are you sure you want to Ban this user? This action cannot be undone."
+    this.confirmationTitle = `Ban User: ${username} ?`;
+  }
+
+  CancelAction() {
+    this.showConfirmation = false;
+    this.confirmationTitle = 'Delete Report?';
+    this.confirmationMessage = 'Are you sure you want to delete this Report? This action cannot be undone.';
+    this.confirmationAction = 'Delete';
+    this.showConfirmation = false;
+    this.username = null;
+    this.report_id = null;
+  }
+
+  ConfirmAction(report_id: number) {
+    this.showConfirmation = true;
+    this.report_id = report_id;
+    this.username = null;
+  }
+
+  DeleteReport() {
+    console.log({"RRRRRRRRR":this.report_id});
+    
+    this.adminService.RemoveReport(this.token, this.report_id).subscribe({
+      next: (res) => {
+        console.log(res);
+        let index = this.reports.findIndex((r: any) => r.id === this.report_id)
+        this.reports.splice(index, 1)
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+
+  }
+
+  BanUser() {
+    console.log("Ban User");
+    this.userService.BanUserr(this.username, this.token).subscribe({
+      next: (res) => {
+        // this.user.isbaned = !this.user.isbaned;
+        console.log(res);
+        // this.DeleteReport();
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
   }
 }

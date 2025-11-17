@@ -79,7 +79,7 @@
                         <strong>{{notif.creator.username}}</strong>
                         <span class="notification-text">Created Post At {{notif.createdAt | date:'short'}}</span>
                     </div>
-                    <button class="seen-btn">Seen</button>
+                    <button class="seen-btn" (click)="MarkNotifsAsRead(notif.id)">{{ notif.seen ? 'Seen' : 'See'}}</button>
                 </div>
 
             </div>

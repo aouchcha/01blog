@@ -64,7 +64,7 @@ public class NotificationService {
         NotificationEntity saved = repo.save(notif);
 
         int count = repo.countByRecipient_IdAndSeenFalse(recipient.getId());
-        NotificationDTO n = new NotificationDTO(saved.getId(), saved.getCreator().getUsername(), count);
+        NotificationDTO n = new NotificationDTO(saved.getId(), saved.getCreator().getUsername(), count, saved.getCreatedAt(), saved.isSeen());
         return n;
     }
 
@@ -73,7 +73,7 @@ public class NotificationService {
             emitter.send(SseEmitter.event()
                     .id(String.valueOf(notif.getId()))
                     .name("notification")
-                    .data(Map.of("message", notif.getCreatorUsername() + " publish a post", "count", notif.getCount())));
+                    .data(Map.of("message", String.format( "%s publish a post",notif.getCreatorUsername()), "count", notif.getCount())));
         } catch (Exception e) {
             emitter.completeWithError(e);
         }
@@ -123,5 +123,16 @@ public class NotificationService {
         }
         List<NotificationEntity> notifs = repo.findByRecipient_IdAndSeenFalse(u.getId());
         return ResponseEntity.ok(Map.of("notifs", notifs));
+    }
+
+    public ResponseEntity<?> markAsRead(Long notification_id) {
+        NotificationEntity notif = repo.findById(notification_id).orElse(null);
+        if (notif == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Notification not found"));
+        }
+        notif.setSeen(true);
+        final NotificationEntity n = repo.save(notif);
+        return ResponseEntity.ok(Map.of("message", "Notification marked as read", "notification", n));
     }
 }

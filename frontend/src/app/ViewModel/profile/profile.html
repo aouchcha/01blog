@@ -47,7 +47,7 @@
             </button>
 
              <button class="action-btn danger-btn" *ngIf="me.role === 'Admin'" (click)="CheckBeforeBan()">
-              {{ user.isBaned ? 'UnBanned' : 'Ban' }}
+              {{ user.isbaned ? 'UnBanned' : 'Ban' }}
             </button>
           </div>
         </div>
@@ -157,7 +157,7 @@
           <p class="post-description">{{ post.description }}</p>
 
           <!-- Post Footer -->
-          <div class="post-footer">
+          <div class="post-footer" *ngIf="me.role !== 'Admin'">
             <button class="reaction-btn">
               ❤️ {{ post.likeCount || 0 }}
             </button>

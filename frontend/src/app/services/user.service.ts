@@ -41,7 +41,7 @@ export class UserService {
         )
     }
 
-    public Report(reportted_username: String,discription: String, token: String | null): Observable<any> {
+    public Report(reportted_username: string | null | null ,discription: String, token: String | null): Observable<any> {
         return this.http.post<any>(
             generateURL("report"),
             {
@@ -52,7 +52,7 @@ export class UserService {
         )
     }
 
-    public RemoveUser(username: String, token: String | null): Observable<any> {
+    public RemoveUser(username: string | null, token: String | null): Observable<any> {
         console.log(token);
         
         return this.http.delete(
@@ -61,7 +61,7 @@ export class UserService {
         )
     }
 
-    public BanUserr(username: String, token: String | null): Observable<any> {
+    public BanUserr(username: string | null , token: String | null): Observable<any> {
         console.log({token});
         console.log("BAAAAAN");
         

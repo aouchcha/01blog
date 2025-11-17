@@ -56,11 +56,11 @@ public class PostsService {
 
     public ResponseEntity<?> getSinglePost(Long post_id) {
 
-        // Post p = postRepository.findById(post_id).orElse(null);
+        Post p = postRepository.findById(post_id).orElse(null);
 
-        // if (p == null) {
-        // return ResponseEntity.badRequest().body(null);
-        // }
+        if (p == null) {
+        return ResponseEntity.badRequest().body(null);
+        }
 
         List<Comment> comments = commentRepository.findAllByPost_id(post_id);
 
@@ -68,7 +68,7 @@ public class PostsService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
         }
 
-        return ResponseEntity.ok().body(Map.of("comments", comments));
+        return ResponseEntity.ok().body(Map.of("comments", comments, "post", p));
 
     }
 

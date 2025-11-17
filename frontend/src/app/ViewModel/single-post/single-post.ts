@@ -60,6 +60,8 @@ export class SinglePost implements OnInit {
   public LoadPage() {
     this.userService.getMe(this.token).subscribe({
       next: (res) => {
+        // console.log({res});
+        
         this.me = res.me;
       },
       error: (err) => {
@@ -72,7 +74,7 @@ export class SinglePost implements OnInit {
   public getPost() {
     this.postsService.getSinglePost(this.token, this.post_id).subscribe({
       next: (res) => {
-        console.log(res);
+        console.log({res});
         this.post = res.post
         this.comments = res.comments
       },

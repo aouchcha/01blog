@@ -151,9 +151,11 @@
 .search-container {
   display: flex;
   align-items: center;
-  max-width: 375px;
+  min-width: 50%;
   margin-bottom: 24px;
+  /* margin-left: 80px; */
   background-color: white;
+  justify-self: center;
   border-radius: 24px;
   padding: 4px 20px 4px 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -267,6 +269,17 @@
 
 .report-cell {
   color: #000;
+}
+
+.notification-badge {
+  /* position: absolute; */
+  right: 12px;
+  background-color: #681C28;
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-weight: 600;
 }
 
 /* .activity-cell {

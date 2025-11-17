@@ -183,4 +183,13 @@ public class MainController {
         }
         return adminService.loadReports();
     }
+
+    @DeleteMapping("/admin/reports/{report_id}")
+     public ResponseEntity<?> BanUser(@PathVariable Long report_id, @RequestHeader("Authorization") String header) {
+        String token = header.replace("Bearer", "");
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        }
+        return adminService.DeleteReport(report_id);
+    }
 }

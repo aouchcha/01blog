@@ -44,7 +44,7 @@ public class User {
 
     private boolean follow;
 
-    private boolean IsBaned;
+    private boolean isbaned;
 
     // Relations 👇
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -136,11 +136,11 @@ public class User {
         this.follow = follow;
     }
 
-    public boolean getIsBaned() {
-        return this.IsBaned;
+    public boolean getisbaned() {
+        return this.isbaned;
     }
 
-    public void setIsBaned(boolean isBaned) {
-        IsBaned = isBaned;
+    public void setisbaned(boolean isbaned) {
+        this.isbaned = isbaned;
     }
 }

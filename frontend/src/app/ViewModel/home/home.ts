@@ -273,8 +273,6 @@ export class Home implements OnInit {
     }
   }
 
-
-
   public React(post_id: number): void {
     this.setToken();
     this.postsService.React(this.token, post_id).subscribe({
@@ -346,6 +344,24 @@ export class Home implements OnInit {
   closeMenus() {
     this.leftMenuOpen = false;
     this.rightMenuOpen = false;
+  }
+
+  public MarkNotifsAsRead(notification_id: number): void {
+    console.log({notification_id});
+    this.notifService.markAsRead(this.token, notification_id).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.notifsCount = this.notifsCount > 0 ? this.notifsCount - 1 : 0;
+        let index = this.Notifs.findIndex((notif: any) => notif.id === notification_id);
+        this.Notifs[index] = res.notification;
+        console.log({"NOOOOOOO": this.Notifs[index]});
+        
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+    
   }
 
 }

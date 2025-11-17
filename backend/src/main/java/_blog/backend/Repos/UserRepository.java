@@ -32,7 +32,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
                     u.username,
                     u.email,
                     COUNT(DISTINCT p),
-                    COUNT(DISTINCT r)
+                    COUNT(DISTINCT r),
+                    u.isbaned
                 )
                 FROM User u
                 LEFT JOIN u.posts p
