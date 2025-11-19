@@ -12,10 +12,11 @@ import _blog.backend.Entitys.User.LoginRequest;
 import _blog.backend.Repos.UserRepository;
 import _blog.backend.helpers.JwtUtil;
 import _blog.backend.helpers.PasswordUtils;
-
+import jakarta.transaction.Transactional;
 import _blog.backend.Entitys.User.UserResponse;
 
 @Service
+@Transactional
 public class LoginService {
 
     @Autowired

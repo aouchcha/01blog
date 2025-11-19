@@ -30,7 +30,7 @@
         </div>
 
         <nav class="nav-menu">
-            <button class="nav-button active" (click)="getAllPosts()">
+            <button class="nav-button active" (click)="getAllPosts('feed')">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3 4h14M3 10h14M3 16h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
@@ -65,12 +65,15 @@
     </aside>
 
     <!-- Main Content - Feed -->
-    <main class="main-content">
+    <main class="main-content" (scroll)="handleScrollLogic($event)">
         <!-- Notifications Panel -->
         <div class="notifications-panel" *ngIf="ShowNotifs">
             <div class="panel-header">
                 <h2>Notifications</h2>
                 <button class="close-btn" (click)="CloseNotif()">✕</button>
+            </div>
+            <div class="empty-state" *ngIf="!Notifs || Notifs.length === 0">
+                <p>No notifications yet.</p>
             </div>
             <div class="notifications-list" *ngFor="let notif of Notifs">
 
@@ -79,7 +82,8 @@
                         <strong>{{notif.creator.username}}</strong>
                         <span class="notification-text">Created Post At {{notif.createdAt | date:'short'}}</span>
                     </div>
-                    <button class="seen-btn" (click)="MarkNotifsAsRead(notif.id)">{{ notif.seen ? 'Seen' : 'See'}}</button>
+                    <button class="seen-btn" (click)="MarkNotifsAsRead(notif.id)">{{ notif.seen ? 'Seen' :
+                        'See'}}</button>
                 </div>
 
             </div>
@@ -92,7 +96,8 @@
                     class="post-avatar">
                 <div class="areas">
 
-                    <textarea [(ngModel)]="title" placeholder="Write Blog Title..." class="post-textarea" id="title"></textarea>
+                    <textarea [(ngModel)]="title" placeholder="Write Blog Title..." class="post-textarea"
+                        id="title"></textarea>
 
                     <textarea [(ngModel)]="description" placeholder="Write Blog Description..."
                         class="post-textarea"></textarea>
@@ -101,6 +106,7 @@
 
             <p class="media-preview" *ngIf="media !== null">
                 <b>File to upload: {{mediaName}}</b>
+                <button class="close-btn" (click)="RemoveImage('create')">✕</button>
             </p>
 
             <div class="create-post-actions">
@@ -195,6 +201,8 @@
                     accept="image/*, video/*">
                 <p class="media-preview" *ngIf="updateMedia !== null">
                     <b>File to upload: {{updatedMediaName}}</b>
+                    <button class="close-btn" (click)="RemoveImage('edit')">✕</button>
+
                 </p>
 
                 <div class="modal-actions">

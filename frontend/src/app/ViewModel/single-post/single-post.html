@@ -25,11 +25,11 @@
                     <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #optionsMenu="matMenu">
-                    <button mat-menu-item (click)="updatePost(post.id)">
+                    <button mat-menu-item (click)="ShowUpdate()">
                         <mat-icon>edit</mat-icon>
                         <span>Update</span>
                     </button>
-                    <button mat-menu-item (click)="deletePost(post.id)">
+                    <button mat-menu-item (click)="CheckConfirmation()">
                         <mat-icon>delete</mat-icon>
                         <span>Delete</span>
                     </button>
@@ -58,6 +58,34 @@
                 <button class="action-btn">
                     💬 {{ post.commentsCount || 0 }}
                 </button>
+            </div>
+        </div>
+
+         <!-- Update Post Modal -->
+        <div class="modal-overlay" *ngIf="update" (click)="Cancel()">
+            <div class="modal-content" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <h2>Update Post</h2>
+                    <button class="modal-close" (click)="Cancel()">✕</button>
+                </div>
+                <textarea [(ngModel)]="updatedTitle" placeholder="Update your title..."
+                    class="modal-textarea"></textarea>
+                <textarea [(ngModel)]="updatedDescription" placeholder="Update your description..."
+                    class="modal-textarea"></textarea>
+
+                <label for="UpdateMedia" class="modal-media-btn">Select Media</label>
+                <input type="file" id="UpdateMedia" (change)="setMedia($event, 'update')" class="media-input"
+                    accept="image/*, video/*">
+                <p class="media-preview" *ngIf="updateMedia !== null">
+                    <b>File to upload: {{updatedMediaName}}</b>
+                    <button class="close-btn" (click)="RemoveImage('edit')">✕</button>
+
+                </p>
+
+                <div class="modal-actions">
+                    <button class="modal-save-btn" (click)="updatePost()">Save</button>
+                    <button class="modal-cancel-btn" (click)="Cancel()">Cancel</button>
+                </div>
             </div>
         </div>
 
@@ -96,11 +124,11 @@
                                 <mat-icon>more_vert</mat-icon>
                             </button>
                             <mat-menu #optionsMenu="matMenu">
-                                <button mat-menu-item (click)="updatePost(post.id)">
+                                <!-- <button mat-menu-item (click)="updateComment(comment)">
                                     <mat-icon>edit</mat-icon>
                                     <span>Update</span>
-                                </button>
-                                <button mat-menu-item (click)="deleteComment(c.id)">
+                                </button> -->
+                                <button mat-menu-item (click)="ConfirmCommentDelet(c.id)">
                                     <mat-icon>delete</mat-icon>
                                     <span>Delete</span>
                                 </button>
@@ -119,6 +147,10 @@
                     <p>No comments yet. Be the first to comment!</p>
                 </div>
             </div>
+        </div>
+        <div class="modal-overlay" *ngIf="showConfirmation" (click)="CancelAction()">
+            <app-confirmation [title]="confirmationTitle" [message]="confirmationMessage" [action]="confirmationAction"
+                (confirmed)="HandleAction($event)"> </app-confirmation>
         </div>
     </div>
 </div>

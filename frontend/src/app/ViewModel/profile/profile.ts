@@ -78,30 +78,6 @@ export class Profile implements OnInit {
     this.LoadProfile()
   }
 
-  // handleConfirmation(event: { action: string; params: any }) {
-
-  //   this.showConfirmation = false;
-
-  //   switch (event.action) {
-
-  //     case "delete-post":
-  //       this.deletePost(event.params.postId);
-  //       break;
-
-  //     case "report-user":
-  //       this.Report();
-  //       break;
-
-  //     // case "ban-user":
-  //     //   this.banUser(event.params.userId);
-  //     //   break;
-
-  //     case "remove-user":
-  //       this.RemoveUser();
-  //       break;
-  //   }
-  // }
-
 
   public LoadProfile() {
     this.userService.getProfile(this.username, this.token).subscribe({

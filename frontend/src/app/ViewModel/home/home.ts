@@ -13,6 +13,9 @@ import { NotificationsService } from '../../services/notification.service';
 import { Post } from '../../models/Post';
 import { HttpClient } from '@angular/common/http';
 import { Confirmation } from '../confirmation/confirmation';
+import { Subject, Subscription } from 'rxjs'; // Import Subject
+import { throttleTime } from 'rxjs/operators'; // Import throttleTime
+import { log } from 'node:util';
 
 
 @Component({
@@ -45,11 +48,19 @@ export class Home implements OnInit {
   public post_id: number | null = null;
   public updatedMediaName: string | null = null;
   public updateMedia: File | null = null;
+  public oldMediaName: string | null = null;
+  public oldMedia: File | null = null;
   public isBrowser: boolean = false;
   public Notifs: any = [];
   public notifsCount: number = 0;
   public ShowNotifs: boolean = false;
   public showConfirmation: boolean = false;
+  public lastPost: Post | null = new Post();
+  public isLoading: boolean = false;
+  public HasMore: boolean = true;
+  public Removed: boolean = false;
+  // private scrollSubject = new Subject<any>();
+  // private scrollSubscription: Subscription | undefined;
 
   constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object, private notifService: NotificationsService, private http: HttpClient, private state: ChangeDetectorRef) {
     this.isBrowser = isPlatformBrowser(platformId)
@@ -71,12 +82,26 @@ export class Home implements OnInit {
 
     this.notifService.reactionsObservable.subscribe((react) => {
       if (react) {
+        console.log({react});
+        
         let index = this.posts.findIndex((p: Post) => p.id === react.post.id)
-        this.posts[index] = react.post;
+        this.posts[index].likeCount = react.post.likeCount;
       }
     })
 
+    // this.scrollSubscription = this.scrollSubject
+    //   .pipe(throttleTime(100)) // Wait 200ms between checks
+    //   .subscribe((event) => {
+    //     this.handleScrollLogic(event);
+    //   });
+
   }
+
+  // public onContainerScroll(event: any): void {
+  //   // We just push the event to the subject. 
+  //   // The logic runs in the throttled subscription in ngOnInit
+  //   this.scrollSubject.next(event);
+  // }
 
   public setToken() {
     // if (CheckToken() === null) {
@@ -89,7 +114,7 @@ export class Home implements OnInit {
   public loadHome(): void {
     this.getOthers();
     this.getMe();
-    this.getAllPosts();
+    this.getAllPosts("feed");
   }
 
   public Cancel(): void {
@@ -119,9 +144,10 @@ export class Home implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       if (helper === 'create') {
-        this.media = input.files[0];  // store the file itself
+        this.media = input.files[0];
         this.mediaName = input.files[0].name;
       } else if (helper === 'update') {
+        this.Removed = true;
         this.updateMedia = input.files[0];
         this.updatedMediaName = input.files[0].name;
       }
@@ -140,7 +166,10 @@ export class Home implements OnInit {
     this.postsService.CreatePost(this.token, data).subscribe({
       next: () => {
         this.Cancel()
-        this.getAllPosts();
+        this.posts = [];
+        this.lastPost = null;
+        this.HasMore = true;
+        this.getAllPosts("feed");
       },
       error: (err) => {
         console.log(err);
@@ -151,23 +180,56 @@ export class Home implements OnInit {
     })
   }
 
-  public getAllPosts(): void {
-    this.setToken();
-    this.ShowNotifs = false;
-    this.postsService.getAllPosts(this.token).subscribe({
-      next: (res) => {
-        console.log(res.posts);
 
-        this.posts = res.posts;
+
+  public getAllPosts(helper: string): void {
+    if (this.isLoading) return;
+
+    this.setToken();
+    this.isLoading = true;
+    this.ShowNotifs = false;
+    if(helper === "feed") {
+      this.lastPost = null;
+      this.posts = [];
+    }
+    console.log({helper});
+    console.log({"last":this.lastPost});
+    
+
+    this.postsService.getAllPosts(this.token, this.lastPost).subscribe({
+      next: (res) => {
+
+        if (res.posts && res.posts.length > 0) {
+          this.posts = [...this.posts, ...res.posts];
+          this.lastPost = this.posts[this.posts.length - 1];
+        } else {
+          console.log("No more posts to load");
+          this.HasMore = false;
+        }
+
+        this.isLoading = false;
       },
       error: (err) => {
         console.log(err);
+        this.isLoading = false;
         if (err.status == 401) {
-          this.Logout()
+          this.Logout();
         }
-
       }
-    })
+    });
+  }
+
+  public handleScrollLogic(event: any): void {
+    const element = event.target;
+
+    // console.log({ "message": "gggggggggggggggg" });
+    // Calculate if user is near bottom
+    const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 50;
+
+    if (atBottom && !this.isLoading && this.HasMore) {
+      console.log({ "message": "Hanni wsselt - Loading More" });
+      this.getAllPosts("other");
+    }
   }
 
   public getMe(): void {
@@ -203,12 +265,16 @@ export class Home implements OnInit {
     this.post_id = post_id;
     const post: Post = this.posts.find((p: Post) => p.id === post_id);
 
-    if (!post) return; // avoid undefined errors
+    if (!post) return;
 
     this.updatedTitle = post.title;
     this.updatedDescription = post.description;
-    this.updateMedia = post.media;
-    this.updatedMediaName = post.mediaUrl.substring(30);
+    if (post.media && post.mediaUrl) {
+      this.updateMedia = post.media;
+      this.oldMedia = post.media;
+      this.updatedMediaName = post.mediaUrl.substring(30);
+      this.oldMediaName = post.mediaUrl.substring(30);
+    }
   }
 
   public UpdatePost() {
@@ -217,20 +283,44 @@ export class Home implements OnInit {
     const data = new FormData();
     data.append("title", this.updatedTitle);
     data.append("description", this.updatedDescription);
+
+    console.log({ "UpdatedMedia": this.updateMedia });
+    // console.log({ "OldMedia": this.oldMedia });
+    // console.log({ "UpdatedMediaName": this.updatedMediaName });
+    // console.log({ "OldMediaName": this.oldMediaName });
+    
+
+    console.log(this.oldMedia === this.updateMedia);
+    console.log(this.oldMediaName === this.updatedMediaName);
+
+
     if (this.updateMedia) {
       data.append("media", this.updateMedia)
     }
-    this.postsService.updatePost(this.token, this.post_id, data).subscribe({
+    this.postsService.updatePost(this.token, this.post_id, data, this.Removed).subscribe({
       next: (res) => {
         console.log(res.post);
         let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
         this.posts[index] = res.post;
+        this.Removed = false;
         this.Cancel()
       },
       error: (err) => {
         console.log(err);
       }
     })
+  }
+
+  public RemoveImage(type: string) {
+    console.log("sssssssssssss");
+    this.Removed = true;
+    if (type === 'create') {
+      this.media = null;
+      this.mediaName = null;
+    } else {
+      this.updateMedia = null;
+      this.updatedMediaName = null;
+    }
   }
 
   public confirmationTitle: string = 'Delete Post?';
@@ -268,7 +358,7 @@ export class Home implements OnInit {
       console.log("hanni");
       this.CancelAction()
     } else {
-      
+
       this.deletePost()
     }
   }
@@ -277,7 +367,7 @@ export class Home implements OnInit {
     this.setToken();
     this.postsService.React(this.token, post_id).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         // let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
         // this.posts[index] = res.post;
         // this.getAllPosts()
@@ -347,21 +437,21 @@ export class Home implements OnInit {
   }
 
   public MarkNotifsAsRead(notification_id: number): void {
-    console.log({notification_id});
+    console.log({ notification_id });
     this.notifService.markAsRead(this.token, notification_id).subscribe({
       next: (res) => {
         console.log(res);
         this.notifsCount = this.notifsCount > 0 ? this.notifsCount - 1 : 0;
         let index = this.Notifs.findIndex((notif: any) => notif.id === notification_id);
         this.Notifs[index] = res.notification;
-        console.log({"NOOOOOOO": this.Notifs[index]});
-        
+        console.log({ "NOOOOOOO": this.Notifs[index] });
+
       },
       error: (err) => {
         console.log(err);
       }
     })
-    
+
   }
 
 }

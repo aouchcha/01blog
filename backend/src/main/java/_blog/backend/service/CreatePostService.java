@@ -11,11 +11,13 @@ import org.springframework.stereotype.Service;
 // import org.springframework.transaction.annotation.Transactional;
 
 import _blog.backend.Entitys.Post.PostRequst;
+import _blog.backend.Entitys.Post.PostResponse;
 import _blog.backend.Repos.FollowRepositry;
 import _blog.backend.Repos.PostRepository;
 import _blog.backend.Repos.UserRepository;
 import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.User.User;
+import _blog.backend.Entitys.User.UserResponse;
 import _blog.backend.Entitys.Interactions.Follow.Follow;
 
 
@@ -91,11 +93,26 @@ public class CreatePostService {
         
         // PostCreationResult pr = savePostAndGetFollowers(newPost, u.getId());
 
-        Post p = postRepository.save(newPost);
+        final Post p = postRepository.save(newPost);
+        // PostResponse pr = new PostResponse();
+        // pr.setCommentsCount(p.getCommentsCount());
+        // pr.setCreatedAt(p.getCreatedAt());
+        // pr.setDescription(p.getDescription());
+        // pr.setId(p.getId());
+        // pr.setLikeCount(p.getLikeCount());
+        // pr.setMedia(postRequest.getMedia());
+        // pr.setTitle(p.getTitle());
+        // UserResponse ur = new UserResponse();
+        // ur.setEmail(u.getEmail());
+        // ur.setFollow(u.getFollow());
+        // ur.setId(u.getId());
+        // ur.setRole(u.getRole());
+        // ur.setUsername(username);
+        // pr.setUserResponse(ur);
         List<Follow> followers = followRepositry.findByFollowed_Id(u.getId());
         followers.forEach(f -> notificationService.sendNotification(f.getFollower(), u, p));
 
-        return ResponseEntity.ok(Map.of("message", "post created successfully"));
+        return ResponseEntity.ok(Map.of("message", "post created successfully", "newpost", p));
     }
 
     // @Transactional

@@ -1,0 +1,43 @@
+2025-11-19 14:45:45.708 GMT [1441080] LOG:  starting PostgreSQL 16.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-11-19 14:45:45.708 GMT [1441080] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-19 14:45:45.711 GMT [1441080] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-11-19 14:45:45.715 GMT [1441083] LOG:  database system was interrupted; last known up at 2025-11-19 13:06:49 GMT
+2025-11-19 14:45:45.763 GMT [1441083] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-11-19 14:45:45.765 GMT [1441083] LOG:  redo starts at 0/18EE160
+2025-11-19 14:45:45.765 GMT [1441083] LOG:  invalid record length at 0/18EE198: expected at least 24, got 0
+2025-11-19 14:45:45.765 GMT [1441083] LOG:  redo done at 0/18EE160 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-11-19 14:45:45.768 GMT [1441081] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-11-19 14:45:45.776 GMT [1441081] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.001 s, total=0.010 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/18EE198, redo lsn=0/18EE198
+2025-11-19 14:45:45.778 GMT [1441080] LOG:  database system is ready to accept connections
+2025-11-19 15:15:46.302 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 15:15:47.031 GMT [1441081] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.710 s, sync=0.012 s, total=0.730 s; sync files=8, longest=0.011 s, average=0.002 s; distance=11 kB, estimate=11 kB; lsn=0/18F0DD8, redo lsn=0/18F0DA0
+2025-11-19 15:20:46.089 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 15:20:46.807 GMT [1441081] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.704 s, sync=0.005 s, total=0.719 s; sync files=8, longest=0.004 s, average=0.001 s; distance=15 kB, estimate=15 kB; lsn=0/18F4C48, redo lsn=0/18F4C10
+2025-11-19 15:35:47.021 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 15:35:47.734 GMT [1441081] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.703 s, sync=0.003 s, total=0.713 s; sync files=8, longest=0.003 s, average=0.001 s; distance=21 kB, estimate=21 kB; lsn=0/18FA310, redo lsn=0/18FA2D8
+2025-11-19 15:40:47.833 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 15:40:48.545 GMT [1441081] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.703 s, sync=0.005 s, total=0.713 s; sync files=8, longest=0.004 s, average=0.001 s; distance=14 kB, estimate=21 kB; lsn=0/18FDE80, redo lsn=0/18FDE48
+2025-11-19 15:45:47.645 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 15:45:48.361 GMT [1441081] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.703 s, sync=0.006 s, total=0.717 s; sync files=8, longest=0.005 s, average=0.001 s; distance=17 kB, estimate=20 kB; lsn=0/1902298, redo lsn=0/1902260
+2025-11-19 15:50:47.422 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 15:50:48.139 GMT [1441081] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.704 s, sync=0.006 s, total=0.717 s; sync files=8, longest=0.005 s, average=0.001 s; distance=17 kB, estimate=20 kB; lsn=0/1906708, redo lsn=0/19066D0
+2025-11-19 15:55:47.239 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 15:55:48.559 GMT [1441081] LOG:  checkpoint complete: wrote 14 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.307 s, sync=0.006 s, total=1.320 s; sync files=13, longest=0.005 s, average=0.001 s; distance=36 kB, estimate=36 kB; lsn=0/190FA48, redo lsn=0/190FA10
+2025-11-19 16:55:48.370 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 16:55:49.087 GMT [1441081] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.704 s, sync=0.006 s, total=0.718 s; sync files=8, longest=0.005 s, average=0.001 s; distance=17 kB, estimate=34 kB; lsn=0/1914138, redo lsn=0/1914100
+2025-11-19 17:00:48.117 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 17:00:48.230 GMT [1441081] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.102 s, sync=0.004 s, total=0.114 s; sync files=2, longest=0.003 s, average=0.002 s; distance=4 kB, estimate=31 kB; lsn=0/1915290, redo lsn=0/1915258
+2025-11-19 17:05:48.330 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 17:05:48.745 GMT [1441081] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.005 s, total=0.415 s; sync files=5, longest=0.004 s, average=0.001 s; distance=5 kB, estimate=29 kB; lsn=0/1916940, redo lsn=0/1916908
+2025-11-19 17:10:48.845 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 17:10:49.057 GMT [1441081] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.202 s, sync=0.003 s, total=0.213 s; sync files=3, longest=0.002 s, average=0.001 s; distance=11 kB, estimate=27 kB; lsn=0/1919758, redo lsn=0/1919720
+2025-11-19 17:50:48.720 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 17:50:48.829 GMT [1441081] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.102 s, sync=0.003 s, total=0.110 s; sync files=2, longest=0.003 s, average=0.002 s; distance=7 kB, estimate=25 kB; lsn=0/191B488, redo lsn=0/191B450
+2025-11-19 17:55:48.930 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 17:55:49.044 GMT [1441081] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.102 s, sync=0.004 s, total=0.114 s; sync files=2, longest=0.004 s, average=0.002 s; distance=7 kB, estimate=23 kB; lsn=0/191D218, redo lsn=0/191D1E0
+2025-11-19 18:05:48.186 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 18:05:48.600 GMT [1441081] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.005 s, total=0.415 s; sync files=5, longest=0.004 s, average=0.001 s; distance=21 kB, estimate=23 kB; lsn=0/19229A8, redo lsn=0/1922970
+2025-11-19 18:10:48.667 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 18:10:49.385 GMT [1441081] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.704 s, sync=0.005 s, total=0.718 s; sync files=8, longest=0.005 s, average=0.001 s; distance=19 kB, estimate=23 kB; lsn=0/19275D8, redo lsn=0/19275A0
+2025-11-19 18:15:48.485 GMT [1441081] LOG:  checkpoint starting: time
+2025-11-19 18:15:49.197 GMT [1441081] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.703 s, sync=0.005 s, total=0.713 s; sync files=8, longest=0.004 s, average=0.001 s; distance=15 kB, estimate=22 kB; lsn=0/192B2D8, redo lsn=0/192B2A0

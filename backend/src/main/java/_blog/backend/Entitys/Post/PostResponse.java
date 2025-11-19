@@ -2,13 +2,15 @@ package _blog.backend.Entitys.Post;
 
 import java.time.LocalDateTime;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import _blog.backend.Entitys.User.UserResponse;
 
 public class PostResponse {
     private Long id;
     private String title;
     private String description;
-    private String media;
+    private MultipartFile media;
     private LocalDateTime createdAt;
     private Long LikeCount = 0L;
     private Long CommentsCount = 0L;
@@ -39,11 +41,11 @@ public class PostResponse {
         this.description = description;
     }
 
-    public String getMedia() {
+    public MultipartFile getMedia() {
         return media;
     }
 
-    public void setMedia(String media) {
+    public void setMedia(MultipartFile media) {
         this.media = media;
     }
 

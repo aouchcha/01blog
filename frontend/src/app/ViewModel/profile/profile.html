@@ -20,11 +20,6 @@
               {{ user.follow ? 'Unfollow' : 'Follow' }}
             </button>
 
-            <!-- Edit Profile Button -->
-            <button class="action-btn secondary-btn" *ngIf="user.username === me?.username">
-              Edit profile
-            </button>
-
             <!-- Home Button -->
             <button class="action-btn secondary-btn" *ngIf="me.role !== 'Admin'" (click)="Home()">
               Home

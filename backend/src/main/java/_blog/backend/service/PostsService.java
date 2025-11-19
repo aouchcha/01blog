@@ -3,11 +3,13 @@ package _blog.backend.service;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 // import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -42,13 +44,26 @@ public class PostsService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public ResponseEntity<?> getPosts() {
+    public ResponseEntity<?> getPosts(LocalDateTime lastDate, Long lastId) {
         final String username = contextHelpers.getUsername();
+        Long userId = userRepository.findIdByUsername(username);
 
-        List<Post> posts = postRepository.findAllPostsByUserAndFollowedUsers(userRepository.findIdByUsername(username));
-
-        if (posts == null) {
+        // Validation (kept from your code)
+        if (userId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
+        }
+
+        List<Post> posts;
+
+        // We enforce a limit of 10
+        PageRequest limit = PageRequest.of(0, 10);
+
+        if (lastDate == null || lastId == null) {
+            // Case 1: First load (Top 10)
+            posts = postRepository.findInitialFeedPosts(userId, limit);
+        } else {
+            // Case 2: Scrolling (Next 10 after the cursor)
+            posts = postRepository.findNextFeedPosts(userId, lastDate, lastId, limit);
         }
 
         return ResponseEntity.ok().body(Map.of("posts", posts));
@@ -59,7 +74,7 @@ public class PostsService {
         Post p = postRepository.findById(post_id).orElse(null);
 
         if (p == null) {
-        return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(null);
         }
 
         List<Comment> comments = commentRepository.findAllByPost_id(post_id);
@@ -97,7 +112,7 @@ public class PostsService {
     @Autowired
     private HandleMedia MediaUtils;
 
-    public ResponseEntity<?> update(Long post_id, PostRequst postRequst) {
+    public ResponseEntity<?> update(Long post_id, PostRequst postRequst, boolean removed) {
         // if (!postRepository.existsById(post_id)) {
         // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message",
         // "invalid post id"));
@@ -108,27 +123,42 @@ public class PostsService {
             return ResponseEntity.badRequest().body(null);
         }
 
-        up.setTitle(postRequst.getTitle());
-        up.setDescription(postRequst.getDescription());
-
-        if (up.getMedia() != null) {
-            Path path = Paths.get("/home/aouchcha/Desktop/01blog/backend/uploads", up.getMedia());
-            try {
-                Files.deleteIfExists(path);
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
-            }
+        if (postRequst.getTitle().trim().isEmpty() ||
+            postRequst.getTitle().length() > 100) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Description is invalid"));
         }
 
-        up.setMedia(null);
+        if (postRequst.getDescription().trim().isEmpty() ||
+            postRequst.getDescription().length() > 1000) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Description is invalid"));
+        }
 
+
+        up.setTitle(postRequst.getTitle());
+        up.setDescription(postRequst.getDescription());
+        if (removed) {
+            if (up.getMedia() != null) {
+                Path path = Paths.get("/home/aouchcha/Desktop/01blog/backend/uploads", up.getMedia());
+                try {
+                    Files.deleteIfExists(path);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
+                }
+            }
+    
+            up.setMedia(null);
+    
+        }
         if (!MediaUtils.save(up, postRequst)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Internal Server Error"));
         }
 
+
         postRepository.save(up);
-        
+
         return ResponseEntity.ok().body(Map.of("message", "post updated with sucess", "post", up));
     }
 }

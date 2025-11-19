@@ -42,6 +42,159 @@
   flex-shrink: 0;
 }
 
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background-color: #f5f5f5;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  background-color: #e0e0e0;
+}
+
+.modal-textarea {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+  outline: none;
+  margin-bottom: 16px;
+}
+
+.modal-textarea:focus {
+  border-color: #681C28;
+  box-shadow: 0 0 0 3px rgba(104, 28, 40, 0.1);
+}
+
+.modal-media-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  transition: all 0.2s;
+  margin-bottom: 16px;
+}
+
+.modal-media-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-save-btn {
+  flex: 1;
+  padding: 12px;
+  background-color: #681C28;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.modal-save-btn:hover {
+  background-color: #8b2635;
+}
+
+.modal-cancel-btn {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.modal-cancel-btn:hover {
+  background-color: #f5f5f5;
+}
+
+
+.media-input {
+  display: none;
+}
+
+
+.media-preview {
+  display: flex;
+  justify-content: space-between;
+  /* padding: 9px 21px; */
+  padding-top: 15px;
+  padding-left: 15px;
+  margin-left: 48px;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #666;
+  /* gap: 302px; */
+  /* width: 100%;*/
+}
+
 /* Post Card */
 .post-card {
   background-color: white;

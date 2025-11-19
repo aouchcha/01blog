@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, NgZone } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { generateHeader, generateURL } from '../helpers/genarateHeader';
 
 @Injectable({ providedIn: 'root' })
@@ -10,7 +10,7 @@ export class NotificationsService {
   private notificationsSubject = new BehaviorSubject<any>(null);
   public notifications$ = this.notificationsSubject.asObservable();
 
-  private reactionsSubject = new BehaviorSubject<any>(null);
+  private reactionsSubject = new Subject<any>();
   public reactionsObservable = this.reactionsSubject.asObservable();
 
   constructor(private zone: NgZone, private http: HttpClient) { }
