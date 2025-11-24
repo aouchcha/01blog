@@ -152,11 +152,11 @@
           <p class="post-description">{{ post.description }}</p>
 
           <!-- Post Footer -->
-          <div class="post-footer" *ngIf="me.role !== 'Admin'">
-            <button class="reaction-btn">
+          <div class="post-footer" *ngIf="me.id === user.id || user.follow === true">
+            <button class="reaction-btn" (click)="React(post.id)">
               ❤️ {{ post.likeCount || 0 }}
             </button>
-            <button class="reaction-btn">
+            <button class="reaction-btn" (click)="ShowSinglePost(post.id)">
               💬 {{ post.commentsCount || 0 }}
             </button>
           </div>

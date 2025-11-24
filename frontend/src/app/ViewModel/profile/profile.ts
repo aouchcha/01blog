@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { PostsService } from '../../services/posts.service';
 import { Post } from '../../models/Post';
 import { Confirmation } from '../confirmation/confirmation';
+import { NotificationsService } from '../../services/notification.service';
 
 
 @Component({
@@ -48,9 +49,9 @@ export class Profile implements OnInit {
   public confirmationMessage: string = 'Are you sure you want to delete this post? This action cannot be undone.';
   public confirmationAction: string | undefined = 'Delete';
   public post_id: number | null = null;
-  public confirmationParams: any = {};
+  // public confirmationParams: any = {};
 
-  constructor(private router: Router, private route: ActivatedRoute, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object, private postService: PostsService) {
+  constructor(private router: Router, private route: ActivatedRoute, private notifService: NotificationsService, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object, private postService: PostsService) {
     this.isBrowser = isPlatformBrowser(platformId)
   }
 
@@ -67,12 +68,21 @@ export class Profile implements OnInit {
 
     this.userService.getMe(this.token).subscribe({
       next: (res) => {
-        // console.log({ res });
+        console.log({ "me": res.me });
 
         this.me = res.me;
       },
       error: (err) => {
         console.log(err);
+      }
+    })
+
+    this.notifService.reactionsObservable.subscribe((react) => {
+      if (react) {
+        console.log({ react });
+
+        let index = this.posts.findIndex((p: Post) => p.id === react.post.id)
+        this.posts[index].likeCount = react.post.likeCount;
       }
     })
     this.LoadProfile()
@@ -82,10 +92,10 @@ export class Profile implements OnInit {
   public LoadProfile() {
     this.userService.getProfile(this.username, this.token).subscribe({
       next: (res) => {
-        console.log({res});
+        console.log({ res });
         this.user = res.user;
-        console.log({"ussssss":this.user});
-        
+        // console.log({"ussssss":this.user});
+
         this.posts = res.posts;
         this.followers = res.followers
         this.followings = res.followings
@@ -133,7 +143,7 @@ export class Profile implements OnInit {
     this.confirmationTitle = `Remove User: ${this.user.username} ?`;
   }
 
-    public CheckBeforeBan() {
+  public CheckBeforeBan() {
     this.showConfirmation = true;
     this.confirmationAction = "Ban";
     this.confirmationMessage = "Are you sure you want to Ban this user? This action cannot be undone."
@@ -183,21 +193,21 @@ export class Profile implements OnInit {
     this.post_id = null;
   }
 
-   HandleAction(value: boolean) {
+  HandleAction(value: boolean) {
     if (!value) {
       this.CancelAction()
     } else {
       if (this.confirmationAction === "Delete") {
         this.deletePost()
-      }else if (this.confirmationAction === "Report") {
+      } else if (this.confirmationAction === "Report") {
         this.Report()
         this.Cancel()
         this.CancelAction()
-      }else if (this.confirmationAction === "Remove") {
+      } else if (this.confirmationAction === "Remove") {
         this.RemoveUser()
         this.Cancel()
         this.CancelAction()
-      }else if (this.confirmationAction === "Ban") {
+      } else if (this.confirmationAction === "Ban") {
         this.BanUser()
         this.Cancel()
         this.CancelAction()
@@ -263,5 +273,20 @@ export class Profile implements OnInit {
     })
   }
 
+  public React(post_id: number) {
+    this.postService.React(this.token, post_id).subscribe({
+      next: (res) => {
+        console.log("HAAAAANI", res);
+        
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
+
+   public ShowSinglePost(post_id: number): void {
+    this.router.navigate([`post/${post_id}`])
+  }
 
 }
