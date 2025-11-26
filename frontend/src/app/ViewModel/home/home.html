@@ -30,7 +30,7 @@
         </div>
 
         <nav class="nav-menu">
-            <button class="nav-button active" (click)="getAllPosts('feed')">
+            <button class="nav-button" (click)="getAllPosts('feed')">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3 4h14M3 10h14M3 16h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
@@ -45,7 +45,7 @@
                 <span>Friends</span>
             </button>
 
-            <button class="nav-button" (click)="ShowNotif()">
+            <button class="nav-button" (click)="getNotif()">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M15 6.5a5 5 0 00-10 0c0 6-3 7.5-3 7.5h16s-3-1.5-3-7.5zM11.73 17a2 2 0 01-3.46 0"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" />
@@ -65,9 +65,9 @@
     </aside>
 
     <!-- Main Content - Feed -->
-    <main class="main-content" (scroll)="handleScrollLogic($event)">
+    <main class="main-content" >
         <!-- Notifications Panel -->
-        <div class="notifications-panel" *ngIf="ShowNotifs">
+        <div class="notifications-panel" *ngIf="ShowNotifs" (scroll)="handleScrollLogic($event, 'notifs')">
             <div class="panel-header">
                 <h2>Notifications</h2>
                 <button class="close-btn" (click)="CloseNotif()">✕</button>
@@ -126,7 +126,7 @@
         </div>
 
         <!-- Posts Feed -->
-        <div class="posts-container" *ngIf="!ShowNotifs">
+        <div class="posts-container" *ngIf="!ShowNotifs" (scroll)="handleScrollLogic($event, 'posts')">
             <div class="empty-state" *ngIf="!posts || posts.length === 0">
                 <p>No posts yet.</p>
             </div>
@@ -226,7 +226,7 @@
             <button class="action-button logout" (click)="Logout()">Logout</button>
         </div>
 
-        <div class="suggestions-section" *ngIf="others && others.length > 0">
+        <div class="suggestions-section" *ngIf="others && others.length > 0" (scroll)="handleScrollLogic($event, 'users')">
             <h3>Suggestions</h3>
             <div class="suggestion-item" *ngFor="let user of others">
                 <p class="suggestion-username" (click)="ToProfile(user.username)">{{user.username}}</p>

@@ -1,10 +1,12 @@
 package _blog.backend.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.scheduling.annotation.Async;
@@ -64,7 +66,8 @@ public class NotificationService {
         NotificationEntity saved = repo.save(notif);
 
         int count = repo.countByRecipient_IdAndSeenFalse(recipient.getId());
-        NotificationDTO n = new NotificationDTO(saved.getId(), saved.getCreator().getUsername(), count, saved.getCreatedAt(), saved.isSeen());
+        NotificationDTO n = new NotificationDTO(saved.getId(), saved.getCreator().getUsername(), count,
+                saved.getCreatedAt(), saved.isSeen());
         return n;
     }
 
@@ -73,7 +76,8 @@ public class NotificationService {
             emitter.send(SseEmitter.event()
                     .id(String.valueOf(notif.getId()))
                     .name("notification")
-                    .data(Map.of("message", String.format( "%s publish a post",notif.getCreatorUsername()), "count", notif.getCount())));
+                    .data(Map.of("message", String.format("%s publish a post", notif.getCreatorUsername()), "count",
+                            notif.getCount())));
         } catch (Exception e) {
             emitter.completeWithError(e);
         }
@@ -113,15 +117,29 @@ public class NotificationService {
         }
     }
 
-    @Autowired UserRepository userRepository;
+    @Autowired
+    UserRepository userRepository;
 
-    public ResponseEntity<?> getNotifs(String username) {
+    public ResponseEntity<?> getNotifs(String username, LocalDateTime lastDate, Long lastId) {
         User u = userRepository.findByUsername(username);
         if (u == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "Ivalid Cridential"));
         }
-        List<NotificationEntity> notifs = repo.findByRecipient_IdAndSeenFalse(u.getId());
+        List<NotificationEntity> notifs;
+        PageRequest limit = PageRequest.of(0, 20);
+
+        if (lastDate == null || lastId == null) {
+            notifs = repo.findByRecipientIdOrderByCreatedAtDescIdDesc(
+                    u.getId(),
+                    limit);
+        } else {
+            notifs = repo.findByRecipientIdAndCreatedAtLessThanOrCreatedAtEqualsAndIdLessThanOrderByCreatedAtDescIdDesc(
+                    u.getId(),
+                    lastDate,
+                    lastId,
+                    limit);
+        }
         return ResponseEntity.ok(Map.of("notifs", notifs));
     }
 

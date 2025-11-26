@@ -1,6 +1,7 @@
 package _blog.backend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -50,14 +51,32 @@ public class UserService {
         return ResponseEntity.ok().body(Map.of("me", u, "notifCount", count));
     }
 
-    public ResponseEntity<?> getUsers(String token) {
+    public ResponseEntity<?> getUsers(String token, Long lastUserId) {
         final String username = jwtUtil.getUsername(token);
         User me = userRepository.findByUsername(username);
         if (me == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "invalid user"));
         }
-        List<User> users = userRepository.findByUsernameNotAndRoleNot(username, Role.Admin);
+
+        List<User> users;
+        PageRequest limit = PageRequest.of(0, 10);
+        if (lastUserId == null) {
+            // First page - get first 10 users
+            users = userRepository.findByUsernameNotAndRoleNotOrderByIdAsc(
+                    username,
+                    Role.Admin,
+                    limit);
+        } else {
+            // Subsequent pages - get users after lastUserId
+            users = userRepository.findByUsernameNotAndRoleNotAndIdGreaterThanOrderByIdAsc(
+                    username,
+                    Role.Admin,
+                    lastUserId,
+                    limit);
+        }
+        // List<User> users = userRepository.findByUsernameNotAndRoleNot(username,
+        // Role.Admin);
         Set<Long> followedUserIds = followRepositry.findFollowedUserIds(me.getId());
 
         for (User u : users) {
@@ -89,7 +108,7 @@ public class UserService {
         } else {
             ProfileInfos.setFollow(false);
         }
-        List<Post> posts = postRepository.findByUserId(ProfileInfos.getId());
+        List<Post> posts = postRepository.findByUserIdOrderByIdDesc(ProfileInfos.getId());
 
         return ResponseEntity.ok(Map.of("user", ProfileInfos, "posts", posts, "followers",
                 followRepositry.countByFollowed_Id(ProfileInfos.getId()), "followings",
@@ -149,7 +168,8 @@ public class UserService {
         System.out.println("HAAAAAAAAAAAAAAAAAAAAAANNNNNNNNNNNIIIIIIIIIIIIIII");
         User u = userRepository.findByUsername(username);
         if (u == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user u wanna to ban doesnt exist"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "the user u wanna to ban doesnt exist"));
         }
         u.setisbaned(!u.getisbaned());
         return ResponseEntity.ok().body(Map.of("message", "User " + u + " Banned with success"));

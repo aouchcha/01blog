@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { generateURL, generateHeader } from "../helpers/genarateHeader";
 import { Observable } from 'rxjs';
 
@@ -24,10 +24,22 @@ export class UserService {
         )
     }
 
-    public getOtherUsers(token: String | null): Observable<any> {
+    public getOtherUsers(token: String | null, lastUserId: number | null): Observable<any> {
+         let params = new HttpParams();
+        if (lastUserId !== null) {
+            params = params
+                // .set('lastDate', lastPost.createdAt)
+                .set('lastUserId', lastUserId.toString());
+        }
+        const options = generateHeader(token);
+
+        const requestOptions = {
+            ...options,
+            params: params
+        };
         return this.http.get<any>(
             generateURL("users"),
-            generateHeader(token)
+            requestOptions
         )
     }
 

@@ -17,6 +17,7 @@ import { Comment } from '../../models/Comments';
 import { NotificationsService } from '../../services/notification.service';
 import { Confirmation } from '../confirmation/confirmation';
 import { log } from 'console';
+import { Subject, takeUntil } from 'rxjs';
 // import { Comment } from '../helpers/Comments';
 
 @Component({
@@ -53,6 +54,8 @@ export class SinglePost implements OnInit {
   public isBrowser: boolean = false;
   public comment_id: number | null = null;
   public type: string = '';
+  private destroy$ = new Subject<void>();
+
 
 
   constructor(private router: Router, private http: HttpClient, private postsService: PostsService, private notifService: NotificationsService, private route: ActivatedRoute, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object) {
@@ -70,16 +73,22 @@ export class SinglePost implements OnInit {
       this.router.navigate(["login"])
     }
     this.token = CheckToken();
-    this.notifService.reactionsObservable.subscribe((react) => {
-      if (react) {
-        console.log({ "Single": react });
 
-        this.post.likeCount = react.post.likeCount;
-      }
-    })
+  this.notifService.reactionsObservable
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(react => {
+      console.log("single post react", react);
+      this.post.likeCount = react.post.likeCount
+    });
+    
     this.post_id = Number(this.route.snapshot.paramMap.get('id'));
     this.LoadPage()
   }
+
+  ngOnDestroy() {
+  this.destroy$.next();
+  this.destroy$.complete();
+}
 
   public LoadPage() {
     this.userService.getMe(this.token).subscribe({
@@ -270,6 +279,7 @@ export class SinglePost implements OnInit {
         // this.posts = res.posts;
         // this.stateup.detectChanges();
         // this.getPost()
+        this.post.likeCount = res.post.likeCount
       },
       error: (err) => {
         console.log(err);

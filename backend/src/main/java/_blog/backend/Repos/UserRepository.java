@@ -2,6 +2,7 @@ package _blog.backend.Repos;
 
 import java.util.*;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,6 +23,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
 
     List<User> findByUsernameNotAndRoleNot(String username, Role role);
+
+    List<User> findByUsernameNotAndRoleNotOrderByIdAsc(String usename, Role role, Pageable page);
+
+    List<User> findByUsernameNotAndRoleNotAndIdGreaterThanOrderByIdAsc(String usename, Role role, Long lastId,Pageable page);
 
     @Query("SELECT u.id FROM User u WHERE u.username = :username")
     Long findIdByUsername(@Param("username") String username);

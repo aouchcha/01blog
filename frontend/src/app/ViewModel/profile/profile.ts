@@ -13,6 +13,7 @@ import { PostsService } from '../../services/posts.service';
 import { Post } from '../../models/Post';
 import { Confirmation } from '../confirmation/confirmation';
 import { NotificationsService } from '../../services/notification.service';
+import { Subject, takeUntil } from 'rxjs';
 
 
 @Component({
@@ -49,6 +50,8 @@ export class Profile implements OnInit {
   public confirmationMessage: string = 'Are you sure you want to delete this post? This action cannot be undone.';
   public confirmationAction: string | undefined = 'Delete';
   public post_id: number | null = null;
+  private destroy$ = new Subject<void>();
+
   // public confirmationParams: any = {};
 
   constructor(private router: Router, private route: ActivatedRoute, private notifService: NotificationsService, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object, private postService: PostsService) {
@@ -66,26 +69,40 @@ export class Profile implements OnInit {
     this.token = CheckToken();
     this.username = String(this.route.snapshot.paramMap.get('username'));
 
+
+
+    this.getMe()
+    this.LoadProfile()
+
+    this.notifService.reactionsObservable
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(react => {
+      console.log("profile react", react);
+
+        let index = this.posts.findIndex((p: Post) => p.id === react.post.id);
+        this.posts[index].likeCount = react.post.likeCount;
+      });
+
+  }
+
+  ngOnDestroy() {
+  this.destroy$.next();
+  this.destroy$.complete();
+}
+
+  public getMe() {
     this.userService.getMe(this.token).subscribe({
       next: (res) => {
         console.log({ "me": res.me });
 
         this.me = res.me;
+        this.notifService.connect(this.me.id)
+
       },
       error: (err) => {
         console.log(err);
       }
     })
-
-    this.notifService.reactionsObservable.subscribe((react) => {
-      if (react) {
-        console.log({ react });
-
-        let index = this.posts.findIndex((p: Post) => p.id === react.post.id)
-        this.posts[index].likeCount = react.post.likeCount;
-      }
-    })
-    this.LoadProfile()
   }
 
 
@@ -276,8 +293,9 @@ export class Profile implements OnInit {
   public React(post_id: number) {
     this.postService.React(this.token, post_id).subscribe({
       next: (res) => {
-        console.log("HAAAAANI", res);
-        
+        console.log("Profile Result", res);
+        let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
+        this.posts[index].likeCount = res.post.likeCount;
       },
       error: (err) => {
         console.log(err);
@@ -285,7 +303,7 @@ export class Profile implements OnInit {
     })
   }
 
-   public ShowSinglePost(post_id: number): void {
+  public ShowSinglePost(post_id: number): void {
     this.router.navigate([`post/${post_id}`])
   }
 

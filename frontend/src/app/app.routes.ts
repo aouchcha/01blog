@@ -13,6 +13,6 @@ export const routes: Routes = [
     { path: "", component: Home },
     { path: 'admin', component: Admin },
     { path: 'post/:id', component: SinglePost },
-    { path: 'user/:username', component: Profile },
+    { path: 'user/:username', component: Profile, runGuardsAndResolvers: 'always'},
     { path: 'reports', component: Reports }
 ];

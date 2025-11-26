@@ -14,7 +14,7 @@ import _blog.backend.Entitys.Post.Post;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    List<Post> findByUserId(Long userId);
+    List<Post> findByUserIdOrderByIdDesc(Long userId);
 
     
     @Query("""

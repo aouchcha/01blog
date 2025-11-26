@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import _blog.backend.service.RegisterService;
@@ -69,12 +70,12 @@ public class MainController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getUsers(@RequestHeader("Authorization") String header) {
+    public ResponseEntity<?> getUsers(@RequestHeader("Authorization") String header,  @RequestParam(required = false) Long lastUserId) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
-        return userService.getUsers(token);
+        return userService.getUsers(token, lastUserId);
     }
 
     @Autowired

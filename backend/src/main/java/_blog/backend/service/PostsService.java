@@ -106,7 +106,7 @@ public class PostsService {
 
         postRepository.delete(p);
 
-        return ResponseEntity.ok().body(Map.of("message", "post removed"));
+        return ResponseEntity.ok().body(Map.of("message", "post removed", "post", p));
     }
 
     @Autowired

@@ -13,9 +13,8 @@ import { NotificationsService } from '../../services/notification.service';
 import { Post } from '../../models/Post';
 import { HttpClient } from '@angular/common/http';
 import { Confirmation } from '../confirmation/confirmation';
-import { Subject, Subscription } from 'rxjs'; // Import Subject
-import { throttleTime } from 'rxjs/operators'; // Import throttleTime
-import { log } from 'node:util';
+import { Subject } from 'rxjs'; // Import Subject
+import { takeUntil } from 'rxjs/operators'; // Import throttleTime
 
 
 @Component({
@@ -57,10 +56,12 @@ export class Home implements OnInit {
   public showConfirmation: boolean = false;
   public lastPost: Post | null = new Post();
   public isLoading: boolean = false;
-  public HasMore: boolean = true;
+  public HasMorePosts: boolean = true;
+  public HasMoreUsers: boolean = true;
+  public HasMoreNotifs: boolean = true;
   public Removed: boolean = false;
-  // private scrollSubject = new Subject<any>();
-  // private scrollSubscription: Subscription | undefined;
+  private destroy$ = new Subject<void>();
+
 
   constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object, private notifService: NotificationsService, private http: HttpClient, private state: ChangeDetectorRef) {
     this.isBrowser = isPlatformBrowser(platformId)
@@ -80,34 +81,21 @@ export class Home implements OnInit {
       }
     })
 
-    this.notifService.reactionsObservable.subscribe((react) => {
-      if (react) {
-        console.log({react});
-        
-        let index = this.posts.findIndex((p: Post) => p.id === react.post.id)
+    this.notifService.reactionsObservable
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(react => {
+        let index = this.posts.findIndex((p: Post) => p.id === react.post.id);
         this.posts[index].likeCount = react.post.likeCount;
-      }
-    })
-
-    // this.scrollSubscription = this.scrollSubject
-    //   .pipe(throttleTime(100)) // Wait 200ms between checks
-    //   .subscribe((event) => {
-    //     this.handleScrollLogic(event);
-    //   });
-
+      });
   }
 
-  // public onContainerScroll(event: any): void {
-  //   // We just push the event to the subject. 
-  //   // The logic runs in the throttled subscription in ngOnInit
-  //   this.scrollSubject.next(event);
-  // }
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
 
   public setToken() {
-    // if (CheckToken() === null) {
-    //   this.router.navigate(["login"]);
-    //   return;
-    // }
     this.token = localStorage.getItem("JWT");
   }
 
@@ -134,10 +122,6 @@ export class Home implements OnInit {
     localStorage.removeItem("JWT");
     this.token = null;
     this.router.navigate(["login"]);
-    // this.http.get(`http://localhost:8080/api/notifications/disconnect/${this.me.id}`).subscribe({
-    //   next: () => this.notifService.disconnect(),
-    //   complete: () => this.router.navigate(["login"])
-    // });
   }
 
   public setMedia(event: Event, helper: String): void {
@@ -168,7 +152,8 @@ export class Home implements OnInit {
         this.Cancel()
         this.posts = [];
         this.lastPost = null;
-        this.HasMore = true;
+        this.HasMorePosts = true;
+      
         this.getAllPosts("feed");
       },
       error: (err) => {
@@ -188,14 +173,14 @@ export class Home implements OnInit {
     this.setToken();
     this.isLoading = true;
     this.ShowNotifs = false;
-    if(helper === "feed") {
+    if (helper === "feed") {
       this.lastPost = null;
+      this.lastNotif = null;
       this.posts = [];
+      this.HasMoreNotifs = true;
+      this.Notifs = [];
     }
-    console.log({helper});
-    console.log({"last":this.lastPost});
-    
-
+   
     this.postsService.getAllPosts(this.token, this.lastPost).subscribe({
       next: (res) => {
 
@@ -203,8 +188,7 @@ export class Home implements OnInit {
           this.posts = [...this.posts, ...res.posts];
           this.lastPost = this.posts[this.posts.length - 1];
         } else {
-          console.log("No more posts to load");
-          this.HasMore = false;
+          this.HasMorePosts = false;
         }
 
         this.isLoading = false;
@@ -219,23 +203,28 @@ export class Home implements OnInit {
     });
   }
 
-  public handleScrollLogic(event: any): void {
+  public handleScrollLogic(event: any, helper: string): void {
     const element = event.target;
 
-    // console.log({ "message": "gggggggggggggggg" });
-    // Calculate if user is near bottom
     const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 50;
-
-    if (atBottom && !this.isLoading && this.HasMore) {
-      console.log({ "message": "Hanni wsselt - Loading More" });
-      this.getAllPosts("other");
+    if (helper == 'posts') {
+      if (atBottom && !this.isLoading && this.HasMorePosts) {
+        this.getAllPosts("other");
+      }
+    }else if (helper == 'users'){
+       if (atBottom && !this.isLoading && this.HasMoreUsers) {
+        this.getOthers();
+      }
+    }else if (helper == 'notifs') {
+       if (atBottom && !this.isLoading && this.HasMoreNotifs) {
+        this.getNotif();
+      }
     }
   }
 
   public getMe(): void {
     this.userServise.getMe(this.token).subscribe({
       next: (res) => {
-        console.log(res);
         this.me = res.me;
         this.notifService.connect(this.me.id)
         this.notifsCount = res.notifCount;
@@ -246,21 +235,28 @@ export class Home implements OnInit {
     })
   }
 
+  public lastUserId: number | null = null;
+
   public getOthers(): void {
-    this.userServise.getOtherUsers(this.token).subscribe({
+    if (this.isLoading) return;
+    this.userServise.getOtherUsers(this.token, this.lastUserId).subscribe({
       next: (res) => {
-        console.log("all users ========", res);
-        this.others = res.users;
+        if (res.users && res.users.length > 0) {
+          this.others = [...this.others, ...res.users];
+          this.lastUserId = this.others[this.others.length - 1].id;
+          this.isLoading = false;
+        } else {
+          this.HasMoreUsers = false;
+        }
       },
       error: (err) => {
+        this.isLoading = false;
         console.log(err);
       }
     })
   }
 
   public ShowUpdate(post_id: number): void {
-    console.log("hanni");
-
     this.update = true;
     this.post_id = post_id;
     const post: Post = this.posts.find((p: Post) => p.id === post_id);
@@ -284,22 +280,11 @@ export class Home implements OnInit {
     data.append("title", this.updatedTitle);
     data.append("description", this.updatedDescription);
 
-    console.log({ "UpdatedMedia": this.updateMedia });
-    // console.log({ "OldMedia": this.oldMedia });
-    // console.log({ "UpdatedMediaName": this.updatedMediaName });
-    // console.log({ "OldMediaName": this.oldMediaName });
-    
-
-    console.log(this.oldMedia === this.updateMedia);
-    console.log(this.oldMediaName === this.updatedMediaName);
-
-
     if (this.updateMedia) {
       data.append("media", this.updateMedia)
     }
     this.postsService.updatePost(this.token, this.post_id, data, this.Removed).subscribe({
       next: (res) => {
-        console.log(res.post);
         let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
         this.posts[index] = res.post;
         this.Removed = false;
@@ -312,7 +297,6 @@ export class Home implements OnInit {
   }
 
   public RemoveImage(type: string) {
-    console.log("sssssssssssss");
     this.Removed = true;
     if (type === 'create') {
       this.media = null;
@@ -328,7 +312,6 @@ export class Home implements OnInit {
   public confirmationAction: string = 'Delete';
 
   CheckConfirmation(post_id: number) {
-    console.log(post_id)
     this.post_id = post_id;
     this.showConfirmation = true;
   }
@@ -337,8 +320,7 @@ export class Home implements OnInit {
     this.setToken();
     this.postsService.deletePost(this.token, this.post_id).subscribe({
       next: (res) => {
-        console.log(res);
-        let index = this.posts.findIndex((p: Post) => p.id === this.post_id)
+        let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
         this.posts.splice(index, 1)
         this.CancelAction()
       },
@@ -355,10 +337,8 @@ export class Home implements OnInit {
 
   HandleAction(value: boolean) {
     if (!value) {
-      console.log("hanni");
       this.CancelAction()
     } else {
-
       this.deletePost()
     }
   }
@@ -366,11 +346,7 @@ export class Home implements OnInit {
   public React(post_id: number): void {
     this.setToken();
     this.postsService.React(this.token, post_id).subscribe({
-      next: (res) => {
-        // console.log(res);
-        // let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
-        // this.posts[index] = res.post;
-        // this.getAllPosts()
+      next: () => {
       },
       error: (err) => {
         console.log(err);
@@ -379,11 +355,9 @@ export class Home implements OnInit {
   }
 
   public Follow(user_id: number): void {
-    console.log("zebbi");
     this.setToken();
     this.userServise.Follow(user_id, this.token).subscribe({
-      next: (res) => {
-        console.log(res);
+      next: () => {
         this.getOthers()
       },
       error: (err) => {
@@ -397,16 +371,24 @@ export class Home implements OnInit {
   }
 
   public ToProfile(username: String) {
-    console.log({ username });
     this.router.navigate([`user/${username}`])
   }
 
-  public ShowNotif() {
-    this.notifService.getNotifs(this.token).subscribe({
+  public lastNotif: any = null;
+
+  public getNotif() {
+    this.ShowNotifs = true;
+    if (this.isLoading) return;
+
+    this.notifService.getNotifs(this.token, this.lastNotif).subscribe({
       next: (res) => {
-        console.log({ res });
-        this.Notifs = res.notifs;
-        this.ShowNotifs = true;
+        if (res.notifs && res.notifs.length > 0) {
+          this.Notifs = [...this.Notifs, ...res.notifs];
+          this.lastNotif = this.Notifs[this.Notifs.length - 1];
+          this.isLoading = false;
+        } else {
+          this.HasMoreNotifs = false;
+        }
       },
       error: (err) => {
         console.log(err);
@@ -416,6 +398,10 @@ export class Home implements OnInit {
 
   public CloseNotif() {
     this.ShowNotifs = false;
+    this.isLoading = false;
+    this.lastNotif = null;
+    this.Notifs = [];
+    this.HasMoreNotifs = true;
   }
 
   leftMenuOpen = false;
@@ -437,15 +423,11 @@ export class Home implements OnInit {
   }
 
   public MarkNotifsAsRead(notification_id: number): void {
-    console.log({ notification_id });
     this.notifService.markAsRead(this.token, notification_id).subscribe({
       next: (res) => {
-        console.log(res);
         this.notifsCount = this.notifsCount > 0 ? this.notifsCount - 1 : 0;
         let index = this.Notifs.findIndex((notif: any) => notif.id === notification_id);
         this.Notifs[index] = res.notification;
-        console.log({ "NOOOOOOO": this.Notifs[index] });
-
       },
       error: (err) => {
         console.log(err);

@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, NgZone } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, shareReplay, Subject } from 'rxjs';
 import { generateHeader, generateURL } from '../helpers/genarateHeader';
 
 @Injectable({ providedIn: 'root' })
@@ -8,18 +8,17 @@ export class NotificationsService {
   private eventSource?: EventSource;
 
   private notificationsSubject = new BehaviorSubject<any>(null);
-  public notifications$ = this.notificationsSubject.asObservable();
+  public notifications$ = this.notificationsSubject.asObservable().pipe(shareReplay(1));
 
   private reactionsSubject = new Subject<any>();
-  public reactionsObservable = this.reactionsSubject.asObservable();
+  public reactionsObservable = this.reactionsSubject.asObservable().pipe(shareReplay(1));
 
-  constructor(private zone: NgZone, private http: HttpClient) { }
-    
+  constructor(private zone: NgZone, private http: HttpClient) {}
+
 
 
   connect(userId: number) {
     if (this.eventSource && this.eventSource.readyState !== EventSource.CLOSED) {
-      console.log("wwwwwwwwww");
 
       return; // already connected
     }
@@ -55,10 +54,22 @@ export class NotificationsService {
     this.eventSource = undefined;
   }
 
-  public getNotifs(token: String | null): Observable<any> {
+  public getNotifs(token: String | null, lastNotif: any): Observable<any> {
+    let params = new HttpParams();
+        if (lastNotif !== null) {
+            params = params
+                .set('lastDate', lastNotif.createdAt)
+                .set('lastId', lastNotif.id.toString());
+        }
+        const options = generateHeader(token);
+
+        const requestOptions = {
+            ...options,
+            params: params
+        };
     return this.http.get<any>(
       generateURL("notifications"),
-      generateHeader(token)
+      requestOptions
     );
   }
 
