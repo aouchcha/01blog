@@ -73,6 +73,8 @@ public class PostsService {
 
     @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> getSinglePost(Long post_id) {
+        // final String username = contextHelpers.getUsername();
+
 
         Post p = postRepository.findById(post_id).orElse(null);
 

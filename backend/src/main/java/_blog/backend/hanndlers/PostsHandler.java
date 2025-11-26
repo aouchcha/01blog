@@ -41,12 +41,6 @@ public class PostsHandler {
     public ResponseEntity<?> getPosts(@RequestHeader("Authorization") String header,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastDate,
             @RequestParam(required = false) Long lastId) {
-        // String token = header.replace("Bearer ", "");
-        // if (!jwtUtil.validateToken(token) || jwtUtil.getRole(token).equals("Admin"))
-        // {
-        // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
-        // "invalid token"));
-        // }
         return postsService.getPosts(lastDate, lastId);
     }
 
@@ -54,11 +48,11 @@ public class PostsHandler {
     public ResponseEntity<?> getSinglePost(
             @PathVariable Long post_id,
             @RequestHeader("Authorization") String header) {
-        // String token = header.replace("Bearer ", "");
-        // if (!jwtUtil.validateToken(token)) {
-        // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
-        // "invalid token"));
-        // }
+        String token = header.replace("Bearer ", "");
+        if (!jwtUtil.validateToken(token)) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
+        "invalid token"));
+        }
         return postsService.getSinglePost(post_id);
     }
 
@@ -76,11 +70,11 @@ public class PostsHandler {
     public ResponseEntity<?> deletePost(
             @PathVariable Long post_id,
             @RequestHeader("Authorization") String header) {
-        // String token = header.replace("Bearer ", "");
-        // if (!jwtUtil.validateToken(token)) {
-        // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
-        // "invalid token"));
-        // }
+        String token = header.replace("Bearer ", "");
+        if (!jwtUtil.validateToken(token)) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
+        "invalid token"));
+        }
         return postsService.delete(post_id);
     }
 
@@ -90,11 +84,11 @@ public class PostsHandler {
             @RequestHeader("Authorization") String header,
             @RequestParam(required = false) boolean removed
         ) {
-        // String token = header.replace("Bearer ", "");
-        // if (!jwtUtil.validateToken(token)) {
-        // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
-        // "invalid token"));
-        // }
+        String token = header.replace("Bearer ", "");
+        if (!jwtUtil.validateToken(token)) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
+        "invalid token"));
+        }
         return postsService.update(post_id, postRequst, removed);
     }
 }

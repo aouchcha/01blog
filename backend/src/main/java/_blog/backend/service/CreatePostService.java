@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 // import org.springframework.transaction.annotation.Transactional;
 
 import _blog.backend.Entitys.Post.PostRequst;
-import _blog.backend.Entitys.Post.PostResponse;
+// import _blog.backend.Entitys.Post.PostResponse;
 import _blog.backend.Repos.FollowRepositry;
 import _blog.backend.Repos.PostRepository;
 import _blog.backend.Repos.UserRepository;
 import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.User.User;
-import _blog.backend.Entitys.User.UserResponse;
+// import _blog.backend.Entitys.User.UserResponse;
 import _blog.backend.Entitys.Interactions.Follow.Follow;
 
 
@@ -117,21 +117,4 @@ public class CreatePostService {
         return ResponseEntity.ok(Map.of("message", "post created successfully", "newpost", p));
     }
 
-    // @Transactional
-    // private PostCreationResult savePostAndGetFollowers(Post post, Long userId) {
-    //     postRepository.save(post);
-    //     List<Follow> followers = followRepositry.findByFollowed_Id(userId);
-        
-    //     return new PostCreationResult(post, followers);
-    // }
-
-    // private static class PostCreationResult {
-    //     Post post;
-    //     List<Follow> followers;
-        
-    //     PostCreationResult(Post post, List<Follow> followers) {
-    //         this.post = post;
-    //         this.followers = followers;
-    //     }
-    // }
 }

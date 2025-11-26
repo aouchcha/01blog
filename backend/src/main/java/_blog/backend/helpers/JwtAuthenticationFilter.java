@@ -14,8 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import _blog.backend.Entitys.User.User;
-import _blog.backend.Repos.UserRepository;
+// import _blog.backend.Entitys.User.User;
+// import _blog.backend.Repos.UserRepository;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,8 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @Autowired
-    private UserRepository userRepository;
+    // @Autowired
+    // private UserRepository userRepository;
     // We need our JWT helper to read and validate tokens.
 
     @Override
@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 2. Check if the token is valid.
         if (token != null && jwtUtil.validateToken(token) /*&& u != null*/) {
-            System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+            // System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
             // 3. If valid, parse the user's details from the token.
             String username = jwtUtil.getUsername(token);
             String role = jwtUtil.getRole(token);

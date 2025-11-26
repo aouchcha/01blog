@@ -164,7 +164,7 @@ public class UserService {
     @Transactional
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> Ban(String username, String token) {
-        System.out.println("HAAAAAAAAAAAAAAAAAAAAAANNNNNNNNNNNIIIIIIIIIIIIIII");
+        // System.out.println("HAAAAAAAAAAAAAAAAAAAAAANNNNNNNNNNNIIIIIIIIIIIIIII");
         User u = userRepository.findByUsername(username);
         if (u == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
