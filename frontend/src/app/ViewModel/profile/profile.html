@@ -41,8 +41,11 @@
               Remove User
             </button>
 
-             <button class="action-btn danger-btn" *ngIf="me.role === 'Admin'" (click)="CheckBeforeBan()">
-              {{ user.isbaned ? 'UnBanned' : 'Ban' }}
+             <button class="action-btn danger-btn" *ngIf="me.role === 'Admin' && !user.isbaned" (click)="CheckBeforeBan()">
+              Ban
+            </button>
+            <button class="action-btn danger-btn" *ngIf="me.role === 'Admin' && user.isbaned" (click)="CheckBeforeUnBan()">
+              UnBan
             </button>
           </div>
         </div>

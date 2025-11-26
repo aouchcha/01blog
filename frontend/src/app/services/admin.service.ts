@@ -45,7 +45,7 @@ export class AdminService {
 
         return this.http.get(
             generateURL("admin/reports"),
-            generateHeader(token)
+            requestOptions
         )
     }
 

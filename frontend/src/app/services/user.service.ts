@@ -77,7 +77,19 @@ export class UserService {
         
         
         return this.http.put(
-            generateURL(`user/${username}`),
+            generateURL(`user/ban/${username}`),
+            null,
+            generateHeader(token)
+        )
+    }
+
+      public UnBanUserr(username: string | null , token: String | null): Observable<any> {
+        console.log({token});
+        console.log("BAAAAAN");
+        
+        
+        return this.http.put(
+            generateURL(`user/unban/${username}`),
             null,
             generateHeader(token)
         )

@@ -24,7 +24,7 @@ export class Reports implements OnInit {
   public lastReport: any = null;
   public isLoading: boolean = false;
   public HasMoreReports: boolean = true;
-
+  public total: number = 0; 
   public showConfirmation: boolean = false;
   public confirmationTitle: string = 'Delete Report?';
   public confirmationMessage: string = 'Are you sure you want to delete this Report? This action cannot be undone.';
@@ -67,15 +67,18 @@ export class Reports implements OnInit {
 
     this.adminService.loadReports(this.token, this.lastReport).subscribe({
       next: (res) => {
-        console.log(res);
+        console.log({res});
         if (res.reports && res.reports.length > 0) {
           this.reports = [...this.reports, ...res.reports];
           this.lastReport = this.reports[this.reports.length - 1];
+          this.total = res.reportsCount;
           this.isLoading = false;
         }else {
           this.HasMoreReports = false;
         }
         // this.reports = res.reports;
+        console.log({"length :": this.reports.length});
+        
       },
       error: (err) => {
         console.log(err);
@@ -137,9 +140,10 @@ export class Reports implements OnInit {
     this.confirmationTitle = 'Delete Report?';
     this.confirmationMessage = 'Are you sure you want to delete this Report? This action cannot be undone.';
     this.confirmationAction = 'Delete';
-    this.showConfirmation = false;
+    // this.showConfirmation = false;
     this.username = null;
-    this.report_id = null;
+    this.showDetailsModal = false;
+    // this.report_id = null;
   }
 
   ConfirmAction(report_id: number) {
@@ -153,10 +157,15 @@ export class Reports implements OnInit {
 
     this.adminService.RemoveReport(this.token, this.report_id).subscribe({
       next: (res) => {
-        console.log(res);
-        let index = this.reports.findIndex((r: any) => r.id === this.report_id)
+        console.log({"reports :":this.reports});
+        let index = this.reports.findIndex((r: any) => r.id == this.report_id)
+        console.log({index});
+        
         this.reports.splice(index, 1)
         this.lastReport = this.reports[this.reports.length - 1];
+        this.total -= 1;
+        this.report_id = null;
+        // this.showConfirmation = false;
       },
       error: (err) => {
         console.log(err);
@@ -171,6 +180,7 @@ export class Reports implements OnInit {
       next: (res) => {
         // this.user.isbaned = !this.user.isbaned;
         console.log(res);
+        // this.showConfirmation = false;
         // this.DeleteReport();
       },
       error: (err) => {

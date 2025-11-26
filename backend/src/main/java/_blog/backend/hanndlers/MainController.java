@@ -153,13 +153,22 @@ public class MainController {
         return userService.Remove(username, token);
     }
 
-    @PutMapping("/user/{username}")
+    @PutMapping("/user/ban/{username}")
     public ResponseEntity<?> BanUser(@PathVariable String username, @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
         return userService.Ban(username, token);
+    }
+
+        @PutMapping("/user/unban/{username}")
+    public ResponseEntity<?> UnBanUser(@PathVariable String username, @RequestHeader("Authorization") String header) {
+        String token = header.replace("Bearer", "");
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        }
+        return userService.UnBanned(username, token);
     }
 
     @PostMapping("/report")

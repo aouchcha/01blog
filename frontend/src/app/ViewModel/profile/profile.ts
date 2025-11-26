@@ -167,6 +167,13 @@ export class Profile implements OnInit {
     this.confirmationTitle = `Ban User: ${this.user.username} ?`;
   }
 
+    public CheckBeforeUnBan() {
+    this.showConfirmation = true;
+    this.confirmationAction = "UnBan";
+    this.confirmationMessage = "Are you sure you want to UnBan this user? This action cannot be undone."
+    this.confirmationTitle = `Ban User: ${this.user.username} ?`;
+  }
+
   public CheckReport() {
     this.showConfirmation = true;
     this.DoYouWantReport = false;
@@ -228,6 +235,10 @@ export class Profile implements OnInit {
         this.BanUser()
         this.Cancel()
         this.CancelAction()
+      }else if (this.confirmationAction === "UnBan") {
+        this.UnBanUser();
+        this.Cancel();
+        this.CancelAction();
       }
     }
   }
@@ -240,6 +251,19 @@ export class Profile implements OnInit {
       next: (res) => {
         console.log(res);
         this.router.navigate(["admin"])
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
+
+    public UnBanUser() {
+    this.setToken()
+    this.userService.UnBanUserr(this.user.username, this.token).subscribe({
+      next: (res) => {
+        this.user.isbaned = !this.user.isbaned;
+        console.log(res);
       },
       error: (err) => {
         console.log(err);

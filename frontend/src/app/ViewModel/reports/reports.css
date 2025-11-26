@@ -95,6 +95,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px;
+  height: 85vh;
+  overflow-y: auto;
 }
 
 /* Empty State */

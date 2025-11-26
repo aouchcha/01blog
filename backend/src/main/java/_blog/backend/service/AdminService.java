@@ -27,7 +27,7 @@ public class AdminService {
     @Autowired
     private ReportRepository reportRepository;
 
-     @Autowired
+    @Autowired
     // private JwtUtil jwtUtil;
     private ContextHelpers contextHelpers;
 
@@ -61,16 +61,18 @@ public class AdminService {
         }
 
         List<ReportEntity> reports;
-    PageRequest pageRequest = PageRequest.of(0, 10);
-    
-    if (lastDate == null || lastId == null) {
-        // First page - get initial 10 reports
-        reports = reportRepository.findInitialReports(pageRequest);
-    } else {
-        // Subsequent pages - get reports after cursor
-        reports = reportRepository.findNextReports(lastDate, lastId, pageRequest);
-    }
-        return ResponseEntity.ok(Map.of("reports", reports));
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        if (lastDate == null || lastId == null) {
+            // First page - get initial 10 reports
+            reports = reportRepository.findInitialReports(pageRequest);
+        } else {
+            // Subsequent pages - get reports after cursor
+            reports = reportRepository.findNextReports(lastDate, lastId, pageRequest);
+        }
+        Long reports_count = reportRepository.count();
+
+        return ResponseEntity.ok(Map.of("reports", reports, "reportsCount", reports_count));
     }
 
     @PreAuthorize("hasRole('Admin')")

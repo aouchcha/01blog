@@ -170,7 +170,20 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "the user u wanna to ban doesnt exist"));
         }
-        u.setisbaned(!u.getisbaned());
+        u.setisbaned(true);
         return ResponseEntity.ok().body(Map.of("message", "User " + u + " Banned with success"));
+    }
+
+       @Transactional
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<?> UnBanned(String username, String token) {
+        // System.out.println("HAAAAAAAAAAAAAAAAAAAAAANNNNNNNNNNNIIIIIIIIIIIIIII");
+        User u = userRepository.findByUsername(username);
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "the user u wanna to ban doesnt exist"));
+        }
+        u.setisbaned(false);
+        return ResponseEntity.ok().body(Map.of("message", "User " + u + " UnBanned with success"));
     }
 }
