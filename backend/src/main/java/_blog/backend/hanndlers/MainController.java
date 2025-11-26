@@ -1,10 +1,13 @@
 package _blog.backend.hanndlers;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +40,7 @@ import _blog.backend.helpers.JwtUtil;
 @RestController
 @CrossOrigin(origins = { "http://localhost:4200" })
 @RequestMapping("/api")
+// @PreAuthorize()
 public class MainController {
     @Autowired
     private JwtUtil jwtUtil;
@@ -70,7 +74,8 @@ public class MainController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getUsers(@RequestHeader("Authorization") String header,  @RequestParam(required = false) Long lastUserId) {
+    public ResponseEntity<?> getUsers(@RequestHeader("Authorization") String header,
+            @RequestParam(required = false) Long lastUserId) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
@@ -112,7 +117,8 @@ public class MainController {
             @RequestHeader("Authorization") String header) {
         // String token = header.replace("Bearer", "");
         // if (!jwtUtil.validateToken(token)) {
-        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
+        // "invalid token"));
         // }
         return commentsService.create(commentRequest);
     }
@@ -123,7 +129,8 @@ public class MainController {
             @RequestHeader("Authorization") String header) {
         // String token = header.replace("Bearer ", "");
         // if (!jwtUtil.validateToken(token)) {
-        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+        // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
+        // "invalid token"));
         // }
         return commentsService.delete(comment_id);
     }
@@ -147,7 +154,7 @@ public class MainController {
     }
 
     @PutMapping("/user/{username}")
-     public ResponseEntity<?> BanUser(@PathVariable String username, @RequestHeader("Authorization") String header) {
+    public ResponseEntity<?> BanUser(@PathVariable String username, @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
@@ -167,26 +174,30 @@ public class MainController {
 
     @Autowired
     private AdminService adminService;
+
     @GetMapping("/admin")
-    public ResponseEntity<?> AdminBoardContent(@RequestHeader("Authorization") String header) {
+    public ResponseEntity<?> AdminBoardContent(@RequestHeader("Authorization") String header,
+            @RequestParam(required = false) Long lastUserId) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token) || !jwtUtil.getRole(token).equals("Admin")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
-        return adminService.getBoard(token);
+        return adminService.getBoard(token, lastUserId);
     }
 
     @GetMapping("/admin/reports")
-    public ResponseEntity<?> LoadReports(@RequestHeader("Authorization") String header) {
-         String token = header.replace("Bearer", "");
+    public ResponseEntity<?> LoadReports(@RequestHeader("Authorization") String header,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastDate,
+            @RequestParam(required = false) Long lastId) {
+        String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token) || !jwtUtil.getRole(token).equals("Admin")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
-        return adminService.loadReports();
+        return adminService.loadReports(lastDate, lastId);
     }
 
     @DeleteMapping("/admin/reports/{report_id}")
-     public ResponseEntity<?> BanUser(@PathVariable Long report_id, @RequestHeader("Authorization") String header) {
+    public ResponseEntity<?> BanUser(@PathVariable Long report_id, @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));

@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { generateHeader, generateURL } from "../helpers/genarateHeader";
 
@@ -10,16 +10,39 @@ import { generateHeader, generateURL } from "../helpers/genarateHeader";
 export class AdminService {
     public constructor(private http: HttpClient) {}
 
-    public getDashBoard(token: String | null): Observable<any> {
+    public getDashBoard(token: String | null, lastUserId: number | null): Observable<any> {
+         let params = new HttpParams();
+        if (lastUserId !== null) {
+            params = params.set('lastUserId', lastUserId.toString());
+        }
+        const options = generateHeader(token);
+
+        const requestOptions = {
+            ...options,
+            params: params
+        };
+
         return this.http.get(
             generateURL("admin"),
-            generateHeader(token)
+            requestOptions
         )
     }
 
-    public loadReports(token: String | null) : Observable<any> {
+    public loadReports(token: String | null, lastReport: any) : Observable<any> {
         // console.log({token});
-        
+        let params = new HttpParams();
+        if (lastReport !== null) {
+            params = params
+                .set('lastDate', lastReport.createdAt)
+                .set('lastId', lastReport.id.toString());
+        }
+        const options = generateHeader(token);
+
+        const requestOptions = {
+            ...options,
+            params: params
+        };
+
         return this.http.get(
             generateURL("admin/reports"),
             generateHeader(token)

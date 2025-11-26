@@ -26,6 +26,10 @@ export class Admin implements OnInit {
   public filtredUsers : any = [];
   public isBrowser: boolean = false;
   public report_count: number = 0;
+  public isLoading: boolean = false;
+  public lastUserId: number | null = null;
+  public HasMoreUsers: boolean = true;
+
 
   public constructor(private router: Router, private adminService: AdminService, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object) { 
     this.isBrowser = isPlatformBrowser(platformId)
@@ -46,12 +50,14 @@ export class Admin implements OnInit {
 
   }
 
+
+
   public getAdminInfo() {
     this.userService.getMe(this.token).subscribe({
       next: (res) => {
         
         this.admin = res.me;
-        console.log({"Admin":this.admin});
+        // console.log({"Admin":this.admin});
       },
       error: (err) => {
         if (err.status == 401) {
@@ -62,14 +68,43 @@ export class Admin implements OnInit {
     })
   }
 
+
+    public handleScrollLogic(event: any): void {
+    const element = event.target;
+
+    const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 50;
+    if (atBottom && !this.isLoading && this.HasMoreUsers) {
+      console.log({"mwssage":"wsset lekher"});
+      
+     this.getDashboard();
+   }
+  }
+
   public getDashboard() {
-    this.adminService.getDashBoard(this.token).subscribe({
+    if (this.isLoading) return;
+    // console.log({});
+    
+    console.log({"last user id: ":this.lastUserId});
+    this.adminService.getDashBoard(this.token, this.lastUserId).subscribe({
       next: (res) => {
-        this.OriginaleUsers = res.users;
+        console.log({res});
+        
+        if (res.users && res.users.length > 0) {
+          this.OriginaleUsers = [...this.OriginaleUsers, ...res.users];
+          this.lastUserId = this.OriginaleUsers[this.OriginaleUsers.length - 1].id;
+          this.isLoading = false;
+          
+        }else {
+          this.HasMoreUsers = false;
+        }
+
+        console.log({"new :":this.OriginaleUsers});
+        
+        // this.OriginaleUsers = res.users;
         this.usersStates = this.OriginaleUsers;
         this.filtredUsers = this.OriginaleUsers;
         this.report_count = res.reportsCount;
-        console.log({"FFFFFFFFFFFF": res});
+        // console.log({"FFFFFFFFFFFF": res});
 
       },
       error: (err) => {

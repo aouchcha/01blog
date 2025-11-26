@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 // import org.springframework.security.core.Authentication;
@@ -44,6 +45,7 @@ public class PostsService {
     @Autowired
     private CommentRepository commentRepository;
 
+    @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> getPosts(LocalDateTime lastDate, Long lastId) {
         final String username = contextHelpers.getUsername();
         Long userId = userRepository.findIdByUsername(username);
@@ -69,6 +71,7 @@ public class PostsService {
         return ResponseEntity.ok().body(Map.of("posts", posts));
     }
 
+    @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> getSinglePost(Long post_id) {
 
         Post p = postRepository.findById(post_id).orElse(null);
@@ -112,6 +115,7 @@ public class PostsService {
     @Autowired
     private HandleMedia MediaUtils;
 
+    @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> update(Long post_id, PostRequst postRequst, boolean removed) {
         // if (!postRepository.existsById(post_id)) {
         // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message",

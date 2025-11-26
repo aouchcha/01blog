@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 // import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 // import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ public class CommentsService {
     private CommentRepository commentRepository;
 
     // @Transactional
+    @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> create(CommentRequest request) {
 
         final String username = contextHelpers.getUsername();
@@ -79,6 +81,7 @@ public class CommentsService {
         return ResponseEntity.ok(Map.of("message", "comment added successfully", "post", p));
     }
 
+    @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> delete(Long comment_id) {
 
         Comment comment = commentRepository.findById(comment_id).orElse(null);

@@ -36,6 +36,7 @@ export class PostsService {
             ...options,
             params: params
         };
+        
         return this.http.get<any>(
             generateURL("post"),
             requestOptions

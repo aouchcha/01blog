@@ -25,11 +25,9 @@ export class UserService {
     }
 
     public getOtherUsers(token: String | null, lastUserId: number | null): Observable<any> {
-         let params = new HttpParams();
+        let params = new HttpParams();
         if (lastUserId !== null) {
-            params = params
-                // .set('lastDate', lastPost.createdAt)
-                .set('lastUserId', lastUserId.toString());
+            params = params.set('lastUserId', lastUserId.toString());
         }
         const options = generateHeader(token);
 

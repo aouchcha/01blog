@@ -21,7 +21,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="reports-main">
+    <main class="reports-main" (scroll)="handleScrollLogic($event)">
         <!-- Empty State -->
         <div class="empty-state" *ngIf="!reports || reports.length === 0">
             <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">

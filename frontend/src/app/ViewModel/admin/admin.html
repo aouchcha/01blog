@@ -104,7 +104,7 @@
         <button class="filter-btn"></button>
 
         <!-- Table -->
-        <div class="table-container">
+        <div class="table-container" (scroll)="handleScrollLogic($event)">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -115,9 +115,9 @@
                         <th>IsBanned</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr *ngFor="let u of filtredUsers" (click)="ToProfile(u.username)">
-                        <td class="user-cell">
+                <tbody >
+                    <tr *ngFor="let u of filtredUsers" >
+                        <td class="user-cell" (click)="ToProfile(u.username)">
                             <!-- <img src="avatar-placeholder.jpg" alt="User" class="user-avatar"> -->
                             <span class="user-name">{{u.username}}</span>
                         </td>

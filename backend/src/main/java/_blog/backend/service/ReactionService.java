@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import _blog.backend.Entitys.Interactions.Follow.Follow;
@@ -45,7 +46,8 @@ public class ReactionService {
 
     @Autowired
     private RateLimiterService rateLimiterService;
-
+    
+    @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> react(LikeRequest likeRequest, String token) {
         final String username = jwtUtil.getUsername(token);
 

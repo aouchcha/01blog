@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
@@ -62,21 +63,17 @@ public class UserService {
         List<User> users;
         PageRequest limit = PageRequest.of(0, 10);
         if (lastUserId == null) {
-            // First page - get first 10 users
             users = userRepository.findByUsernameNotAndRoleNotOrderByIdAsc(
                     username,
                     Role.Admin,
                     limit);
         } else {
-            // Subsequent pages - get users after lastUserId
             users = userRepository.findByUsernameNotAndRoleNotAndIdGreaterThanOrderByIdAsc(
                     username,
                     Role.Admin,
                     lastUserId,
                     limit);
         }
-        // List<User> users = userRepository.findByUsernameNotAndRoleNot(username,
-        // Role.Admin);
         Set<Long> followedUserIds = followRepositry.findFollowedUserIds(me.getId());
 
         for (User u : users) {
@@ -148,6 +145,7 @@ public class UserService {
         return ResponseEntity.ok().body(Map.of("message", "reported succesfuuly"));
     }
 
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> Remove(String username, String token) {
         if (!userRepository.existsByUsername(username)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -164,6 +162,7 @@ public class UserService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> Ban(String username, String token) {
         System.out.println("HAAAAAAAAAAAAAAAAAAAAAANNNNNNNNNNNIIIIIIIIIIIIIII");
         User u = userRepository.findByUsername(username);

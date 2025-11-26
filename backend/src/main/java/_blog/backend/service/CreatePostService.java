@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 // import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +49,8 @@ public class CreatePostService {
 
     @Autowired
     private RateLimiterService rateLimiterService;
-
+    
+    @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> create(PostRequst postRequest) {
 
         // if (!jwtUtil.validateToken(token)) {

@@ -21,6 +21,9 @@ export class Reports implements OnInit {
   public isBrowser: boolean = false;
   public username: string | null = null;
   public report_id: number | null = null;
+  public lastReport: any = null;
+  public isLoading: boolean = false;
+  public HasMoreReports: boolean = true;
 
   public showConfirmation: boolean = false;
   public confirmationTitle: string = 'Delete Report?';
@@ -47,15 +50,38 @@ export class Reports implements OnInit {
     this.token = localStorage.getItem("JWT");
   }
 
+  public handleScrollLogic(event: any): void {
+    const element = event.target;
+
+    const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 50;
+    if (atBottom && !this.isLoading && this.HasMoreReports) {
+      console.log({ "mwssage": "wsset lekher" });
+
+      this.LoadReports();
+    }
+  }
+
   public LoadReports() {
     this.setToken();
-    this.adminService.loadReports(this.token).subscribe({
+    if (this.isLoading) return;
+
+    this.adminService.loadReports(this.token, this.lastReport).subscribe({
       next: (res) => {
         console.log(res);
-        this.reports = res.reports;
+        if (res.reports && res.reports.length > 0) {
+          this.reports = [...this.reports, ...res.reports];
+          this.lastReport = this.reports[this.reports.length - 1];
+          this.isLoading = false;
+        }else {
+          this.HasMoreReports = false;
+        }
+        // this.reports = res.reports;
       },
       error: (err) => {
         console.log(err);
+        if (err.status == 401) {
+          this.router.navigate(["login"])
+        }
       }
     })
   }
@@ -99,8 +125,8 @@ export class Reports implements OnInit {
     this.report_id = report_id;
     console.log(report_id);
     console.log(username);
-    
-    
+
+
     this.confirmationAction = "Ban";
     this.confirmationMessage = "Are you sure you want to Ban this user? This action cannot be undone."
     this.confirmationTitle = `Ban User: ${username} ?`;
@@ -123,13 +149,14 @@ export class Reports implements OnInit {
   }
 
   DeleteReport() {
-    console.log({"RRRRRRRRR":this.report_id});
-    
+    console.log({ "RRRRRRRRR": this.report_id });
+
     this.adminService.RemoveReport(this.token, this.report_id).subscribe({
       next: (res) => {
         console.log(res);
         let index = this.reports.findIndex((r: any) => r.id === this.report_id)
         this.reports.splice(index, 1)
+        this.lastReport = this.reports[this.reports.length - 1];
       },
       error: (err) => {
         console.log(err);

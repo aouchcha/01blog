@@ -26,13 +26,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByUsernameNotAndRoleNotOrderByIdAsc(String usename, Role role, Pageable page);
 
-    List<User> findByUsernameNotAndRoleNotAndIdGreaterThanOrderByIdAsc(String usename, Role role, Long lastId,Pageable page);
+    List<User> findByUsernameNotAndRoleNotAndIdGreaterThanOrderByIdAsc(String usename, Role role, Long lastId,
+            Pageable page);
 
     @Query("SELECT u.id FROM User u WHERE u.username = :username")
     Long findIdByUsername(@Param("username") String username);
 
+    // First page query
     @Query("""
-                Select new _blog.backend.Entitys.User.UserStatsDTO (
+                SELECT new _blog.backend.Entitys.User.UserStatsDTO (
                     u.id,
                     u.username,
                     u.email,
@@ -44,8 +46,28 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 LEFT JOIN u.posts p
                 LEFT JOIN u.reports_against_me_list r
                 WHERE u.role <> 0
-                GROUP BY u.id, u.username, u.email
+                GROUP BY u.id, u.username, u.email, u.isbaned
+                ORDER BY u.id ASC
             """)
-    List<UserStatsDTO> findUsersStates();
+    List<UserStatsDTO> findUsersStates(Pageable pageable);
+
+    // Subsequent pages query
+    @Query("""
+                SELECT new _blog.backend.Entitys.User.UserStatsDTO (
+                    u.id,
+                    u.username,
+                    u.email,
+                    COUNT(DISTINCT p),
+                    COUNT(DISTINCT r),
+                    u.isbaned
+                )
+                FROM User u
+                LEFT JOIN u.posts p
+                LEFT JOIN u.reports_against_me_list r
+                WHERE u.role <> 0 AND u.id > :lastUserId
+                GROUP BY u.id, u.username, u.email, u.isbaned
+                ORDER BY u.id ASC
+            """)
+    List<UserStatsDTO> findUsersStatesAfter(@Param("lastUserId") Long lastUserId, Pageable pageable);
 
 }
