@@ -318,7 +318,7 @@
 /* Post Media */
 .post-media-wrapper {
   width: 100%;
-  max-height: 400px;
+  max-height: 500px;
   overflow: hidden;
   background-color: #f5f5f5;
 }
@@ -332,7 +332,10 @@
 }
 
 .post-media-video {
-  max-height: 400px;
+  width: fit-content;
+  height: 500px;
+  object-fit: cover;
+  justify-self: center;
 }
 
 /* Post Content */

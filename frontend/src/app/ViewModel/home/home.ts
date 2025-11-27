@@ -15,6 +15,7 @@ import { HttpClient } from '@angular/common/http';
 import { Confirmation } from '../confirmation/confirmation';
 import { Subject } from 'rxjs'; // Import Subject
 import { takeUntil } from 'rxjs/operators'; // Import throttleTime
+import { User } from '../../models/User';
 
 
 @Component({
@@ -245,6 +246,8 @@ export class Home implements OnInit {
           this.others = [...this.others, ...res.users];
           this.lastUserId = this.others[this.others.length - 1].id;
           this.isLoading = false;
+          console.log(this.others.length);
+          
         } else {
           this.HasMoreUsers = false;
         }
@@ -357,7 +360,13 @@ export class Home implements OnInit {
   public Follow(user_id: number): void {
     this.setToken();
     this.userServise.Follow(user_id, this.token).subscribe({
-      next: () => {
+      next: (res) => {
+        console.log({res});
+        this.lastUserId = null;
+        this.HasMoreUsers = true;
+        this.others = [];
+        // let index = this.others.findIndex((u: User) => u.username === res.user.username);
+          // this.others[index] = res.user;
         this.getOthers()
       },
       error: (err) => {

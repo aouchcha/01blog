@@ -320,7 +320,7 @@
 .media-preview {
   display: flex;
   justify-content: space-between;
-  /* padding: 9px 21px; */
+  padding: 9px 21px;
   padding-top: 15px;
   padding-left: 15px;
   margin-left: 48px;
@@ -329,8 +329,8 @@
   margin-bottom: 12px;
   font-size: 13px;
   color: #666;
-  /* gap: 302px; */
-  /* width: 100%;*/
+  gap: 302px;
+  width: 100%;
 }
 
 
@@ -477,7 +477,7 @@
 }
 
 .post-media {
-  width: 100%;
+  width: fit-content;
   border-radius: 8px;
   max-height: 500px;
   object-fit: cover;

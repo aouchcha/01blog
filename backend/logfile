@@ -155,3 +155,7 @@
 2025-11-19 13:06:49.086 GMT [1408290] LOG:  checkpoint starting: end-of-recovery immediate wait
 2025-11-19 13:06:49.094 GMT [1408290] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.001 s, total=0.009 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/18EE0E8, redo lsn=0/18EE0E8
 2025-11-19 13:06:49.095 GMT [1408289] LOG:  database system is ready to accept connections
+2025-11-27 11:39:28.188 GMT [269039] FATAL:  lock file "postmaster.pid" already exists
+2025-11-27 11:39:28.188 GMT [269039] HINT:  Is another postmaster (PID 266470) running in data directory "/home/aouchcha/pgsql/data"?
+2025-11-27 11:39:43.656 GMT [269167] FATAL:  lock file "postmaster.pid" already exists
+2025-11-27 11:39:43.656 GMT [269167] HINT:  Is another postmaster (PID 266470) running in data directory "/home/aouchcha/pgsql/data"?
