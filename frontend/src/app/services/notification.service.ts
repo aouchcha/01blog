@@ -18,6 +18,7 @@ export class NotificationsService {
 
 
   connect(userId: number) {
+    
     if (this.eventSource && this.eventSource.readyState !== EventSource.CLOSED) {
 
       return; // already connected

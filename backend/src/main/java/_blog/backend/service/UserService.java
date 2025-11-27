@@ -86,7 +86,7 @@ public class UserService {
         return ResponseEntity.ok().body(Map.of("users", users));
     }
 
-    public ResponseEntity<?> getUserProfile(String username, String token) {
+    public ResponseEntity<?> getUserProfile(String username, String token, LocalDateTime lastDate,Long lastId) {
         final String myName = jwtUtil.getUsername(token);
         User me = userRepository.findByUsername(myName);
         if (me == null) {
@@ -105,11 +105,21 @@ public class UserService {
         } else {
             ProfileInfos.setFollow(false);
         }
-        List<Post> posts = postRepository.findByUserIdOrderByIdDesc(ProfileInfos.getId());
+        List<Post> posts ;
+        PageRequest limit = PageRequest.of(0, 10);
+
+        if (lastDate == null || lastId == null) {
+            //get The First 10 posts of the user
+            posts = postRepository.findTop10ByUser_IdOrderByCreatedAtDescIdDesc(ProfileInfos.getId(), limit);
+        }else {
+            //get the next 10
+            posts = postRepository.findNextPosts(ProfileInfos.getId(), lastDate, lastId, limit);
+        }
+        // = postRepository.findByUserIdOrderByIdDesc(ProfileInfos.getId());
 
         return ResponseEntity.ok(Map.of("user", ProfileInfos, "posts", posts, "followers",
                 followRepositry.countByFollowed_Id(ProfileInfos.getId()), "followings",
-                followRepositry.countByFollower_Id(ProfileInfos.getId())));
+                followRepositry.countByFollower_Id(ProfileInfos.getId()), "count",postRepository.countByUserId(ProfileInfos.getId())));
     }
 
     @Autowired

@@ -131,12 +131,14 @@ public class MainController {
     }
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<?> getProfile(@PathVariable String username, @RequestHeader("Authorization") String header) {
+    public ResponseEntity<?> getProfile(@PathVariable String username, @RequestHeader("Authorization") String header,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lastDate,
+            @RequestParam(required = false) Long lastId) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
         }
-        return userService.getUserProfile(username, token);
+        return userService.getUserProfile(username, token, lastDate, lastId);
     }
 
     @DeleteMapping("/user/{username}")
@@ -157,7 +159,7 @@ public class MainController {
         return userService.Ban(username, token);
     }
 
-        @PutMapping("/user/unban/{username}")
+    @PutMapping("/user/unban/{username}")
     public ResponseEntity<?> UnBanUser(@PathVariable String username, @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {

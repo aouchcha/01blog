@@ -72,7 +72,7 @@
         <!-- Stats -->
         <div class="profile-stats">
           <div class="stat-item">
-            <strong>{{ posts?.length || 0 }}</strong>
+            <strong>{{ postscount || 0 }}</strong>
             <span>Posts</span>
           </div>
           <div class="stat-item">
@@ -99,7 +99,7 @@
   </section>
 
   <!-- Posts Section -->
-  <section class="posts-section">
+  <section class="posts-section" (scroll)="handleScrollLogic($event)">
     <div class="section-header">
       <h2>Posts</h2>
     </div>

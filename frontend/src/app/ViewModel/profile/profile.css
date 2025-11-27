@@ -203,9 +203,13 @@
 
 /* Posts Section */
 .posts-section {
+  height: 100vh;
   max-width: 1000px;
   margin: 0 auto;
   padding: 32px 24px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .section-header {
@@ -240,7 +244,7 @@
 /* Posts Grid */
 .posts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 5fr));
   gap: 20px;
 }
 

@@ -4,7 +4,7 @@ export class User {
     isbaned: boolean = false;
     id: number = 0;
     role: String = "";
-    username: string | null = "";
+    username: string  = "";
     postCount: number = 0;
     reportCount: number = 0;
 }

@@ -1,6 +1,7 @@
 package _blog.backend.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,17 +38,22 @@ public class AdminService {
         // System.out.println("IIIIIIIIIIIIIIIIIIIIIIIID : "+ lastUserId);
         PageRequest limit = PageRequest.of(0, 15);
 
-        List<UserStatsDTO> users;
-        if (lastUserId == null || lastUserId == 0) {
-            // First page
-            // System.out.println("3AAAAAAAAAAAAAAAAAADI");
-            users = userRepository.findUsersStates(limit);
-        } else {
-            // Subsequent pages
-            // System.out.println("JOOOOOOOOOOOOOOOOOOOUUUJ");
-            users = userRepository.findUsersStatesAfter(lastUserId, limit);
+        List<UserStatsDTO> users = new ArrayList<>();
+        Long reports_count = 0L;
+        try {
+            if (lastUserId == null || lastUserId == 0) {
+                // First page
+                // System.out.println("3AAAAAAAAAAAAAAAAAADI");
+                users = userRepository.findUsersStates(limit);
+            } else {
+                // Subsequent pages
+                // System.out.println("JOOOOOOOOOOOOOOOOOOOUUUJ");
+                users = userRepository.findUsersStatesAfter(lastUserId, limit);
+            }
+            reports_count = reportRepository.count();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(null);
         }
-        Long reports_count = reportRepository.count();
         return ResponseEntity.ok(Map.of("users", users, "reportsCount", reports_count));
     }
 
@@ -55,22 +61,31 @@ public class AdminService {
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> loadReports(LocalDateTime lastDate, Long lastId) {
         final String username = contextHelpers.getUsername();
-        User u = userRepository.findByUsername(username);
-        if (u == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
-        }
+        User u = null;
+        List<ReportEntity> reports = new ArrayList<>();
+        Long reports_count = 0L;
+        try {
+            u = userRepository.findByUsername(username);
+            if (u == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
+            }
+    
+            PageRequest pageRequest = PageRequest.of(0, 10);
+    
+            if (lastDate == null || lastId == null) {
+                // First page - get initial 10 reports
+                reports = reportRepository.findInitialReports(pageRequest);
+            } else {
+                // Subsequent pages - get reports after cursor
+                reports = reportRepository.findNextReports(lastDate, lastId, pageRequest);
+            }
+            reports_count = reportRepository.count();
+            
+        } catch (Exception e) {
+            // TODO: handle exception
+            return ResponseEntity.internalServerError().body(null);
 
-        List<ReportEntity> reports;
-        PageRequest pageRequest = PageRequest.of(0, 10);
-
-        if (lastDate == null || lastId == null) {
-            // First page - get initial 10 reports
-            reports = reportRepository.findInitialReports(pageRequest);
-        } else {
-            // Subsequent pages - get reports after cursor
-            reports = reportRepository.findNextReports(lastDate, lastId, pageRequest);
         }
-        Long reports_count = reportRepository.count();
 
         return ResponseEntity.ok(Map.of("reports", reports, "reportsCount", reports_count));
     }

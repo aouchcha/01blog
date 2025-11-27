@@ -28,20 +28,28 @@ public class LoginService {
     public ResponseEntity<?> signin(LoginRequest request) {
         // System.out.println(request.getUsername());
         // System.out.println(request.getPassword());
-        final User user = userRepository.findByUsername(request.getUsername());
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Ivalid Cridential"));
-        }
+        User user = null; 
 
-        if (!PasswordUtils.checkPassword(request.getPassword(), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Invalid Cridential"));
-        }
-
-        if (user.getisbaned()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "You are banned"));
+        try {
+            user = userRepository.findByUsername(request.getUsername());
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "Ivalid Cridential"));
+            }
+    
+            if (!PasswordUtils.checkPassword(request.getPassword(), user.getPassword())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "Invalid Cridential"));
+            }
+    
+            if (user.getisbaned()) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "You are banned"));
+            }
+            
+        } catch (Exception e) {
+            // TODO: handle exception
+            return ResponseEntity.internalServerError().body(null);
         }
 
         String token = jwtUtils.generateToken(user.getUsername(), user.getRole());

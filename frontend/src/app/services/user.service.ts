@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { generateURL, generateHeader } from "../helpers/genarateHeader";
 import { Observable } from 'rxjs';
+import { Post } from '../models/Post';
 
 @Injectable({
     providedIn: 'root'
@@ -17,10 +18,22 @@ export class UserService {
         )
     }
 
-    public getProfile(username: String, token: String | null): Observable<any> {
+    public getProfile(username: String, token: String | null, lastPost: Post| null): Observable<any> {
+        let params = new HttpParams();
+        if (lastPost !== null) {
+            params = params
+                .set('lastDate', lastPost.createdAt)
+                .set('lastId', lastPost.id.toString());
+        }
+        const options = generateHeader(token);
+
+        const requestOptions = {
+            ...options,
+            params: params
+        };
         return this.http.get<any>(
             generateURL(`user/${username}`),
-            generateHeader(token)
+            requestOptions
         )
     }
 

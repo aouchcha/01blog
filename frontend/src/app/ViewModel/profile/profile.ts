@@ -51,6 +51,10 @@ export class Profile implements OnInit {
   public confirmationAction: string | undefined = 'Delete';
   public post_id: number | null = null;
   private destroy$ = new Subject<void>();
+  private isLoading: boolean = false;
+  private HasMorePosts: boolean = true;
+  private lastPost: Post | null = null;
+  public postscount: number = 0;
 
   // public confirmationParams: any = {};
 
@@ -77,7 +81,7 @@ export class Profile implements OnInit {
     this.notifService.reactionsObservable
       .pipe(takeUntil(this.destroy$))
       .subscribe(react => {
-      console.log("profile react", react);
+        console.log("profile react", react);
 
         let index = this.posts.findIndex((p: Post) => p.id === react.post.id);
         this.posts[index].likeCount = react.post.likeCount;
@@ -86,9 +90,9 @@ export class Profile implements OnInit {
   }
 
   ngOnDestroy() {
-  this.destroy$.next();
-  this.destroy$.complete();
-}
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   public getMe() {
     this.userService.getMe(this.token).subscribe({
@@ -107,20 +111,40 @@ export class Profile implements OnInit {
 
 
   public LoadProfile() {
-    this.userService.getProfile(this.username, this.token).subscribe({
+    if (this.isLoading) return;
+    this.userService.getProfile(this.username, this.token, this.lastPost).subscribe({
       next: (res) => {
         console.log({ res });
         this.user = res.user;
+        this.postscount = res.count;
         // console.log({"ussssss":this.user});
-
-        this.posts = res.posts;
-        this.followers = res.followers
-        this.followings = res.followings
+        if (res.posts && res.posts.length > 0) {
+          this.posts = [...this.posts, ...res.posts];
+          this.lastPost = this.posts[this.posts.length - 1];
+          this.followers = res.followers
+          this.followings = res.followings
+          console.log(this.posts);
+          this.isLoading = false
+        } else {
+          this.HasMorePosts = false;
+        }
       },
       error: (err) => {
+        this.isLoading = false;
         console.log(err);
       }
     })
+  }
+
+  public handleScrollLogic(event: any): void {
+    const element = event.target;
+
+    const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 100;
+
+    if (atBottom && !this.isLoading && this.HasMorePosts) {
+      this.LoadProfile();
+    }
+
   }
 
   public Home() {
@@ -167,7 +191,7 @@ export class Profile implements OnInit {
     this.confirmationTitle = `Ban User: ${this.user.username} ?`;
   }
 
-    public CheckBeforeUnBan() {
+  public CheckBeforeUnBan() {
     this.showConfirmation = true;
     this.confirmationAction = "UnBan";
     this.confirmationMessage = "Are you sure you want to UnBan this user? This action cannot be undone."
@@ -235,7 +259,7 @@ export class Profile implements OnInit {
         this.BanUser()
         this.Cancel()
         this.CancelAction()
-      }else if (this.confirmationAction === "UnBan") {
+      } else if (this.confirmationAction === "UnBan") {
         this.UnBanUser();
         this.Cancel();
         this.CancelAction();
@@ -258,7 +282,7 @@ export class Profile implements OnInit {
     })
   }
 
-    public UnBanUser() {
+  public UnBanUser() {
     this.setToken()
     this.userService.UnBanUserr(this.user.username, this.token).subscribe({
       next: (res) => {

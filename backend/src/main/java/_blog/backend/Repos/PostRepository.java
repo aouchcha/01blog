@@ -16,7 +16,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByUserIdOrderByIdDesc(Long userId);
 
-    
+    @Query("SELECT p FROM Post p WHERE p.user.id = :userId AND " +
+            "(p.createdAt < :lastDate OR (p.createdAt = :lastDate AND p.id < :lastId)) " +
+            "ORDER BY p.createdAt DESC, p.id DESC")
+    List<Post> findNextPosts(Long userId,
+            @Param("lastDate") LocalDateTime lastDate,
+            @Param("lastId") Long lastId,
+            Pageable pageable);
+
+    List<Post> findTop10ByUser_IdOrderByCreatedAtDescIdDesc(Long userId, Pageable pageable);
+
     @Query("""
                 SELECT p FROM Post p
                 WHERE (
@@ -26,7 +35,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                 ORDER BY p.createdAt DESC, p.id DESC
             """)
     List<Post> findInitialFeedPosts(@Param("userId") Long userId, Pageable pageable);
-
 
     @Query("""
                 SELECT p FROM Post p
@@ -47,5 +55,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @SuppressWarnings("null")
     boolean existsById(Long id);
+
+    Long countByUserId(Long id);
 
 }

@@ -65,7 +65,7 @@
     </aside>
 
     <!-- Main Content - Feed -->
-    <main class="main-content" >
+    <main class="main-content">
         <!-- Notifications Panel -->
         <div class="notifications-panel" *ngIf="ShowNotifs" (scroll)="handleScrollLogic($event, 'notifs')">
             <div class="panel-header">
@@ -104,10 +104,15 @@
                 </div>
             </div>
 
-            <p class="media-preview" *ngIf="media !== null">
-                <b>File to upload: {{mediaName}}</b>
+            <div class="media-preview" *ngIf="previewUrl">
                 <button class="close-btn" (click)="RemoveImage('create')">✕</button>
-            </p>
+
+                <img *ngIf="isImage" [src]="previewUrl" class="preview-img">
+                <video *ngIf="isVideo" [src]="previewUrl" class="preview-video" controls></video>
+
+                <p><b>{{ mediaName }}</b></p>
+            </div>
+
 
             <div class="create-post-actions">
                 <label for="Media" class="media-btn">
@@ -199,12 +204,22 @@
                 <label for="UpdateMedia" class="modal-media-btn">Select Media</label>
                 <input type="file" id="UpdateMedia" (change)="setMedia($event, 'update')" class="media-input"
                     accept="image/*, video/*">
+                <!-- ///////////////////////////////////////////////////////////////// -->
+                <div class="media-preview" *ngIf="updatePreviewUrl">
+                    <button class="close-btn" (click)="RemoveImage('edit')">✕</button>
+
+                    <img *ngIf="updateIsImage" [src]="updatePreviewUrl" class="preview-img">
+                    <video *ngIf="updateIsVideo" [src]="updatePreviewUrl" class="preview-video" controls></video>
+
+                    <p><b>{{ updatedMediaName }}</b></p>
+                </div>
+                <!-- //////////////////////////////////////////////////////////////////////////
                 <p class="media-preview" *ngIf="updateMedia !== null">
                     <b>File to upload: {{updatedMediaName}}</b>
                     <button class="close-btn" (click)="RemoveImage('edit')">✕</button>
 
                 </p>
-
+                //////////////////////////////////////////////////////////////////// -->
                 <div class="modal-actions">
                     <button class="modal-save-btn" (click)="UpdatePost()">Save</button>
                     <button class="modal-cancel-btn" (click)="Cancel()">Cancel</button>
@@ -226,7 +241,8 @@
             <button class="action-button logout" (click)="Logout()">Logout</button>
         </div>
 
-        <div class="suggestions-section" *ngIf="others && others.length > 0" (scroll)="handleScrollLogic($event, 'users')">
+        <div class="suggestions-section" *ngIf="others && others.length > 0"
+            (scroll)="handleScrollLogic($event, 'users')">
             <h3>Suggestions</h3>
             <div class="suggestion-item" *ngFor="let user of others">
                 <p class="suggestion-username" (click)="ToProfile(user.username)">{{user.username}}</p>

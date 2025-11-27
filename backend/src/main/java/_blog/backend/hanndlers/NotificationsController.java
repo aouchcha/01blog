@@ -36,10 +36,10 @@ public class NotificationsController {
         return notificationService.connect(userId, lastEventId);
     }
 
-    @GetMapping("/disconnect/{userId}")
-    public void disconnect(@PathVariable Long userId) {
-        notificationService.disconnect(userId);
-    }
+    // @GetMapping("/disconnect/{userId}")
+    // public void disconnect(@PathVariable Long userId) {
+    //     notificationService.disconnect(userId);
+    // }
 
     @Autowired
     private JwtUtil jwtUtil;

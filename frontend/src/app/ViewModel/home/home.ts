@@ -42,12 +42,18 @@ export class Home implements OnInit {
   public posts: any = [];
   public me: any = {};
   public others: any = [];
-  public mediaName: string | null = null;
   public media: File | null = null;
+  public mediaName: string | null = null;
+  public previewUrl: string | null = null;
+  public isImage: boolean = false;
+  public isVideo: boolean = false;
   public update: boolean = false;
   public post_id: number | null = null;
   public updatedMediaName: string | null = null;
   public updateMedia: File | null = null;
+  updatePreviewUrl: string | null = null;
+  updateIsImage: boolean = false;
+  updateIsVideo: boolean = false;
   public oldMediaName: string | null = null;
   public oldMedia: File | null = null;
   public isBrowser: boolean = false;
@@ -69,10 +75,12 @@ export class Home implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log({"message":"hchithalQ w dkhelt"});
+    
     if (!this.isBrowser) {
       return
     }
-
+    // this.media?.
     this.setToken()
     this.loadHome()
 
@@ -93,6 +101,7 @@ export class Home implements OnInit {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    this.notifService.disconnect();
   }
 
 
@@ -117,6 +126,11 @@ export class Home implements OnInit {
     this.updateMedia = null;
     this.updatedMediaName = null;
     this.post_id = null;
+    // this.previewUrl = null;
+    // this.updatePreviewUrl = null;
+    this.update = false;
+    this.isImage = false;
+    this.isVideo = false;
   }
 
   public Logout(): void {
@@ -125,19 +139,43 @@ export class Home implements OnInit {
     this.router.navigate(["login"]);
   }
 
-  public setMedia(event: Event, helper: String): void {
+  public setMedia(event: Event, helper: string): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    const isImage = file.type.startsWith("image/");
+    const isVideo = file.type.startsWith("video/");
+
+    reader.onload = () => {
       if (helper === 'create') {
-        this.media = input.files[0];
-        this.mediaName = input.files[0].name;
-      } else if (helper === 'update') {
-        this.Removed = true;
-        this.updateMedia = input.files[0];
-        this.updatedMediaName = input.files[0].name;
+        this.media = file;
+        this.mediaName = file.name;
+
+        this.previewUrl = reader.result as string;
+        this.isImage = isImage;
+        this.isVideo = isVideo;
       }
-    }
+
+      else if (helper === 'update') {
+        this.Removed = true;
+        this.updateMedia = file;
+        this.updatedMediaName = file.name;
+
+        this.updatePreviewUrl = reader.result as string;
+        // console.log({isImage});
+        // console.log({isVideo});
+        
+        this.updateIsImage = isImage;
+        this.updateIsVideo = isVideo;
+      }
+    };
+
+    reader.readAsDataURL(file);
   }
+
 
   public CreatePost(): void {
     this.setToken();
@@ -154,7 +192,7 @@ export class Home implements OnInit {
         this.posts = [];
         this.lastPost = null;
         this.HasMorePosts = true;
-      
+        this.previewUrl = null;
         this.getAllPosts("feed");
       },
       error: (err) => {
@@ -181,7 +219,7 @@ export class Home implements OnInit {
       this.HasMoreNotifs = true;
       this.Notifs = [];
     }
-   
+
     this.postsService.getAllPosts(this.token, this.lastPost).subscribe({
       next: (res) => {
 
@@ -212,12 +250,12 @@ export class Home implements OnInit {
       if (atBottom && !this.isLoading && this.HasMorePosts) {
         this.getAllPosts("other");
       }
-    }else if (helper == 'users'){
-       if (atBottom && !this.isLoading && this.HasMoreUsers) {
+    } else if (helper == 'users') {
+      if (atBottom && !this.isLoading && this.HasMoreUsers) {
         this.getOthers();
       }
-    }else if (helper == 'notifs') {
-       if (atBottom && !this.isLoading && this.HasMoreNotifs) {
+    } else if (helper == 'notifs') {
+      if (atBottom && !this.isLoading && this.HasMoreNotifs) {
         this.getNotif();
       }
     }
@@ -247,7 +285,7 @@ export class Home implements OnInit {
           this.lastUserId = this.others[this.others.length - 1].id;
           this.isLoading = false;
           console.log(this.others.length);
-          
+
         } else {
           this.HasMoreUsers = false;
         }
@@ -273,6 +311,21 @@ export class Home implements OnInit {
       this.oldMedia = post.media;
       this.updatedMediaName = post.mediaUrl.substring(30);
       this.oldMediaName = post.mediaUrl.substring(30);
+      // console.log({"old media": this.oldMediaName});
+      this.updatePreviewUrl = post.mediaUrl;
+      this.VideoOrImage(this.oldMediaName);
+      // this.updateIsImage = true;
+      // this.old
+    }
+  }
+
+  public VideoOrImage(Url: string) {
+    if (Url.endsWith(".mp4")) {
+      this.updateIsVideo = true;
+      this.updateIsImage = false;
+    }else {
+      this.updateIsImage = true;
+      this.updateIsVideo = false;
     }
   }
 
@@ -299,16 +352,24 @@ export class Home implements OnInit {
     })
   }
 
-  public RemoveImage(type: string) {
-    this.Removed = true;
-    if (type === 'create') {
+  RemoveImage(helper: string) {
+    if (helper === 'create') {
       this.media = null;
-      this.mediaName = null;
-    } else {
+      this.mediaName = "";
+      this.previewUrl = null;
+      this.isImage = false;
+      this.isVideo = false;
+    }
+    else if (helper === 'edit') {
       this.updateMedia = null;
-      this.updatedMediaName = null;
+      this.updatedMediaName = "";
+      this.updatePreviewUrl = null;
+      this.updateIsImage = false;
+      this.updateIsVideo = false;
+      this.Removed = true;
     }
   }
+
 
   public confirmationTitle: string = 'Delete Post?';
   public confirmationMessage: string = 'Are you sure you want to delete this post? This action cannot be undone.';
@@ -361,12 +422,12 @@ export class Home implements OnInit {
     this.setToken();
     this.userServise.Follow(user_id, this.token).subscribe({
       next: (res) => {
-        console.log({res});
+        console.log({ res });
         this.lastUserId = null;
         this.HasMoreUsers = true;
         this.others = [];
         // let index = this.others.findIndex((u: User) => u.username === res.user.username);
-          // this.others[index] = res.user;
+        // this.others[index] = res.user;
         this.getOthers()
       },
       error: (err) => {
@@ -395,6 +456,8 @@ export class Home implements OnInit {
           this.Notifs = [...this.Notifs, ...res.notifs];
           this.lastNotif = this.Notifs[this.Notifs.length - 1];
           this.isLoading = false;
+          console.log(this.Notifs.length);
+          
         } else {
           this.HasMoreNotifs = false;
         }
