@@ -50,8 +50,7 @@ public class PostsHandler {
             @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer ", "");
         if (!jwtUtil.validateToken(token)) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
-        "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return postsService.getSinglePost(post_id);
     }
@@ -61,7 +60,7 @@ public class PostsHandler {
             @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return createPostService.create(postRequst);
     }
@@ -72,22 +71,19 @@ public class PostsHandler {
             @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer ", "");
         if (!jwtUtil.validateToken(token)) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
-        "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return postsService.delete(post_id);
     }
 
     @PutMapping("/{post_id}")
     public ResponseEntity<?> Update(
-        @PathVariable Long post_id, @ModelAttribute PostRequst postRequst,
+            @PathVariable Long post_id, @ModelAttribute PostRequst postRequst,
             @RequestHeader("Authorization") String header,
-            @RequestParam(required = false) boolean removed
-        ) {
+            @RequestParam(required = false) boolean removed) {
         String token = header.replace("Bearer ", "");
         if (!jwtUtil.validateToken(token)) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message",
-        "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return postsService.update(post_id, postRequst, removed);
     }

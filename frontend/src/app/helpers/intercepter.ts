@@ -13,7 +13,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
     catchError(err => {
       // const body = err;
-      console.log({ "message body Error": err }); // Access the message field
+      console.log(err.error.error); // Access the message field
 
       switch (err.status) {
         case 0:
@@ -22,7 +22,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
           break;
 
         case 400:
-          toast.showError("Bad Request — check your data.");
+          toast.showError(`Bad Request — ${err.error.error}.`);
           console.log({ "message": "Error 400" });
           router.navigate([""])
 
@@ -36,12 +36,12 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
           router.navigate(['/login']);
           break;
         case 403:
-          toast.showError("Forbidden — you are banned.");
+          toast.showError("Forbidden");
           console.log({ "message": "Error 403" });
           router.navigate(['/login']);
           break;
         case 404:
-          toast.showError("Resource not found.");
+          toast.showError(`Not Found — ${err.error.error}.`);
           console.log({ "message": "Error 404" });
           router.navigate([""])
 
@@ -49,7 +49,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
           break;
         case 500:
           console.log({ "message": "Error 500" });
-          toast.showError("Server error — try again later.");
+          toast.showError(`Internal Server Error — ${err.error.error}.`);
           router.navigate([""])
 
           break;

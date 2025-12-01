@@ -147,7 +147,7 @@ public class MainController {
             @RequestParam(required = false) Long lastId) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return userService.getUserProfile(username, token, lastDate, lastId);
     }
@@ -156,7 +156,7 @@ public class MainController {
     public ResponseEntity<?> RemoveUser(@PathVariable String username, @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return userService.Remove(username, token);
     }
@@ -165,7 +165,7 @@ public class MainController {
     public ResponseEntity<?> BanUser(@PathVariable String username, @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return userService.Ban(username, token);
     }
@@ -174,7 +174,7 @@ public class MainController {
     public ResponseEntity<?> UnBanUser(@PathVariable String username, @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return userService.UnBanned(username, token);
     }
@@ -184,7 +184,7 @@ public class MainController {
             @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return userService.report(reportRequest, token);
     }
@@ -197,7 +197,7 @@ public class MainController {
             @RequestParam(required = false) Long lastUserId) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token) || !jwtUtil.getRole(token).equals("Admin")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return adminService.getBoard(token, lastUserId);
     }
@@ -208,7 +208,7 @@ public class MainController {
             @RequestParam(required = false) Long lastId) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token) || !jwtUtil.getRole(token).equals("Admin")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return adminService.loadReports(lastDate, lastId);
     }
@@ -217,7 +217,7 @@ public class MainController {
     public ResponseEntity<?> BanUser(@PathVariable Long report_id, @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return adminService.DeleteReport(report_id);
     }

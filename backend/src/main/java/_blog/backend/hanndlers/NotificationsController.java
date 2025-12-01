@@ -56,7 +56,7 @@ public class NotificationsController {
 
         // Validate BEFORE any SSE setup
         if (token == null || !jwtUtil.validateToken(token)) {
-            System.out.println("VVVVVVVVVVVVVVVVVVVVVv   " + token);
+            // System.out.println("VVVVVVVVVVVVVVVVVVVVVv   " + token);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\": \"Invalid SSE token\"}");
@@ -90,7 +90,7 @@ public class NotificationsController {
             @RequestParam(required = false) Long lastId) {
         String token = header.replace("Bearer ", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         final String username = jwtUtil.getUsername(token);
         return notificationService.getNotifications(username, lastDate, lastId);
@@ -101,7 +101,7 @@ public class NotificationsController {
             @RequestHeader("Authorization") String header) {
         String token = header.replace("Bearer ", "");
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "invalid token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
         }
         return notificationService.markAsRead(notification_id);
     }

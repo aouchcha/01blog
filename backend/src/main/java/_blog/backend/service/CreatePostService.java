@@ -61,25 +61,25 @@ public class CreatePostService {
         final String username = contextHelpers.getUsername();   
 
          if (!rateLimiterService.isAllowed(username)) {
-            return ResponseEntity.status(429).body(Map.of("message", "Rate limit exceeded. Try again later."));
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
         }
 
          if (postRequest.getTitle().trim().isEmpty() ||
             postRequest.getTitle().length() > 100) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Description is invalid"));
+                    .body(Map.of("error", "Description is invalid"));
         }
 
         if (postRequest.getDescription().trim().isEmpty() ||
             postRequest.getDescription().length() > 1000) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Description is invalid"));
+                    .body(Map.of("error", "Description is invalid"));
         }
 
         User u = userRepository.findByUsername(username);
         if (u == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "the user is not valid"));
+                    .body(Map.of("error", "the user is not valid"));
         }
 
         Post newPost = new Post();
@@ -90,27 +90,11 @@ public class CreatePostService {
 
         if (!mediaUtils.save(newPost, postRequest)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Internal Server Error"));
+                    .body(Map.of("error", "Internal Server Error"));
         }
         
-        // PostCreationResult pr = savePostAndGetFollowers(newPost, u.getId());
-
         final Post p = postRepository.save(newPost);
-        // PostResponse pr = new PostResponse();
-        // pr.setCommentsCount(p.getCommentsCount());
-        // pr.setCreatedAt(p.getCreatedAt());
-        // pr.setDescription(p.getDescription());
-        // pr.setId(p.getId());
-        // pr.setLikeCount(p.getLikeCount());
-        // pr.setMedia(postRequest.getMedia());
-        // pr.setTitle(p.getTitle());
-        // UserResponse ur = new UserResponse();
-        // ur.setEmail(u.getEmail());
-        // ur.setFollow(u.getFollow());
-        // ur.setId(u.getId());
-        // ur.setRole(u.getRole());
-        // ur.setUsername(username);
-        // pr.setUserResponse(ur);
+    
         List<Follow> followers = followRepositry.findByFollowed_Id(u.getId());
         followers.forEach(f -> notificationService.sendNotification(f.getFollower(), u, p));
 

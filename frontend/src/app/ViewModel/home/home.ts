@@ -467,8 +467,10 @@ export class Home implements OnInit {
 
     this.notifService.getNotifs(this.token, this.lastNotif).subscribe({
       next: (res) => {
-        if (res.notifs && res.notifs.length > 0) {
-          this.Notifs = [...this.Notifs, ...res.notifs];
+        console.log({res});
+        
+        if (res.notifications && res.notifications.length > 0) {
+          this.Notifs = [...this.Notifs, ...res.notifications];
           this.lastNotif = this.Notifs[this.Notifs.length - 1];
           this.isLoading = false;
           console.log(this.Notifs.length);

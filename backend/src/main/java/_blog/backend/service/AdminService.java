@@ -29,24 +29,20 @@ public class AdminService {
     private ReportRepository reportRepository;
 
     @Autowired
-    // private JwtUtil jwtUtil;
     private ContextHelpers contextHelpers;
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> getBoard(String token, Long lastUserId) {
-        // System.out.println("IIIIIIIIIIIIIIIIIIIIIIIID : "+ lastUserId);
         PageRequest limit = PageRequest.of(0, 15);
 
         List<UserStatsDTO> users = new ArrayList<>();
         Long reports_count = 0L;
         try {
             if (lastUserId == null || lastUserId == 0) {
-                // First page
                 // System.out.println("3AAAAAAAAAAAAAAAAAADI");
                 users = userRepository.findUsersStates(limit);
             } else {
-                // Subsequent pages
                 // System.out.println("JOOOOOOOOOOOOOOOOOOOUUUJ");
                 users = userRepository.findUsersStatesAfter(lastUserId, limit);
             }
@@ -67,22 +63,19 @@ public class AdminService {
         try {
             u = userRepository.findByUsername(username);
             if (u == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "the user is not valid"));
             }
     
             PageRequest pageRequest = PageRequest.of(0, 10);
     
             if (lastDate == null || lastId == null) {
-                // First page - get initial 10 reports
                 reports = reportRepository.findInitialReports(pageRequest);
             } else {
-                // Subsequent pages - get reports after cursor
                 reports = reportRepository.findNextReports(lastDate, lastId, pageRequest);
             }
             reports_count = reportRepository.count();
             
         } catch (Exception e) {
-            // TODO: handle exception
             return ResponseEntity.internalServerError().body(null);
 
         }
@@ -94,7 +87,7 @@ public class AdminService {
     public ResponseEntity<?> DeleteReport(Long reportId) {
         ReportEntity r = reportRepository.findById(reportId).orElse(null);
         if (r == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Bad Request"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Bad Request"));
         }
         reportRepository.delete(r);
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Report Deleted With success"));

@@ -44,7 +44,7 @@ public class UserService {
     public ResponseEntity<?> getData(String token) {
         final String username = jwtUtil.getUsername(token);
         if (!userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalide user"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalide user"));
         }
         User u = userRepository.findByUsername(username);
         int count = notificationRepository.countByRecipient_IdAndSeenFalse(u.getId());

@@ -29,9 +29,9 @@ import _blog.backend.helpers.JwtUtil;
 @Service
 public class NotificationService {
 
-    private static final long SSE_TIMEOUT = 10 * 60 * 1000L; // 10 minutes
+    private static final long SSE_TIMEOUT = 10 * 60 * 1000L;
     private static final int NOTIFICATION_PAGE_SIZE = 20;
-    private static final int MAX_CONNECTIONS_PER_USER = 5; // Limit connections per user
+    private static final int MAX_CONNECTIONS_PER_USER = 5;
 
     @Autowired
     private NotificationRepository notificationRepository;
@@ -42,9 +42,10 @@ public class NotificationService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    // Fully thread-safe
     private final Map<Long, Set<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
-    public SseEmitter connect(Long userId, String lastEventIdHeader, String token) throws InvalidJwtException {
+    public SseEmitter connect(Long userId, String lastEventIdHeader, String token) {
         User user = userRepository.findByUsername(jwtUtil.getUsername(token));
         if (user == null || !user.getId().equals(userId)) {
             throw new InvalidJwtException("Invalid user or token mismatch");
@@ -52,7 +53,7 @@ public class NotificationService {
 
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
 
-        registerEmitterWithLimit(userId, emitter);
+        registerEmitter(userId, emitter);
 
         emitter.onCompletion(() -> removeEmitter(userId, emitter));
         emitter.onTimeout(() -> removeEmitter(userId, emitter));
@@ -61,94 +62,84 @@ public class NotificationService {
         return emitter;
     }
 
-    private void registerEmitterWithLimit(Long userId, SseEmitter newEmitter) {
-        emitters.compute(userId, (key, existingEmitters) -> {
-            if (existingEmitters == null) {
-                existingEmitters = new LinkedHashSet<>();
-            }
+    private void registerEmitter(Long userId, SseEmitter newEmitter) {
 
-            if (existingEmitters.size() >= MAX_CONNECTIONS_PER_USER) {
-                SseEmitter oldest = existingEmitters.iterator().next();
-                existingEmitters.remove(oldest);
+        emitters.compute(userId, (id, set) -> {
+            if (set == null)
+                set = ConcurrentHashMap.newKeySet();
 
+            if (set.size() >= MAX_CONNECTIONS_PER_USER) {
+                SseEmitter oldest = set.iterator().next();
+                set.remove(oldest);
                 try {
                     oldest.complete();
-                } catch (RuntimeException e) {
-                    System.err.println("Error closing old SSE connection: " + e.getMessage());
+                } catch (Exception ignore) {
                 }
             }
 
-            existingEmitters.add(newEmitter);
-            return existingEmitters;
+            set.add(newEmitter);
+            return set;
         });
     }
 
     private void removeEmitter(Long userId, SseEmitter emitter) {
-        Set<SseEmitter> userEmitters = emitters.get(userId);
-        if (userEmitters != null) {
-            userEmitters.remove(emitter);
-            if (userEmitters.isEmpty()) {
+        Set<SseEmitter> set = emitters.get(userId);
+        if (set != null) {
+            set.remove(emitter);
+            if (set.isEmpty())
                 emitters.remove(userId);
-                // System.out.println("All SSE connections closed for user " + userId);
-            }
         }
     }
 
-    public void sendNotification(User recipient, User creator, Post post) throws InvalidJwtException {
+    // ---------------------------
+    // NOTIFICATION SEND
+    // ---------------------------
+    public void sendNotification(User recipient, User creator, Post post) {
         if (recipient == null || creator == null || post == null) {
             throw new InvalidJwtException("Bad Request");
         }
 
-        NotificationDTO notificationData = saveNotification(recipient, creator, post);
+        NotificationDTO dto = saveNotification(recipient, creator, post);
 
-        Set<SseEmitter> userEmitters = emitters.get(recipient.getId());
-        if (userEmitters != null && !userEmitters.isEmpty()) {
-            userEmitters.forEach(emitter -> sendNotificationEvent(emitter, notificationData));
-        }
+        Set<SseEmitter> set = emitters.get(recipient.getId());
+        if (set == null || set.isEmpty())
+            return;
+
+        // Prevent ConcurrentModificationException
+        List<SseEmitter> safeEmitters = List.copyOf(set);
+
+        safeEmitters.forEach(emitter -> sendNotificationEvent(emitter, dto));
     }
 
-    @Transactional
-    public NotificationDTO saveNotification(User recipient, User creator, Post post) {
-        NotificationEntity notification = new NotificationEntity();
-        notification.setRecipient(recipient);
-        notification.setCreator(creator);
-        notification.setPost(post);
-
-        NotificationEntity savedNotification = notificationRepository.save(notification);
-
-        int unreadCount = notificationRepository.countByRecipient_IdAndSeenFalse(recipient.getId());
-
-        return new NotificationDTO(
-                savedNotification.getId(),
-                savedNotification.getCreator().getUsername(),
-                unreadCount,
-                savedNotification.getCreatedAt(),
-                savedNotification.isSeen());
-    }
-
-    private void sendNotificationEvent(SseEmitter emitter, NotificationDTO notification) {
+    private void sendNotificationEvent(SseEmitter emitter, NotificationDTO dto) {
         try {
             emitter.send(SseEmitter.event()
-                    .id(String.valueOf(notification.getId()))
+                    .id(String.valueOf(dto.getId()))
                     .name("notification")
                     .data(Map.of(
-                            "message", String.format("%s published a post", notification.getCreatorUsername()),
-                            "count", notification.getCount())));
+                            "message", dto.getCreatorUsername() + " published a post",
+                            "count", dto.getCount())));
         } catch (Exception e) {
-            // System.err.println("Failed to send notification event: " + e.getMessage());
             emitter.completeWithError(e);
         }
     }
 
+    // ---------------------------
+    // REACTIONS
+    // ---------------------------
     public void sendReaction(Long userId, Like like) {
         if (userId == null || like == null) {
             throw new InvalidJwtException("Bad Request");
         }
 
-        Set<SseEmitter> userEmitters = emitters.get(userId);
-        if (userEmitters != null && !userEmitters.isEmpty()) {
-            userEmitters.forEach(emitter -> sendReactionEvent(emitter, like));
-        }
+        Set<SseEmitter> set = emitters.get(userId);
+        if (set == null || set.isEmpty())
+            return;
+
+        // Safe copy
+        List<SseEmitter> safeEmitters = List.copyOf(set);
+
+        safeEmitters.forEach(emitter -> sendReactionEvent(emitter, like));
     }
 
     private void sendReactionEvent(SseEmitter emitter, Like like) {
@@ -157,11 +148,32 @@ public class NotificationService {
                     .id(String.valueOf(like.getId()))
                     .name("reaction")
                     .data(Map.of("post", like.getPost())));
-        } catch (IOException e) {
-            System.err.println("Failed to send reaction event: " + e.getMessage());
+        } catch (Exception e) {
             emitter.completeWithError(e);
         }
     }
+
+    // ---------------------------
+    // SAVE NOTIFICATION IN DB
+    // ---------------------------
+    @Transactional
+    public NotificationDTO saveNotification(User recipient, User creator, Post post) {
+        NotificationEntity n = new NotificationEntity();
+        n.setRecipient(recipient);
+        n.setCreator(creator);
+        n.setPost(post);
+
+        NotificationEntity saved = notificationRepository.save(n);
+        int unread = notificationRepository.countByRecipient_IdAndSeenFalse(recipient.getId());
+
+        return new NotificationDTO(
+                saved.getId(),
+                saved.getCreator().getUsername(),
+                unread,
+                saved.getCreatedAt(),
+                saved.isSeen());
+    }
+
 
     public ResponseEntity<?> getNotifications(String username, LocalDateTime lastDate, Long lastId) {
         User user = userRepository.findByUsername(username);
@@ -192,7 +204,6 @@ public class NotificationService {
         return ResponseEntity.ok(Map.of("notifications", notifications));
     }
 
-
     @Transactional
     public ResponseEntity<?> markAsRead(Long notificationId) {
         NotificationEntity notification = notificationRepository.findById(notificationId).orElse(null);
@@ -215,13 +226,6 @@ public class NotificationService {
         return ResponseEntity.ok(Map.of(
                 "message", "Notification marked as read",
                 "notification", updatedNotification));
-    }
-
-  
-    public int getActiveConnectionsCount() {
-        return emitters.values().stream()
-                .mapToInt(Set::size)
-                .sum();
     }
 
 }

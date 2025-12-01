@@ -48,24 +48,24 @@ public class CommentsService {
 
         if (u == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "invalid user"));
+                    .body(Map.of("error", "invalid user"));
         }
 
         if (request.getContent().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "comment content is mandatory"));
+                    .body(Map.of("error", "comment content is mandatory"));
         }
 
         if (request.getContent().trim().length() > 250) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "comment content should be less than 250 letters"));
+                    .body(Map.of("error", "comment content should be less than 250 letters"));
         }
 
         Post p = postRepository.findById(request.getPost_id()).orElse(null);
 
         if (p == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "invalid post_id"));
+                    .body(Map.of("error", "invalid post_id"));
         }
 
         Comment c = new Comment();
@@ -87,7 +87,7 @@ public class CommentsService {
         Comment comment = commentRepository.findById(comment_id).orElse(null);
 
         if (comment == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "comment doesn't removed"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "comment doesn't removed"));
         }
 
         commentRepository.delete(comment);
@@ -95,7 +95,7 @@ public class CommentsService {
         Post p = postRepository.findById(comment.getPost().getId()).orElse(null);
 
         if (p == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "comment doesn't removed"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "comment doesn't removed"));
         }
 
         p.setCommentsCount(p.getCommentsCount() - 1);

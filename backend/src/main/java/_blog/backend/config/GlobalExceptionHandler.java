@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleRuntimeExceptions(RuntimeException ex) {
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", ex.getMessage()));
+                .status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", "Can not find the resource requested"));
     }
 }

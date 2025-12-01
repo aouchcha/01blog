@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import _blog.backend.Entitys.Interactions.Follow.Follow;
+import _blog.backend.Entitys.Interactions.Reactions.Like;
 import _blog.backend.Entitys.Notifications.NotificationEntity;
 import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.Report.ReportEntity;
@@ -75,7 +76,9 @@ public class User {
     @JsonIgnoreProperties("recipient") // avoid recursion
     private List<NotificationEntity> Follows_Forme_list = new ArrayList<>();
 
-    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("user") // avoid recursion
+    private List<Like> Like_List = new ArrayList<>();
 
     public User() {
     }
