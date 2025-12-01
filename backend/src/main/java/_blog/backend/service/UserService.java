@@ -86,8 +86,9 @@ public class UserService {
         return ResponseEntity.ok().body(Map.of("users", users));
     }
 
-    public ResponseEntity<?> getUserProfile(String username, String token, LocalDateTime lastDate,Long lastId) {
+    public ResponseEntity<?> getUserProfile(String username, String token, LocalDateTime lastDate, Long lastId) {
         final String myName = jwtUtil.getUsername(token);
+        System.out.println("MMMMMMMMMMMMMMMMMYYYYYYYYYYYYYYY   =     " + myName);
         User me = userRepository.findByUsername(myName);
         if (me == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -95,6 +96,11 @@ public class UserService {
         }
 
         User ProfileInfos = userRepository.findByUsername(username);
+
+        if (ProfileInfos == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "invalid user to search"));
+        }
 
         if (ProfileInfos.getRole().equals(Role.Admin)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -168,7 +174,7 @@ public class UserService {
 
         final User u = userRepository.findByUsername(username);
         userRepository.delete(u);
-        return ResponseEntity.ok().body(Map.of("message", "User " + u + " Removed with success"));
+        return ResponseEntity.ok().body(Map.of("message", "User " + u.getUsername() + " Removed with success"));
     }
 
     @Transactional
@@ -181,7 +187,7 @@ public class UserService {
                     .body(Map.of("message", "the user u wanna to ban doesnt exist"));
         }
         u.setisbaned(true);
-        return ResponseEntity.ok().body(Map.of("message", "User " + u + " Banned with success"));
+        return ResponseEntity.ok().body(Map.of("message", "User " + u.getUsername() + " Banned with success"));
     }
 
        @Transactional
@@ -194,6 +200,6 @@ public class UserService {
                     .body(Map.of("message", "the user u wanna to ban doesnt exist"));
         }
         u.setisbaned(false);
-        return ResponseEntity.ok().body(Map.of("message", "User " + u + " UnBanned with success"));
+        return ResponseEntity.ok().body(Map.of("message", "User " + u.getUsername() + " UnBanned with success"));
     }
 }

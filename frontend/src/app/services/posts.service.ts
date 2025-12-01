@@ -23,9 +23,9 @@ export class PostsService {
         )
     }
 
-    public getAllPosts(token: String | null, lastPost: Post | null): Observable<any> {
+    public getAllPosts(token: String | null, lastPost: Post | null | undefined): Observable<any> {
         let params = new HttpParams();
-        if (lastPost !== null) {
+        if (lastPost !== null && lastPost != undefined) {
             params = params
                 .set('lastDate', lastPost.createdAt)
                 .set('lastId', lastPost.id.toString());
@@ -53,6 +53,8 @@ export class PostsService {
     }
 
     public React(token: String | null, post_id: number) {
+        console.log({token});
+        
         return this.http.post<any>(
             generateURL("react"),
             {

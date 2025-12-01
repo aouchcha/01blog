@@ -96,7 +96,7 @@ export class SinglePost implements OnInit {
         // console.log({res});
 
         this.me = res.me;
-        this.notifService.connect(this.me.id)
+        this.notifService.connect(this.me.id, this.token)
 
       },
       error: (err) => {

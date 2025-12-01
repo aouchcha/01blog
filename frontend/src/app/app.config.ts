@@ -1,18 +1,19 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { httpErrorInterceptor } from './services/intercepter';
+import { httpErrorInterceptor } from './helpers/intercepter';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({ eventCoalescing: true }),
+    // provideBrowserGlobalErrorListeners(),
+    // provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes), 
-    provideClientHydration(withEventReplay()),
+    // provideClientHydration(withEventReplay()),
     provideHttpClient(withInterceptors([httpErrorInterceptor])),
-
+    importProvidersFrom(MatSnackBarModule)
     // withFetch()
   ]
 };

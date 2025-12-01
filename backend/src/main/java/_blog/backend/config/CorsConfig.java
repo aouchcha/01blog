@@ -24,7 +24,7 @@ public class CorsConfig {
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         
         // 4. Allow credentials (like cookies, if you were using them)
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(false);
         
         // 5. Register this configuration for all /api/** paths
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -80,9 +80,9 @@ public class SecurityConfig {
             // These lines are read from top to bottom, like firewall rules.
             .requestMatchers("/api/register").permitAll()
             .requestMatchers("/api/login").permitAll()
+            .requestMatchers("/api/validate").permitAll()
             // These URLs are public. No token is required. Let them pass.
-            .requestMatchers("/api/notifications/**").permitAll()
-            
+            .requestMatchers("/api/notifications/**").permitAll()    
             .requestMatchers("/uploads/**").permitAll()
             // Your static files are also public.
             

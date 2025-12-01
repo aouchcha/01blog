@@ -1,3 +1,4 @@
+// src/app/routes.ts
 import { Routes } from '@angular/router';
 import { Login } from './ViewModel/login/login';
 import { Register } from './ViewModel/register/register';
@@ -7,12 +8,44 @@ import { Profile } from './ViewModel/profile/profile';
 import { Admin } from './ViewModel/admin/admin';
 import { Reports } from './ViewModel/reports/reports';
 
+import { authGuard } from './helpers/guard';
+import { guestGuard } from './helpers/guest.guard';
+
 export const routes: Routes = [
-    { path: "register", component: Register },
-    { path: "login", component: Login },
-    { path: "", component: Home },
-    { path: 'admin', component: Admin },
-    { path: 'post/:id', component: SinglePost },
-    { path: 'user/:username', component: Profile, runGuardsAndResolvers: 'always'},
-    { path: 'reports', component: Reports }
+    { 
+        path: "register", 
+        component: Register,
+        canActivate: [guestGuard]
+    },
+    { 
+        path: "login", 
+        component: Login,
+        canActivate: [guestGuard]
+    },
+    { 
+        path: "", 
+        component: Home,
+        // canActivate: [authGuard]
+    },
+    { 
+        path: 'admin', 
+        component: Admin,
+        canActivate: [authGuard] 
+    },
+    { 
+        path: 'post/:id', 
+        component: SinglePost,
+        canActivate: [authGuard]
+    },
+    { 
+        path: 'user/:username', 
+        component: Profile,
+        canActivate: [authGuard],
+        runGuardsAndResolvers: 'always'
+    },
+    { 
+        path: 'reports', 
+        component: Reports,
+        canActivate: [authGuard] 
+    },
 ];

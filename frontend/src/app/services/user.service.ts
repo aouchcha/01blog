@@ -11,6 +11,13 @@ import { Post } from '../models/Post';
 export class UserService {
     constructor(private http: HttpClient) { }
 
+    public ValidateToken(token: String | null): Observable<any> {
+        return this.http.get(
+            generateURL("validate"),
+            generateHeader(token)
+        )
+    }
+
     public getMe(token: String | null): Observable<any> {
         return this.http.get<any>(
             generateURL("me"),
@@ -18,7 +25,7 @@ export class UserService {
         )
     }
 
-    public getProfile(username: String, token: String | null, lastPost: Post| null): Observable<any> {
+    public getProfile(username: String, token: String | null, lastPost: Post | null): Observable<any> {
         let params = new HttpParams();
         if (lastPost !== null) {
             params = params
@@ -64,7 +71,7 @@ export class UserService {
         )
     }
 
-    public Report(reportted_username: string | null | null ,discription: String, token: String | null): Observable<any> {
+    public Report(reportted_username: string | null | null, discription: String, token: String | null): Observable<any> {
         return this.http.post<any>(
             generateURL("report"),
             {
@@ -77,18 +84,18 @@ export class UserService {
 
     public RemoveUser(username: string | null, token: String | null): Observable<any> {
         console.log(token);
-        
+
         return this.http.delete(
             generateURL(`user/${username}`),
             generateHeader(token)
         )
     }
 
-    public BanUserr(username: string | null , token: String | null): Observable<any> {
-        console.log({token});
+    public BanUserr(username: string | null, token: String | null): Observable<any> {
+        console.log({ token });
         console.log("BAAAAAN");
-        
-        
+
+
         return this.http.put(
             generateURL(`user/ban/${username}`),
             null,
@@ -96,11 +103,11 @@ export class UserService {
         )
     }
 
-      public UnBanUserr(username: string | null , token: String | null): Observable<any> {
-        console.log({token});
+    public UnBanUserr(username: string | null, token: String | null): Observable<any> {
+        console.log({ token });
         console.log("BAAAAAN");
-        
-        
+
+
         return this.http.put(
             generateURL(`user/unban/${username}`),
             null,

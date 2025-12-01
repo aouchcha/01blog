@@ -61,7 +61,7 @@ export class Home implements OnInit {
   public notifsCount: number = 0;
   public ShowNotifs: boolean = false;
   public showConfirmation: boolean = false;
-  public lastPost: Post | null = new Post();
+  public lastPost: Post | null | undefined = new Post();
   public isLoading: boolean = false;
   public HasMorePosts: boolean = true;
   public HasMoreUsers: boolean = true;
@@ -107,6 +107,8 @@ export class Home implements OnInit {
 
   public setToken() {
     this.token = localStorage.getItem("JWT");
+    console.log(this.token);
+    
   }
 
   public loadHome(): void {
@@ -136,6 +138,7 @@ export class Home implements OnInit {
   public Logout(): void {
     localStorage.removeItem("JWT");
     this.token = null;
+    this.notifService.disconnect();
     this.router.navigate(["login"]);
   }
 
@@ -193,6 +196,7 @@ export class Home implements OnInit {
         this.lastPost = null;
         this.HasMorePosts = true;
         this.previewUrl = null;
+        this.HasMorePosts = true;
         this.getAllPosts("feed");
       },
       error: (err) => {
@@ -262,10 +266,15 @@ export class Home implements OnInit {
   }
 
   public getMe(): void {
+    console.log({"TTTTTTTTTt":this.token});
+    
     this.userServise.getMe(this.token).subscribe({
       next: (res) => {
+        console.log({res});
+        
         this.me = res.me;
-        this.notifService.connect(this.me.id)
+        // this.token = 
+        this.notifService.connect(this.me.id, this.token)
         this.notifsCount = res.notifCount;
       },
       error: (err) => {
@@ -386,6 +395,12 @@ export class Home implements OnInit {
       next: (res) => {
         let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
         this.posts.splice(index, 1)
+        this.lastPost = this.posts[this.posts.length - 1];
+        console.log({"REMOVE LAST":this.lastPost});
+        
+        if (this.posts.length < 10) {
+          this.getAllPosts('other')
+        }
         this.CancelAction()
       },
       error: (err) => {

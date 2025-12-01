@@ -100,7 +100,7 @@ export class Profile implements OnInit {
         console.log({ "me": res.me });
 
         this.me = res.me;
-        this.notifService.connect(this.me.id)
+        this.notifService.connect(this.me.id, this.token)
 
       },
       error: (err) => {
@@ -330,7 +330,11 @@ export class Profile implements OnInit {
         console.log(res);
         let index = this.posts.findIndex((p: Post) => p.id === this.post_id)
         this.posts.splice(index, 1)
+        this.lastPost = this.posts[this.posts.length - 1];
         this.CancelAction()
+        if (this.posts.length < 10) {
+          this.LoadProfile()
+        }
       },
       error: (err) => {
         console.log(err);

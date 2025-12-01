@@ -48,6 +48,17 @@ public class MainController {
     @Autowired
     private RegisterService registerservice;
 
+    @GetMapping("/validate")
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String header) {
+        String token = header.replace("Bearer ", "");
+        if (token == null || !jwtUtil.validateToken(token)) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid token", "valid", false));
+        }
+        return ResponseEntity.ok(Map.of("valid", true));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<?> create(@RequestBody RegisterRequest registerRequest) {
         return registerservice.register(registerRequest);
