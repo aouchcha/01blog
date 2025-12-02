@@ -340,3 +340,7 @@
 2025-12-02 15:45:39.811 GMT [259534] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.002 s, total=0.409 s; sync files=5, longest=0.002 s, average=0.001 s; distance=1 kB, estimate=3082 kB; lsn=0/1EEB1B8, redo lsn=0/1EEB180
 2025-12-02 15:50:39.911 GMT [259534] LOG:  checkpoint starting: time
 2025-12-02 15:50:40.624 GMT [259534] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.703 s, sync=0.005 s, total=0.714 s; sync files=7, longest=0.005 s, average=0.001 s; distance=2 kB, estimate=2774 kB; lsn=0/1EEBD88, redo lsn=0/1EEBD50
+2025-12-02 17:20:41.110 GMT [259534] LOG:  checkpoint starting: time
+2025-12-02 17:20:41.522 GMT [259534] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.005 s, total=0.413 s; sync files=5, longest=0.004 s, average=0.001 s; distance=26 kB, estimate=2500 kB; lsn=0/1EF2650, redo lsn=0/1EF2618
+2025-12-02 17:25:41.622 GMT [259534] LOG:  checkpoint starting: time
+2025-12-02 17:25:42.037 GMT [259534] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.004 s, total=0.415 s; sync files=5, longest=0.003 s, average=0.001 s; distance=2 kB, estimate=2250 kB; lsn=0/1EF2FC8, redo lsn=0/1EF2F90
