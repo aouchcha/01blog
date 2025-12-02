@@ -7,6 +7,7 @@ export class Post {
     id: number = 0;
     likeCount: number = 0;
     commentsCount: number = 0;
+    isHidden: boolean = false;
     media: File | null = null;
     mediaUrl: string = ""
     user: User = new User();

@@ -41,10 +41,12 @@
               Remove User
             </button>
 
-             <button class="action-btn danger-btn" *ngIf="me.role === 'Admin' && !user.isbaned" (click)="CheckBeforeBan()">
+            <button class="action-btn danger-btn" *ngIf="me.role === 'Admin' && !user.isbaned"
+              (click)="CheckBeforeBan()">
               Ban
             </button>
-            <button class="action-btn danger-btn" *ngIf="me.role === 'Admin' && user.isbaned" (click)="CheckBeforeUnBan()">
+            <button class="action-btn danger-btn" *ngIf="me.role === 'Admin' && user.isbaned"
+              (click)="CheckBeforeUnBan()">
               UnBan
             </button>
           </div>
@@ -87,11 +89,12 @@
 
         <!-- Meta Info -->
         <div class="profile-meta" *ngIf="user.email">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M14 6.667l-6 4-6-4M2.667 3.333h10.666c.737 0 1.334.597 1.334 1.334v6.666c0 .737-.597 1.334-1.334 1.334H2.667a1.333 1.333 0 01-1.334-1.334V4.667c0-.737.597-1.334 1.334-1.334z"
               stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
+          </svg> -->
+          <mat-icon>email</mat-icon>
           <span>{{ user.email }}</span>
         </div>
       </div>
@@ -128,14 +131,18 @@
           </div>
 
           <!-- Delete Button -->
-          <button class="delete-btn" *ngIf="post.user.username === me?.username || me?.role === 'Admin'"
+          <div class="postActions">
+            <button class="delete-btn" *ngIf="post.user.username === me?.username || me?.role === 'Admin'"
             (click)="CheckDeletePost(post.id)">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M2.5 5h15M8.333 9.167v5M11.667 9.167v5M3.333 5l.834 11.667c0 .916.75 1.666 1.666 1.666h8.334c.916 0 1.666-.75 1.666-1.666L16.667 5M7.5 5V3.333c0-.916.75-1.666 1.667-1.666h1.666c.917 0 1.667.75 1.667 1.666V5"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
+            <mat-icon>delete</mat-icon>
           </button>
+          <button class="hide-btn" *ngIf="me.role === 'Admin' && me.role === 'Admin' && !post.isHidden" (click)="CheckBeforeHide()">
+            <mat-icon>visibility_off</mat-icon>
+          </button>
+           <button class="hide-btn" *ngIf="me.role === 'Admin' && me.role === 'Admin' && post.isHidden" (click)="CheckBeforeHide()">
+            <mat-icon>visibility</mat-icon>
+          </button>
+          </div>
         </header>
 
         <!-- Media -->
@@ -157,10 +164,10 @@
           <!-- Post Footer -->
           <div class="post-footer" *ngIf="me.id === user.id || user.follow === true">
             <button class="reaction-btn" (click)="React(post.id)">
-              ❤️ {{ post.likeCount || 0 }}
+              <mat-icon>favorite</mat-icon> {{ post.likeCount || 0 }}
             </button>
             <button class="reaction-btn" (click)="ShowSinglePost(post.id)">
-              💬 {{ post.commentsCount || 0 }}
+              <mat-icon>comment</mat-icon> {{ post.commentsCount || 0 }}
             </button>
           </div>
         </div>

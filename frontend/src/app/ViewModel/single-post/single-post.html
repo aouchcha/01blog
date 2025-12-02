@@ -1,11 +1,13 @@
 <div class="single-post-container">
     <div class="post-wrapper">
         <!-- Back to Home Button -->
-        <button class="back-button" (click)="Home()">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 10H5M5 10l4-4M5 10l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
+        <button class="back-button" *ngIf="me.role !== 'Admin'" (click)="Home()">
+            <mat-icon>arrow_back</mat-icon>
             Back to Home
+        </button>
+        <button class="back-button" *ngIf="me.role === 'Admin'" (click)="ToReports()">
+            <mat-icon>arrow_back</mat-icon>
+            Back to Reports
         </button>
 
         <!-- Post Card -->
@@ -34,6 +36,18 @@
                         <span>Delete</span>
                     </button>
                 </mat-menu>
+                <div class="post-admin-options" *ngIf="me.role === 'Admin'">
+                    <button class="delete-btn" (click)="CheckConfirmation()">
+                        <mat-icon>delete</mat-icon>
+                        <!-- <span>Delete</span> -->
+                    </button>
+                    <button class="hide-btn" *ngIf="!post.isHidden" (click)="CheckBeforeHide()">
+                        <mat-icon>visibility_off</mat-icon>
+                    </button>
+                    <button class="hide-btn" *ngIf="post.isHidden" (click)="CheckBeforeHide()">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+                </div>
             </div>
 
             <div class="post-content">
@@ -51,7 +65,7 @@
                 </div>
             </div>
 
-            <div class="post-actions">
+            <div class="post-actions" *ngIf="me.role !== 'Admin'">
                 <button class="action-btn" (click)="React(post.id)">
                     ❤️ {{ post.likeCount || 0 }}
                 </button>
@@ -61,7 +75,7 @@
             </div>
         </div>
 
-         <!-- Update Post Modal -->
+        <!-- Update Post Modal -->
         <div class="modal-overlay" *ngIf="update" (click)="Cancel()">
             <div class="modal-content" (click)="$event.stopPropagation()">
                 <div class="modal-header">

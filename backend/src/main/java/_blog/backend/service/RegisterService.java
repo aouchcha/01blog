@@ -1,5 +1,7 @@
 package _blog.backend.service;
 
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,26 +20,27 @@ public class RegisterService {
     private final UserRepository userRepositry;
     public RegisterService(UserRepository repo) { this.userRepositry = repo; }
     public ResponseEntity<?> register(RegisterRequest request) {
+
         if (request.getUsername().trim().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The username is required");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The username is required"));
         }
 
         if (!isValidName(request.getUsername().trim())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The username is malformed");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The username is malformed"));
         }
         if (request.getEmail().trim().isEmpty() || !isValidEmail(request.getEmail())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The email is required or malformed");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The email is required or malformed"));
         }
         if (request.getPassword().trim().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The password is required");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The password is required"));
         }
 
         if (userRepositry.existsByEmail(request.getEmail())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The email is already present");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The email is already present"));
         }
 
          if (userRepositry.existsByUsername(request.getUsername())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The username is already present");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The username is already present"));
         }
 
         try {
@@ -46,7 +49,7 @@ public class RegisterService {
             userRepositry.save(u);
             return ResponseEntity.status(HttpStatus.CREATED).body(u);
         }catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error","User already exists"));
         }
     }
 

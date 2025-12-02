@@ -2,6 +2,7 @@ package _blog.backend.Entitys.Report;
 
 import java.time.LocalDateTime;
 
+import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.User.User;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.Column;
@@ -30,6 +31,13 @@ public class ReportEntity {
 
     @Nonnull
     private String description;
+
+    @Nonnull
+    private String type;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -68,5 +76,21 @@ public class ReportEntity {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
     }
 }

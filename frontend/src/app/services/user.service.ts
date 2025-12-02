@@ -76,7 +76,8 @@ export class UserService {
             generateURL("report"),
             {
                 "reportted_username": reportted_username,
-                "discription": discription
+                "discription": discription,
+                "type": "user"
             },
             generateHeader(token)
         )

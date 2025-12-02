@@ -45,7 +45,7 @@ public class PostsService {
     @Autowired
     private CommentRepository commentRepository;
 
-    @PreAuthorize("hasRole('User')")
+    // @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> getPosts(LocalDateTime lastDate, Long lastId) {
         final String username = contextHelpers.getUsername();
         Long userId = userRepository.findIdByUsername(username);
@@ -71,7 +71,7 @@ public class PostsService {
         return ResponseEntity.ok().body(Map.of("posts", posts));
     }
 
-    @PreAuthorize("hasRole('User')")
+    // @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> getSinglePost(Long post_id) {
         // final String username = contextHelpers.getUsername();
 
@@ -166,5 +166,18 @@ public class PostsService {
         postRepository.save(up);
 
         return ResponseEntity.ok().body(Map.of("message", "post updated with sucess", "post", up));
+    }
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<?> HidePost(Long post_id) {
+        Post p = postRepository.findById(post_id).orElse(null);
+
+        if (p == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Post doesn't exist"));
+        }
+
+        p.setIsHidden(true);
+        postRepository.save(p);
+
+        return ResponseEntity.ok().body(Map.of("message", "post hidden", "post", p));
     }
 }

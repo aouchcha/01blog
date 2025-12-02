@@ -17,6 +17,7 @@ import jakarta.persistence.Transient;
 import _blog.backend.Entitys.Comment.Comment;
 import _blog.backend.Entitys.Interactions.Reactions.Like;
 import _blog.backend.Entitys.Notifications.NotificationEntity;
+import _blog.backend.Entitys.Report.ReportEntity;
 import _blog.backend.Entitys.User.User;
 
 import java.util.*;
@@ -49,6 +50,7 @@ public class Post {
 
     private Long LikeCount = 0L;
     private Long CommentsCount = 0L;
+    private Boolean isHidden = false;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
@@ -58,6 +60,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NotificationEntity> notifs;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReportEntity> postReports;
 
     public Post() {
     };
@@ -107,7 +112,7 @@ public class Post {
     }
 
     public void setMedia(String media) {
-        // System.err.println("SETMEDIA ====================>   " + media);
+        // System.err.println("SETMEDIA ====================> " + media);
         this.media = media;
     }
 
@@ -129,5 +134,11 @@ public class Post {
 
     public String getMediaUrl() {
         return media == null ? null : "http://localhost:8080/uploads/" + media;
+    }
+    public Boolean getIsHidden() {
+        return isHidden;
+    }
+    public void setIsHidden(Boolean isHidden) {
+        this.isHidden = isHidden;
     }
 }

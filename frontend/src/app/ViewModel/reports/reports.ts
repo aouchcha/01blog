@@ -5,12 +5,14 @@ import { CheckToken } from '../../helpers/genarateHeader';
 import { Router } from '@angular/router';
 import { Confirmation } from '../confirmation/confirmation';
 import { UserService } from '../../services/user.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-reports',
   imports: [
     CommonModule,
-    Confirmation
+    Confirmation,
+    MatIconModule
   ],
   templateUrl: './reports.html',
   styleUrl: './reports.css'
@@ -187,5 +189,11 @@ export class Reports implements OnInit {
         console.log(err);
       }
     })
+  }
+
+  GoToPost(postId: number) {
+    console.log({postId});
+    
+    this.router.navigate([`post/${postId}`]);
   }
 }

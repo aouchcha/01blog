@@ -31,34 +31,33 @@
 
         <nav class="nav-menu">
             <button class="nav-button" (click)="getAllPosts('feed')">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 4h14M3 10h14M3 16h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-                <span>News Feed</span>
+                <mat-icon>feed</mat-icon>Feed
             </button>
 
-            <button class="nav-button">
+            <!-- <button class="nav-button">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M16 18v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 6a4 4 0 11-8 0 4 4 0 018 0z"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
                 <span>Friends</span>
-            </button>
+            </button> -->
 
             <button class="nav-button" (click)="getNotif()">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M15 6.5a5 5 0 00-10 0c0 6-3 7.5-3 7.5h16s-3-1.5-3-7.5zM11.73 17a2 2 0 01-3.46 0"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
+                </svg> -->
+                <mat-icon>notifications</mat-icon>
                 <span>Notification</span>
                 <span class="notification-badge" *ngIf="notifsCount > 0">{{notifsCount}}</span>
             </button>
 
             <button class="nav-button" (click)="ToProfile(me.username)">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10 10a4 4 0 100-8 4 4 0 000 8zM3 18a7 7 0 0114 0" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" />
-                </svg>
+                </svg> -->
+                <mat-icon>person</mat-icon>
                 <span>Profile</span>
             </button>
         </nav>
@@ -180,10 +179,14 @@
 
                 <div class="post-actions">
                     <button class="action-btn" (click)="React(post.id)">
-                        ❤️ {{ post.likeCount || 0 }}
+                        <mat-icon>favorite</mat-icon> {{ post.likeCount || 0 }}
                     </button>
                     <button class="action-btn" (click)="ShowSinglePost(post.id)">
-                        💬 {{ post.commentsCount || 0 }}
+                        <mat-icon>comment</mat-icon>
+                        {{ post.commentsCount || 0 }}
+                    </button>
+                    <button class="action-btn" (click)="OpenReportSection(post.id)">
+                        <mat-icon>report</mat-icon>
                     </button>
                 </div>
             </div>
@@ -231,6 +234,24 @@
         <div class="modal-overlay" *ngIf="showConfirmation" (click)="CancelAction()">
             <app-confirmation [title]="confirmationTitle" [message]="confirmationMessage" [action]="confirmationAction"
                 (confirmed)="HandleAction($event)"> </app-confirmation>
+        </div>
+
+        <div class="modal-overlay" *ngIf="DoYouWantReport">
+            <div class="report-card">
+                <h3>Report Post</h3>
+                <div class="form-group">
+                    <textarea [(ngModel)]="Report_Description" required class="report-textarea"
+                        placeholder="Describe the issue..."></textarea>
+                </div>
+                <div class="report-actions">
+                    <button class="action-btn primary-btn" (click)="CheckBeforeReport()">
+                        Submit Report
+                    </button>
+                    <button class="action-btn secondary-btn" (click)="Cancel()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
         </div>
     </main>
 

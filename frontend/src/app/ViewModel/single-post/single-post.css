@@ -42,6 +42,37 @@
   flex-shrink: 0;
 }
 
+/* Post Admin Options */
+.post-admin-options {
+  display: flex;
+  gap: 12px;
+  margin-left: 16px;
+}
+
+.hide-btn:hover {
+  background-color: #ffebee;
+  color: #f08624;
+}
+
+/* Delete Button */
+.delete-btn , .hide-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background-color: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.delete-btn:hover {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
 
 /* Modal */
 .modal-overlay {

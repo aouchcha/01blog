@@ -88,6 +88,18 @@ export class PostsService {
         );
     }
 
+    public ReportPost(token: String | null, post_id: number | null, description: String): Observable<any> {
+        return this.http.post<any>(
+            generateURL("report"),
+            {
+                "post_id": post_id,
+                "discription": description,
+                "type": "post"
+            },
+            generateHeader(token)
+        )
+    }
+
     public CreateComment(content: String, post_id: number, token: String | null): Observable<any> {
         return this.http.post<any>(
             generateURL("comment"),
@@ -104,5 +116,13 @@ export class PostsService {
             generateURL(`comment/${comment_id}`),
             generateHeader(token)
         );
+    }
+
+    public HidePost(token: String | null, post_id: number | null): Observable<any> {
+        return this.http.patch(
+            generateURL(`post/hide/${post_id}`),
+            {},
+            generateHeader(token)
+        )
     }
 }

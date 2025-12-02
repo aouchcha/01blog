@@ -2,7 +2,6 @@ import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-// import { StateService } from '../helpers/state-service';
 import { generateURL, generateHeader, CheckToken } from '../../helpers/genarateHeader';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,9 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { Comment } from '../../models/Comments';
 import { NotificationsService } from '../../services/notification.service';
 import { Confirmation } from '../confirmation/confirmation';
-import { log } from 'console';
 import { Subject, takeUntil } from 'rxjs';
-// import { Comment } from '../helpers/Comments';
 
 @Component({
   selector: 'app-single-post',
@@ -96,7 +93,9 @@ export class SinglePost implements OnInit {
         // console.log({res});
 
         this.me = res.me;
-        this.notifService.connect(this.me.id, this.token)
+        if (this.me.role !== "Admin") {
+          this.notifService.connect(this.me.id, this.token)
+        }
 
       },
       error: (err) => {
@@ -218,14 +217,24 @@ export class SinglePost implements OnInit {
 
   }
 
-  public confirmationTitle: string = 'Delete Post?';
-  public confirmationMessage: string = 'Are you sure you want to delete this post? This action cannot be undone.';
-  public confirmationAction: string = 'Delete';
+  public confirmationTitle: string = '';
+  public confirmationMessage: string = '';
+  public confirmationAction: string = '';
   public showConfirmation: boolean = false;
 
   CheckConfirmation() {
-    // console.log(post_id)
-    // this.post_id = post_id;
+    this.confirmationTitle = 'Delete Post?';
+    this.confirmationMessage = 'Are you sure you want to delete this post? This action cannot be undone.';
+    this.confirmationAction = 'Delete';
+    this.showConfirmation = true;
+    this.type = 'post';
+    this.comment_id = null;
+  }
+
+  CheckBeforeHide() {
+    this.confirmationTitle = 'Hide Post?';
+    this.confirmationMessage = 'Are you sure you want to hide this post?';
+    this.confirmationAction = 'Hide';
     this.showConfirmation = true;
     this.type = 'post';
     this.comment_id = null;
@@ -235,6 +244,7 @@ export class SinglePost implements OnInit {
     this.showConfirmation = false;
     this.comment_id = null;
   }
+  
 
 
 
@@ -244,8 +254,6 @@ export class SinglePost implements OnInit {
         console.log(res);
         this.CancelAction()
         setTimeout(() => {
-          // this.error = '';
-          // this.stateup.detectChanges();
           this.router.navigate([""])
         }, 2000);
       },
@@ -256,13 +264,35 @@ export class SinglePost implements OnInit {
 
   }
 
+  public hidePost() {
+    this.postsService.HidePost(this.token, this.post_id).subscribe({
+      next: (res: any) => {
+        console.log(res);
+        this.CancelAction()
+        // setTimeout(() => {
+        //   this.router.navigate([""])
+        // }, 2000);
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
+    console.log("hide Post");
+    
+    console.log(this.post_id);
+  }
+
   HandleAction(value: boolean) {
     if (!value) {
       console.log("hanni");
       this.CancelAction()
     } else {
       if (this.type === 'post') {
-        this.deletePost()
+        if (this.confirmationAction === 'Hide') {
+          this.hidePost()
+        }else {
+          this.deletePost()
+        }
       } else {
         this.deleteComment()
       }
@@ -315,5 +345,9 @@ export class SinglePost implements OnInit {
 
   public Home() {
     this.router.navigate([""])
+  }
+
+  public ToReports() {
+    this.router.navigate(["/reports"])
   }
 }

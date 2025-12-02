@@ -300,7 +300,12 @@
   color: #999;
 }
 
-.delete-btn {
+.postActions {
+  display: flex;
+  gap: 8px;
+}
+
+.delete-btn, .hide-btn {
   width: 36px;
   height: 36px;
   border: none;
@@ -317,6 +322,11 @@
 .delete-btn:hover {
   background-color: #ffebee;
   color: #d32f2f;
+}
+
+.hide-btn:hover {
+  background-color: #ffebee;
+  color: #f08624;
 }
 
 /* Post Media */

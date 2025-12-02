@@ -175,13 +175,62 @@
   /* Chrome, Safari */
 }
 
+/* Report Section */
+.report-section {
+  margin-bottom: 24px;
+}
+
+.report-card {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 12px;
+  padding: 20px;
+  width: 50%;
+  height: fit-content;
+}
+
+.report-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.report-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  background-color: white;
+}
+
+.report-textarea:focus {
+  border-color: #681C28;
+  box-shadow: 0 0 0 3px rgba(104, 28, 40, 0.1);
+}
+
+.report-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: space-evenly;
+}
+
 /* Notifications Panel */
 .notifications-panel {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   height: 80vh;
-  overflow-y:scroll;
+  overflow-y: scroll;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -328,7 +377,8 @@
   text-align: center;
 }
 
-.preview-img, .preview-video {
+.preview-img,
+.preview-video {
   max-width: 100%;
   max-height: 300px;
   border-radius: 10px;
@@ -523,6 +573,29 @@
 
 .action-btn:hover {
   background-color: #f5f5f5;
+}
+
+.primary-btn {
+  background-color: #681C28;
+  color: white;
+}
+
+.primary-btn:hover {
+  background-color: #8b2635;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(104, 28, 40, 0.3);
+}
+
+.secondary-btn {
+  background-color: transparent;
+  color: #666;
+  border: 1px solid #e0e0e0;
+}
+
+.secondary-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #681C28;
+  color: #681C28;
 }
 
 /* Modal */

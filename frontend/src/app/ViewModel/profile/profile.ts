@@ -198,6 +198,13 @@ export class Profile implements OnInit {
     this.confirmationTitle = `Ban User: ${this.user.username} ?`;
   }
 
+  CheckBeforeHide() {
+    this.confirmationTitle = 'Hide Post?';
+    this.confirmationMessage = 'Are you sure you want to hide this post?';
+    this.confirmationAction = 'Hide';
+    this.showConfirmation = true;
+  }
+
   public CheckReport() {
     this.showConfirmation = true;
     this.DoYouWantReport = false;

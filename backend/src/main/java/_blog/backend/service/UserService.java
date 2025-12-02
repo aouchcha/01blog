@@ -111,56 +111,98 @@ public class UserService {
         } else {
             ProfileInfos.setFollow(false);
         }
-        List<Post> posts ;
+        List<Post> posts;
         PageRequest limit = PageRequest.of(0, 10);
 
         if (lastDate == null || lastId == null) {
-            //get The First 10 posts of the user
+            // get The First 10 posts of the user
             posts = postRepository.findTop10ByUser_IdOrderByCreatedAtDescIdDesc(ProfileInfos.getId(), limit);
-        }else {
-            //get the next 10
+        } else {
+            // get the next 10
             posts = postRepository.findNextPosts(ProfileInfos.getId(), lastDate, lastId, limit);
         }
         // = postRepository.findByUserIdOrderByIdDesc(ProfileInfos.getId());
 
         return ResponseEntity.ok(Map.of("user", ProfileInfos, "posts", posts, "followers",
                 followRepositry.countByFollowed_Id(ProfileInfos.getId()), "followings",
-                followRepositry.countByFollower_Id(ProfileInfos.getId()), "count",postRepository.countByUserId(ProfileInfos.getId())));
+                followRepositry.countByFollower_Id(ProfileInfos.getId()), "count",
+                postRepository.countByUserId(ProfileInfos.getId())));
     }
 
     @Autowired
     private ReportRepository reportRepository;
 
+    @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> report(ReportRequest reportRequest, String token) {
 
+        if (reportRequest.getType() == null || reportRequest.getType().trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "No Type Found"));
+        }
+
+        final String type = reportRequest.getType().trim().toLowerCase();
+        User repported = null;
+        Post post = null;
+
+        if (type.equals("post")) {
+            if (reportRequest.getPost_id() == null) {
+                throw new IllegalArgumentException("post_id is required for POST reports");
+            }else {
+                post = postRepository.findById(reportRequest.getPost_id()).orElse(null);
+                if (post == null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalid post to report"));
+                }
+                repported = post.getUser();
+            }
+        }
+
+        if (type.equals("user")) {
+            if (reportRequest.getReportted_username() == null) {
+                throw new IllegalArgumentException("reportted_username is required for USER reports");
+            }else {
+                repported = userRepository.findByUsername(reportRequest.getReportted_username());
+                if (repported == null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalid user to report"));
+                }
+                post = null;
+            }
+        }
+
         if (reportRequest.getDiscription().trim().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "No Description Found"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "No Description Found"));
         }
 
         final String myName = jwtUtil.getUsername(token);
 
-        if (!userRepository.existsByUsername(myName)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalid user"));
-        }
 
-        // final String reportted_name =
-
-        if (!userRepository.existsByUsername(reportRequest.getReportted_username())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "invalid user to report"));
-        }
 
         final User me = userRepository.findByUsername(myName);
-        final User repported = userRepository.findByUsername(reportRequest.getReportted_username());
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalid user"));
+        }
+
+        if (me.getId() == repported.getId()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "you cant report yourself"));
+        }
+
+        // repported = userRepository.findByUsername(reportRequest.getReportted_username());
+        // if (repported == null) {
+        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalid user to report"));
+        // }
+
+        // post = postRepository.findById(reportRequest.getPost_id()).orElse(null);
 
         ReportEntity r = new ReportEntity();
         r.setDescription(reportRequest.getDiscription());
         r.setRepporter(me);
         r.setRepported(repported);
         r.setCreatedAt(LocalDateTime.now());
+        r.setType(reportRequest.getType());
+        r.setPost(post);
         reportRepository.save(r);
         return ResponseEntity.ok().body(Map.of("message", "reported succesfuuly"));
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> Remove(String username, String token) {
         if (!userRepository.existsByUsername(username)) {
@@ -190,7 +232,7 @@ public class UserService {
         return ResponseEntity.ok().body(Map.of("message", "User " + u.getUsername() + " Banned with success"));
     }
 
-       @Transactional
+    @Transactional
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> UnBanned(String username, String token) {
         // System.out.println("HAAAAAAAAAAAAAAAAAAAAAANNNNNNNNNNNIIIIIIIIIIIIIII");

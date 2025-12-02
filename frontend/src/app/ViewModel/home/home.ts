@@ -15,7 +15,8 @@ import { HttpClient } from '@angular/common/http';
 import { Confirmation } from '../confirmation/confirmation';
 import { Subject } from 'rxjs'; // Import Subject
 import { takeUntil } from 'rxjs/operators'; // Import throttleTime
-import { User } from '../../models/User';
+// import { User } from '../../models/User';
+import { ToastService } from '../../services/toast.service';
 
 
 @Component({
@@ -70,13 +71,13 @@ export class Home implements OnInit {
   private destroy$ = new Subject<void>();
 
 
-  constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object, private notifService: NotificationsService, private http: HttpClient, private state: ChangeDetectorRef) {
+  constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object, private notifService: NotificationsService, private http: HttpClient, private toast: ToastService) {
     this.isBrowser = isPlatformBrowser(platformId)
   }
 
   ngOnInit(): void {
-    console.log({"message":"hchithalQ w dkhelt"});
-    
+    console.log({ "message": "hchithalQ w dkhelt" });
+
     if (!this.isBrowser) {
       return
     }
@@ -94,6 +95,7 @@ export class Home implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe(react => {
         let index = this.posts.findIndex((p: Post) => p.id === react.post.id);
+        if (index === -1) return;
         this.posts[index].likeCount = react.post.likeCount;
       });
   }
@@ -108,7 +110,7 @@ export class Home implements OnInit {
   public setToken() {
     this.token = localStorage.getItem("JWT");
     console.log(this.token);
-    
+
   }
 
   public loadHome(): void {
@@ -133,6 +135,8 @@ export class Home implements OnInit {
     this.update = false;
     this.isImage = false;
     this.isVideo = false;
+    this.DoYouWantReport = false;
+    this.Report_Description = '';
   }
 
   public Logout(): void {
@@ -170,7 +174,7 @@ export class Home implements OnInit {
         this.updatePreviewUrl = reader.result as string;
         // console.log({isImage});
         // console.log({isVideo});
-        
+
         this.updateIsImage = isImage;
         this.updateIsVideo = isVideo;
       }
@@ -266,14 +270,18 @@ export class Home implements OnInit {
   }
 
   public getMe(): void {
-    console.log({"TTTTTTTTTt":this.token});
-    
+    console.log({ "TTTTTTTTTt": this.token });
+
     this.userServise.getMe(this.token).subscribe({
       next: (res) => {
-        console.log({res});
-        
+        console.log({ res });
+
         this.me = res.me;
-        // this.token = 
+        if (this.me.role === "Admin") {
+          this.toast.showError('Admins do not have access to home.', 3000 );
+          this.Logout();
+          return;
+        };
         this.notifService.connect(this.me.id, this.token)
         this.notifsCount = res.notifCount;
       },
@@ -332,7 +340,7 @@ export class Home implements OnInit {
     if (Url.endsWith(".mp4")) {
       this.updateIsVideo = true;
       this.updateIsImage = false;
-    }else {
+    } else {
       this.updateIsImage = true;
       this.updateIsVideo = false;
     }
@@ -389,6 +397,28 @@ export class Home implements OnInit {
     this.showConfirmation = true;
   }
 
+  public DoYouWantReport: boolean = false;
+  public Report_Description: string = '';
+
+  OpenReportSection(post_id: number) {
+    this.post_id = post_id;
+    this.DoYouWantReport = true;
+    console.log("Open Report Section");
+  }
+
+  CheckBeforeReport() {
+    if (this.Report_Description.trim() === '') {
+      this.toast.showError('Please provide a description for the report.', 3000 );
+      return;
+    }
+    this.showConfirmation = true;
+    this.DoYouWantReport = false;
+    this.confirmationAction = "Report";
+    this.confirmationMessage = "Are you sure you want to report this post ? This action cannot be undone."
+    this.confirmationTitle = `Report Post ?`;
+
+  }
+
   public deletePost() {
     this.setToken();
     this.postsService.deletePost(this.token, this.post_id).subscribe({
@@ -396,8 +426,8 @@ export class Home implements OnInit {
         let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
         this.posts.splice(index, 1)
         this.lastPost = this.posts[this.posts.length - 1];
-        console.log({"REMOVE LAST":this.lastPost});
-        
+        console.log({ "REMOVE LAST": this.lastPost });
+
         if (this.posts.length < 10) {
           this.getAllPosts('other')
         }
@@ -410,16 +440,40 @@ export class Home implements OnInit {
   }
 
   CancelAction() {
+    this.Report_Description = '';
+    this.DoYouWantReport = false;
     this.showConfirmation = false;
     this.post_id = null;
+    // console.log("CAncel action");
+    
   }
 
   HandleAction(value: boolean) {
     if (!value) {
       this.CancelAction()
     } else {
-      this.deletePost()
+      if (this.confirmationAction === "Delete") {
+        this.deletePost()
+      } else if (this.confirmationAction === "Report") {
+        this.ReportPost()
+        console.log({"Report Post": this.Report_Description});
+        // this.CancelAction()
+        
+      }
     }
+  }
+
+  public ReportPost(): void {
+    this.setToken();
+    this.postsService.ReportPost(this.token, this.post_id, this.Report_Description).subscribe({
+      next: (res) => {
+        this.toast.showSuccess('Post reported successfully.', 3000 );
+        this.CancelAction()
+      },
+      error: (err) => {
+        // console.log(err);
+      }
+    })
   }
 
   public React(post_id: number): void {
@@ -467,14 +521,14 @@ export class Home implements OnInit {
 
     this.notifService.getNotifs(this.token, this.lastNotif).subscribe({
       next: (res) => {
-        console.log({res});
-        
+        console.log({ res });
+
         if (res.notifications && res.notifications.length > 0) {
           this.Notifs = [...this.Notifs, ...res.notifications];
           this.lastNotif = this.Notifs[this.Notifs.length - 1];
           this.isLoading = false;
           console.log(this.Notifs.length);
-          
+
         } else {
           this.HasMoreNotifs = false;
         }

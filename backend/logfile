@@ -302,3 +302,41 @@
 2025-11-30 16:05:28.894 GMT [712564] LOG:  checkpoint complete: wrote 13 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.205 s, sync=0.005 s, total=1.216 s; sync files=12, longest=0.004 s, average=0.001 s; distance=20 kB, estimate=30 kB; lsn=0/1A51DF0, redo lsn=0/1A51DB8
 2025-11-30 16:10:27.931 GMT [712564] LOG:  checkpoint starting: time
 2025-11-30 16:10:28.747 GMT [712564] LOG:  checkpoint complete: wrote 9 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.805 s, sync=0.003 s, total=0.816 s; sync files=8, longest=0.002 s, average=0.001 s; distance=31 kB, estimate=31 kB; lsn=0/1A59DA8, redo lsn=0/1A59D70
+2025-12-02 12:24:17.416 GMT [258484] FATAL:  lock file "postmaster.pid" already exists
+2025-12-02 12:24:17.416 GMT [258484] HINT:  Is another postmaster (PID 236651) running in data directory "/home/aouchcha/pgsql/data"?
+2025-12-02 12:26:14.688 GMT [259533] LOG:  starting PostgreSQL 16.2 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04.2) 11.4.0, 64-bit
+2025-12-02 12:26:14.688 GMT [259533] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-12-02 12:26:14.690 GMT [259533] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-12-02 12:26:14.694 GMT [259536] LOG:  database system was shut down at 2025-12-02 12:25:21 GMT
+2025-12-02 12:26:14.696 GMT [259533] LOG:  database system is ready to accept connections
+2025-12-02 12:26:23.851 GMT [259584] ERROR:  cannot drop the currently open database
+2025-12-02 12:26:23.851 GMT [259584] STATEMENT:  DROP DATABASE blog04
+2025-12-02 12:27:03.482 GMT [259849] ERROR:  cannot drop the currently open database
+2025-12-02 12:27:03.482 GMT [259849] STATEMENT:  DROP DATABASE blog04
+2025-12-02 12:27:29.038 GMT [260225] ERROR:  database "blog04" already exists
+2025-12-02 12:27:29.038 GMT [260225] STATEMENT:  CREATE DATABASE blog04;
+2025-12-02 12:27:45.923 GMT [260313] ERROR:  database "blog04" is being accessed by other users
+2025-12-02 12:27:45.923 GMT [260313] DETAIL:  There is 1 other session using the database.
+2025-12-02 12:27:45.923 GMT [260313] STATEMENT:  DROP DATABASE blog04;
+2025-12-02 12:29:48.404 GMT [265767] ERROR:  database "blog04" is being accessed by other users
+2025-12-02 12:29:48.404 GMT [265767] DETAIL:  There are 2 other sessions using the database.
+2025-12-02 12:29:48.404 GMT [265767] STATEMENT:  DROP DATABASE blog04;
+2025-12-02 12:30:30.635 GMT [265706] FATAL:  terminating connection due to administrator command
+2025-12-02 12:30:30.635 GMT [265744] FATAL:  terminating connection due to administrator command
+2025-12-02 12:30:35.849 GMT [259534] LOG:  checkpoint starting: immediate force wait
+2025-12-02 12:30:35.857 GMT [259534] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.002 s, total=0.009 s; sync files=3, longest=0.001 s, average=0.001 s; distance=153 kB, estimate=153 kB; lsn=0/1AC8958, redo lsn=0/1AC8920
+2025-12-02 12:30:55.195 GMT [266295] FATAL:  lock file "postmaster.pid" already exists
+2025-12-02 12:30:55.195 GMT [266295] HINT:  Is another postmaster (PID 259533) running in data directory "/home/aouchcha/pgsql/data"?
+2025-12-02 12:30:55.296 GMT [266297] FATAL:  database "blog04" does not exist
+2025-12-02 12:31:10.027 GMT [266410] FATAL:  lock file "postmaster.pid" already exists
+2025-12-02 12:31:10.027 GMT [266410] HINT:  Is another postmaster (PID 259533) running in data directory "/home/aouchcha/pgsql/data"?
+2025-12-02 12:35:35.869 GMT [259534] LOG:  checkpoint starting: time
+2025-12-02 12:37:08.861 GMT [259534] LOG:  checkpoint complete: wrote 931 buffers (5.7%); 1 WAL file(s) added, 0 removed, 0 recycled; write=92.961 s, sync=0.011 s, total=92.993 s; sync files=330, longest=0.002 s, average=0.001 s; distance=4228 kB, estimate=4228 kB; lsn=0/1EE9FC0, redo lsn=0/1EE9A50
+2025-12-02 12:50:36.090 GMT [259534] LOG:  checkpoint starting: time
+2025-12-02 12:50:38.107 GMT [259534] LOG:  checkpoint complete: wrote 21 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.006 s, sync=0.002 s, total=2.017 s; sync files=12, longest=0.002 s, average=0.001 s; distance=2 kB, estimate=3805 kB; lsn=0/1EEA4F8, redo lsn=0/1EEA4C0
+2025-12-02 13:00:36.226 GMT [259534] LOG:  checkpoint starting: time
+2025-12-02 13:00:36.942 GMT [259534] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.704 s, sync=0.005 s, total=0.717 s; sync files=7, longest=0.005 s, average=0.001 s; distance=1 kB, estimate=3425 kB; lsn=0/1EEAC58, redo lsn=0/1EEAC20
+2025-12-02 15:45:39.402 GMT [259534] LOG:  checkpoint starting: time
+2025-12-02 15:45:39.811 GMT [259534] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.403 s, sync=0.002 s, total=0.409 s; sync files=5, longest=0.002 s, average=0.001 s; distance=1 kB, estimate=3082 kB; lsn=0/1EEB1B8, redo lsn=0/1EEB180
+2025-12-02 15:50:39.911 GMT [259534] LOG:  checkpoint starting: time
+2025-12-02 15:50:40.624 GMT [259534] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.703 s, sync=0.005 s, total=0.714 s; sync files=7, longest=0.005 s, average=0.001 s; distance=2 kB, estimate=2774 kB; lsn=0/1EEBD88, redo lsn=0/1EEBD50
