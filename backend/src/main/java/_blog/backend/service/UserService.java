@@ -88,7 +88,7 @@ public class UserService {
 
     public ResponseEntity<?> getUserProfile(String username, String token, LocalDateTime lastDate, Long lastId) {
         final String myName = jwtUtil.getUsername(token);
-        System.out.println("MMMMMMMMMMMMMMMMMYYYYYYYYYYYYYYY   =     " + myName);
+        // System.out.println("MMMMMMMMMMMMMMMMMYYYYYYYYYYYYYYY = " + myName);
         User me = userRepository.findByUsername(myName);
         if (me == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -116,10 +116,12 @@ public class UserService {
 
         if (lastDate == null || lastId == null) {
             // get The First 10 posts of the user
-            posts = postRepository.findTop10ByUser_IdOrderByCreatedAtDescIdDesc(ProfileInfos.getId(), limit);
+            posts = postRepository.findTop10ByUserIdOrderByCreatedAtDescIdDesc(ProfileInfos.getId(),
+                    me.getRole().equals(Role.Admin), limit);
         } else {
             // get the next 10
-            posts = postRepository.findNextPosts(ProfileInfos.getId(), lastDate, lastId, limit);
+            posts = postRepository.findNextPosts(ProfileInfos.getId(), me.getRole().equals(Role.Admin), lastDate,
+                    lastId, limit);
         }
         // = postRepository.findByUserIdOrderByIdDesc(ProfileInfos.getId());
 
@@ -146,10 +148,11 @@ public class UserService {
         if (type.equals("post")) {
             if (reportRequest.getPost_id() == null) {
                 throw new IllegalArgumentException("post_id is required for POST reports");
-            }else {
+            } else {
                 post = postRepository.findById(reportRequest.getPost_id()).orElse(null);
                 if (post == null) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalid post to report"));
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(Map.of("error", "invalid post to report"));
                 }
                 repported = post.getUser();
             }
@@ -158,10 +161,11 @@ public class UserService {
         if (type.equals("user")) {
             if (reportRequest.getReportted_username() == null) {
                 throw new IllegalArgumentException("reportted_username is required for USER reports");
-            }else {
+            } else {
                 repported = userRepository.findByUsername(reportRequest.getReportted_username());
                 if (repported == null) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalid user to report"));
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(Map.of("error", "invalid user to report"));
                 }
                 post = null;
             }
@@ -173,8 +177,6 @@ public class UserService {
 
         final String myName = jwtUtil.getUsername(token);
 
-
-
         final User me = userRepository.findByUsername(myName);
         if (me == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalid user"));
@@ -184,9 +186,11 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "you cant report yourself"));
         }
 
-        // repported = userRepository.findByUsername(reportRequest.getReportted_username());
+        // repported =
+        // userRepository.findByUsername(reportRequest.getReportted_username());
         // if (repported == null) {
-        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalid user to report"));
+        // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
+        // "invalid user to report"));
         // }
 
         // post = postRepository.findById(reportRequest.getPost_id()).orElse(null);

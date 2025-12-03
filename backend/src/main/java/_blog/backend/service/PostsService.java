@@ -75,7 +75,6 @@ public class PostsService {
     public ResponseEntity<?> getSinglePost(Long post_id) {
         // final String username = contextHelpers.getUsername();
 
-
         Post p = postRepository.findById(post_id).orElse(null);
 
         if (p == null) {
@@ -130,17 +129,16 @@ public class PostsService {
         }
 
         if (postRequst.getTitle().trim().isEmpty() ||
-            postRequst.getTitle().length() > 100) {
+                postRequst.getTitle().length() > 100) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "Description is invalid"));
         }
 
         if (postRequst.getDescription().trim().isEmpty() ||
-            postRequst.getDescription().length() > 1000) {
+                postRequst.getDescription().length() > 1000) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "Description is invalid"));
         }
-
 
         up.setTitle(postRequst.getTitle());
         up.setDescription(postRequst.getDescription());
@@ -150,34 +148,49 @@ public class PostsService {
                 try {
                     Files.deleteIfExists(path);
                 } catch (Exception e) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(Map.of("message", e.getMessage()));
                 }
             }
-    
+
             up.setMedia(null);
-    
+
         }
         if (!MediaUtils.save(up, postRequst)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Internal Server Error"));
         }
 
-
         postRepository.save(up);
 
         return ResponseEntity.ok().body(Map.of("message", "post updated with sucess", "post", up));
     }
+
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> HidePost(Long post_id) {
         Post p = postRepository.findById(post_id).orElse(null);
 
         if (p == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Post doesn't exist"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Post doesn't exist"));
         }
 
         p.setIsHidden(true);
         postRepository.save(p);
 
         return ResponseEntity.ok().body(Map.of("message", "post hidden", "post", p));
+    }
+
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<?> UnhidePost(Long post_id) {
+        Post p = postRepository.findById(post_id).orElse(null);
+
+        if (p == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Post doesn't exist"));
+        }
+
+        p.setIsHidden(false);
+        postRepository.save(p);
+
+        return ResponseEntity.ok().body(Map.of("message", "post Unhid", "post", p));
     }
 }

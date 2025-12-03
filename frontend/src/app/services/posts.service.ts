@@ -125,4 +125,12 @@ export class PostsService {
             generateHeader(token)
         )
     }
+
+    public UnhidePost(token: String | null, post_id: number | null): Observable<any> {
+        return this.http.patch(
+            generateURL(`post/unhide/${post_id}`),
+            {},
+            generateHeader(token)
+        )
+    }
 }

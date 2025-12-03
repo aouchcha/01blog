@@ -16,19 +16,33 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByUserIdOrderByIdDesc(Long userId);
 
-    @Query("SELECT p FROM Post p WHERE p.user.id = :userId AND " +
-            "(p.createdAt < :lastDate OR (p.createdAt = :lastDate AND p.id < :lastId)) " +
-            "ORDER BY p.createdAt DESC, p.id DESC")
-    List<Post> findNextPosts(Long userId,
+    @Query("""
+                SELECT p FROM Post p
+                WHERE p.user.id = :userId
+                AND (:isAdmin = true OR p.isHidden = false)
+                AND (p.createdAt < :lastDate OR (p.createdAt = :lastDate AND p.id < :lastId))
+                ORDER BY p.createdAt DESC, p.id DESC
+            """)
+    List<Post> findNextPosts(@Param("userId") Long userId,
+            @Param("isAdmin") boolean isAdmin,
             @Param("lastDate") LocalDateTime lastDate,
             @Param("lastId") Long lastId,
             Pageable pageable);
 
-    List<Post> findTop10ByUser_IdOrderByCreatedAtDescIdDesc(Long userId, Pageable pageable);
+    @Query("""
+                SELECT p FROM Post p
+                WHERE p.user.id = :userId
+                AND (:isAdmin = true OR p.isHidden = false)
+                ORDER BY p.createdAt DESC, p.id DESC
+            """)
+    List<Post> findTop10ByUserIdOrderByCreatedAtDescIdDesc(@Param("userId") Long userId,
+            @Param("isAdmin") boolean isAdmin,
+            Pageable pageable);
 
     @Query("""
                 SELECT p FROM Post p
-                WHERE (
+                WHERE p.isHidden = false
+                AND (
                     p.user.id IN (SELECT f.followed.id FROM Follow f WHERE f.follower.id = :userId)
                     OR p.user.id = :userId
                 )
@@ -38,7 +52,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("""
                 SELECT p FROM Post p
-                WHERE (
+                WHERE p.isHidden = false
+                AND (
                     p.user.id IN (SELECT f.followed.id FROM Follow f WHERE f.follower.id = :userId)
                     OR p.user.id = :userId
                 )
@@ -53,7 +68,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("lastId") Long lastId,
             Pageable pageable);
 
-    @SuppressWarnings("null")
+    // @SuppressWarnings("null")
     boolean existsById(Long id);
 
     Long countByUserId(Long id);

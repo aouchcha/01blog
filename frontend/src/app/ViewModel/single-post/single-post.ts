@@ -240,6 +240,15 @@ export class SinglePost implements OnInit {
     this.comment_id = null;
   }
 
+  CheckBeforeUnHide() {
+    this.confirmationTitle = 'UnHide Post?';
+    this.confirmationMessage = 'Are you sure you want to unhide this post?';
+    this.confirmationAction = 'UnHide';
+    this.showConfirmation = true;
+    this.type = 'post';
+    this.comment_id = null;
+  }
+
   CancelAction() {
     this.showConfirmation = false;
     this.comment_id = null;
@@ -269,15 +278,27 @@ export class SinglePost implements OnInit {
       next: (res: any) => {
         console.log(res);
         this.CancelAction()
-        // setTimeout(() => {
-        //   this.router.navigate([""])
-        // }, 2000);
       },
       error: (err: any) => {
         console.log(err);
       }
     })
     console.log("hide Post");
+    
+    console.log(this.post_id);
+  }
+
+  public unhidePost() {
+    this.postsService.UnhidePost(this.token, this.post_id).subscribe({
+      next: (res: any) => {
+        console.log(res);
+        this.CancelAction()
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
+    console.log("unhide Post");
     
     console.log(this.post_id);
   }
@@ -290,8 +311,10 @@ export class SinglePost implements OnInit {
       if (this.type === 'post') {
         if (this.confirmationAction === 'Hide') {
           this.hidePost()
-        }else {
+        }else if (this.confirmationAction === 'Delete') {
           this.deletePost()
+        }else if (this.confirmationAction === 'UnHide') {
+          this.unhidePost()
         }
       } else {
         this.deleteComment()

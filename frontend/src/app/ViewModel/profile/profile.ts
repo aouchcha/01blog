@@ -14,6 +14,7 @@ import { Post } from '../../models/Post';
 import { Confirmation } from '../confirmation/confirmation';
 import { NotificationsService } from '../../services/notification.service';
 import { Subject, takeUntil } from 'rxjs';
+import { log } from 'node:console';
 
 
 @Component({
@@ -198,11 +199,35 @@ export class Profile implements OnInit {
     this.confirmationTitle = `Ban User: ${this.user.username} ?`;
   }
 
-  CheckBeforeHide() {
+  CheckBeforeHide(post_id: number) {
     this.confirmationTitle = 'Hide Post?';
     this.confirmationMessage = 'Are you sure you want to hide this post?';
     this.confirmationAction = 'Hide';
     this.showConfirmation = true;
+    this.post_id = post_id;
+  }
+
+  CheckBeforeUnHide(post_id: number) {
+    this.confirmationTitle = 'Unhide Post?';
+    this.confirmationMessage = 'Are you sure you want to unhide this post?';
+    this.confirmationAction = 'UnHide';
+    this.showConfirmation = true;
+    this.post_id = post_id;
+  }
+
+    public hidePost() {
+    this.postService.HidePost(this.token, this.post_id).subscribe({
+      next: (res: any) => {
+        console.log({"rrrrrrrrrrrrrrrrr":res});
+        this.CancelAction()
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
+    console.log("hide Post");
+    
+    console.log(this.post_id);
   }
 
   public CheckReport() {
@@ -270,8 +295,31 @@ export class Profile implements OnInit {
         this.UnBanUser();
         this.Cancel();
         this.CancelAction();
+      }else if (this.confirmationAction === "Hide") {
+        console.log("hide Post");
+        
+        this.hidePost();
+        this.CancelAction();
+      } else if (this.confirmationAction === "UnHide") {
+        console.log("unhide Post");
+        this.unhidePost();
       }
     }
+  }
+
+  public unhidePost() {
+    this.postService.UnhidePost(this.token, this.post_id).subscribe({
+      next: (res: any) => {
+        console.log(res);
+        this.CancelAction()
+      },
+      error: (err: any) => {
+        console.log(err);
+      }
+    })
+    console.log("unhide Post");
+    
+    console.log(this.post_id);
   }
 
 

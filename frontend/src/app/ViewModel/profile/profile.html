@@ -136,10 +136,10 @@
             (click)="CheckDeletePost(post.id)">
             <mat-icon>delete</mat-icon>
           </button>
-          <button class="hide-btn" *ngIf="me.role === 'Admin' && me.role === 'Admin' && !post.isHidden" (click)="CheckBeforeHide()">
+          <button class="hide-btn" *ngIf="me.role === 'Admin' && me.role === 'Admin' && !post.isHidden" (click)="CheckBeforeHide(post.id)">
             <mat-icon>visibility_off</mat-icon>
           </button>
-           <button class="hide-btn" *ngIf="me.role === 'Admin' && me.role === 'Admin' && post.isHidden" (click)="CheckBeforeHide()">
+           <button class="hide-btn" *ngIf="me.role === 'Admin' && me.role === 'Admin' && post.isHidden" (click)="CheckBeforeUnHide(post.id)">
             <mat-icon>visibility</mat-icon>
           </button>
           </div>

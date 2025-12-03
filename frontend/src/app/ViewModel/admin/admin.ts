@@ -133,7 +133,7 @@ export class Admin implements OnInit {
   }
 
   public ShowReports() {
-    console.log({"toreport":""});
+    // console.log({"toreport":""});
     
     this.router.navigate(["reports"])
   }
@@ -142,16 +142,20 @@ export class Admin implements OnInit {
     console.log(this.search);
     
     if (this.search.length === 0) {
-      console.log("hanni");
+      // console.log("hanni");
       
       this.filtredUsers = this.OriginaleUsers;
     }
     this.filtredUsers = this.usersStates.filter((u) => {
       return u.username?.startsWith(this.search)
     })
-    console.log(this.OriginaleUsers);
+    // console.log(this.OriginaleUsers);
     
-    console.log(this.filtredUsers);
+    // console.log(this.filtredUsers);
     
+  }
+
+    public ToDashboard() {
+    this.router.navigate(["admin"])
   }
 }

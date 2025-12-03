@@ -101,4 +101,17 @@ public class PostsHandler {
         }
         return postsService.HidePost(post_id); 
     }
+
+    @PatchMapping("/unhide/{post_id}")
+    public ResponseEntity<?> UnhidePost(
+            @PathVariable Long post_id,
+            @RequestHeader("Authorization") String header) {
+        String token = header.replace("Bearer ", "");
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
+        }
+        System.out.println("Unhide Post Called");
+        System.out.println(post_id);
+        return postsService.UnhidePost(post_id);
+    }
 }

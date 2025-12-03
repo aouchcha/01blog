@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 2. Check if the token is valid.
         if (token != null && jwtUtil.validateToken(token) /*&& u != null*/) {
-            System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+            // System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
             // 3. If valid, parse the user's details from the token.
             String username = jwtUtil.getUsername(token);
             String role = jwtUtil.getRole(token);
@@ -98,9 +98,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // A helper method to read the "Authorization: Bearer <token>" header.
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            System.out.println("Authorization");
+            // System.out.println("Authorization");
             
-            System.out.println("Authorization Toke ============>   " + bearerToken.substring(7));
+            // System.out.println("Authorization Toke ============>   " + bearerToken.substring(7));
             return bearerToken.substring(7); // Return just the token string
         }
         return null;
