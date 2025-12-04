@@ -40,10 +40,8 @@ public class AdminService {
         Long reports_count = 0L;
         try {
             if (lastUserId == null || lastUserId == 0) {
-                // System.out.println("3AAAAAAAAAAAAAAAAAADI");
                 users = userRepository.findUsersStates(limit);
             } else {
-                // System.out.println("JOOOOOOOOOOOOOOOOOOOUUUJ");
                 users = userRepository.findUsersStatesAfter(lastUserId, limit);
             }
             reports_count = reportRepository.count();
@@ -76,7 +74,7 @@ public class AdminService {
             reports_count = reportRepository.count();
             
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(null);
+            return ResponseEntity.internalServerError().body(Map.of("error", "internal server error"));
 
         }
 

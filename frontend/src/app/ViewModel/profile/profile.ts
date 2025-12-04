@@ -41,6 +41,7 @@ export class Profile implements OnInit {
   public followers: number = 0;
   public followings: number = 0;
   public DoYouWantReport: boolean = false;
+  public DoYouWantReportPost: boolean = false;
   public description: string = "";
   public isBrowser = false;
   // public popupMessage: String = '';
@@ -176,6 +177,7 @@ export class Profile implements OnInit {
     this.confirmationAction = "Report";
     this.confirmationMessage = "Are you sure you want to report this user? This action cannot be undone."
     this.confirmationTitle = `Report User: ${this.user.username} ?`;
+    this.type = 'user';
   }
 
   public CheckBeforeRemoving() {
@@ -183,6 +185,7 @@ export class Profile implements OnInit {
     this.confirmationAction = "Remove";
     this.confirmationMessage = "Are you sure you want to remove this user? This action cannot be undone."
     this.confirmationTitle = `Remove User: ${this.user.username} ?`;
+    this.type = 'user';
   }
 
   public CheckBeforeBan() {
@@ -190,6 +193,7 @@ export class Profile implements OnInit {
     this.confirmationAction = "Ban";
     this.confirmationMessage = "Are you sure you want to Ban this user? This action cannot be undone."
     this.confirmationTitle = `Ban User: ${this.user.username} ?`;
+    this.type = 'user';
   }
 
   public CheckBeforeUnBan() {
@@ -197,6 +201,7 @@ export class Profile implements OnInit {
     this.confirmationAction = "UnBan";
     this.confirmationMessage = "Are you sure you want to UnBan this user? This action cannot be undone."
     this.confirmationTitle = `Ban User: ${this.user.username} ?`;
+    this.type = 'user';
   }
 
   CheckBeforeHide(post_id: number) {
@@ -205,6 +210,7 @@ export class Profile implements OnInit {
     this.confirmationAction = 'Hide';
     this.showConfirmation = true;
     this.post_id = post_id;
+    this.type = 'post';
   }
 
   CheckBeforeUnHide(post_id: number) {
@@ -213,12 +219,13 @@ export class Profile implements OnInit {
     this.confirmationAction = 'UnHide';
     this.showConfirmation = true;
     this.post_id = post_id;
+    this.type = 'post';
   }
 
-    public hidePost() {
+  public hidePost() {
     this.postService.HidePost(this.token, this.post_id).subscribe({
       next: (res: any) => {
-        console.log({"rrrrrrrrrrrrrrrrr":res});
+        console.log({ "rrrrrrrrrrrrrrrrr": res });
         this.CancelAction()
       },
       error: (err: any) => {
@@ -226,16 +233,20 @@ export class Profile implements OnInit {
       }
     })
     console.log("hide Post");
-    
+
     console.log(this.post_id);
   }
 
   public CheckReport() {
+    this.type = 'user';
     this.showConfirmation = true;
     this.DoYouWantReport = false;
+    this.DoYouWantReportPost = false;
   }
 
   public Cancel() {
+    this.DoYouWantReportPost = false;
+    this.Report_Description = '';
     this.DoYouWantReport = false;
     this.description = '';
     this.confirmationTitle = 'Delete Post?';
@@ -266,20 +277,41 @@ export class Profile implements OnInit {
     this.confirmationMessage = "Are you sure you want to delete this post?";
     this.confirmationAction = "Delete";
     this.showConfirmation = true;
+    this.type = 'post';
   }
 
   CancelAction() {
+    // this.
     this.showConfirmation = false;
     this.post_id = null;
+    this.description = '';
+    this.confirmationTitle = 'Delete Post?';
+    this.confirmationMessage = 'Are you sure you want to delete this post? This action cannot be undone.';
+    this.confirmationAction = 'Delete';
+    this.type = '';
+    this.Report_Description = '';
   }
 
   HandleAction(value: boolean) {
     if (!value) {
       this.CancelAction()
-    } else {
+    } else if (this.type === 'post') {
       if (this.confirmationAction === "Delete") {
         this.deletePost()
+      } else if (this.confirmationAction === "Hide") {
+        console.log("hide Post");
+
+        this.hidePost();
+        this.CancelAction();
+      } else if (this.confirmationAction === "UnHide") {
+        console.log("unhide Post");
+        this.unhidePost();
       } else if (this.confirmationAction === "Report") {
+        this.ReportPost();
+        this.CancelAction();
+      }
+    } else if (this.type === 'user') {
+      if (this.confirmationAction === "Report") {
         this.Report()
         this.Cancel()
         this.CancelAction()
@@ -295,16 +327,45 @@ export class Profile implements OnInit {
         this.UnBanUser();
         this.Cancel();
         this.CancelAction();
-      }else if (this.confirmationAction === "Hide") {
-        console.log("hide Post");
-        
-        this.hidePost();
-        this.CancelAction();
-      } else if (this.confirmationAction === "UnHide") {
-        console.log("unhide Post");
-        this.unhidePost();
       }
     }
+  }
+  public Report_Description: string = '';
+  private type: string = '';
+
+  OpenPostReportSection(post_id: number) {
+    this.post_id = post_id;
+    this.DoYouWantReportPost = true;
+    this.DoYouWantReport = false;
+    // this.type = 'post';CheckConfirmation
+    console.log("Open Report Section");
+  }
+
+  CheckBeforeReport() {
+    if (this.Report_Description.trim() === '') {
+      // this.toast.showError('Please provide a description for the report.', 3000);
+      // return;
+    }
+    this.showConfirmation = true;
+    this.DoYouWantReportPost = false;
+    this.confirmationAction = "Report";
+    this.confirmationMessage = "Are you sure you want to report this post ? This action cannot be undone."
+    this.confirmationTitle = `Report Post ?`;
+    this.type = 'post';
+  }
+
+
+  public ReportPost(): void {
+    this.setToken();
+    this.postService.ReportPost(this.token, this.post_id, this.Report_Description).subscribe({
+      next: (res) => {
+        // this.toast.showSuccess('Post reported successfully.', 3000 );
+        this.CancelAction()
+      },
+      error: (err) => {
+        // console.log(err);
+      }
+    })
   }
 
   public unhidePost() {
@@ -318,7 +379,7 @@ export class Profile implements OnInit {
       }
     })
     console.log("unhide Post");
-    
+
     console.log(this.post_id);
   }
 

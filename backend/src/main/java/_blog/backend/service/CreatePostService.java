@@ -76,10 +76,16 @@ public class CreatePostService {
                     .body(Map.of("error", "Description is invalid"));
         }
 
-        User u = userRepository.findByUsername(username);
+        final User u = userRepository.findByUsername(username);
+
         if (u == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "the user is not valid"));
+        }
+
+        if (u.getisbaned()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You are banned"));
         }
 
         Post newPost = new Post();

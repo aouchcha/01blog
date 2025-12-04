@@ -48,7 +48,6 @@ public class LoginService {
             }
             
         } catch (Exception e) {
-            // TODO: handle exception
             return ResponseEntity.internalServerError().body(null);
         }
 
@@ -59,7 +58,7 @@ public class LoginService {
         UserDto.setId(user.getId());
         UserDto.setRole(user.getRole());
         UserDto.setUsername(user.getUsername());
-        return ResponseEntity.ok(Map.of("token", token, "user", UserDto));
+        return ResponseEntity.ok(Map.of("token", token, "user", UserDto, "message", "Login Successful"));
     }
 }
 

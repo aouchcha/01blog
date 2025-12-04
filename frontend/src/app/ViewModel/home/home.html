@@ -162,7 +162,7 @@
                     </mat-menu>
                 </div>
 
-                <div class="post-content">
+                <div class="post-content" >
                     <h2>{{ post.title }}</h2>
                     <div class="post-media-container" *ngIf="post.media">
                         <ng-container [ngSwitch]="post.mediaUrl?.split('.').pop()">
@@ -216,13 +216,7 @@
 
                     <p><b>{{ updatedMediaName }}</b></p>
                 </div>
-                <!-- //////////////////////////////////////////////////////////////////////////
-                <p class="media-preview" *ngIf="updateMedia !== null">
-                    <b>File to upload: {{updatedMediaName}}</b>
-                    <button class="close-btn" (click)="RemoveImage('edit')">✕</button>
-
-                </p>
-                //////////////////////////////////////////////////////////////////// -->
+                <!-- ///////////////////////////////////////////////////////////////// -->
                 <div class="modal-actions">
                     <button class="modal-save-btn" (click)="UpdatePost()">Save</button>
                     <button class="modal-cancel-btn" (click)="Cancel()">Cancel</button>

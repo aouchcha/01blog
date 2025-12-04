@@ -1,8 +1,6 @@
 package _blog.backend.service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,9 +89,6 @@ public class NotificationService {
         }
     }
 
-    // ---------------------------
-    // NOTIFICATION SEND
-    // ---------------------------
     public void sendNotification(User recipient, User creator, Post post) {
         if (recipient == null || creator == null || post == null) {
             throw new InvalidJwtException("Bad Request");
@@ -105,7 +100,6 @@ public class NotificationService {
         if (set == null || set.isEmpty())
             return;
 
-        // Prevent ConcurrentModificationException
         List<SseEmitter> safeEmitters = List.copyOf(set);
 
         safeEmitters.forEach(emitter -> sendNotificationEvent(emitter, dto));
@@ -124,9 +118,6 @@ public class NotificationService {
         }
     }
 
-    // ---------------------------
-    // REACTIONS
-    // ---------------------------
     public void sendReaction(Long userId, Like like) {
         if (userId == null || like == null) {
             throw new InvalidJwtException("Bad Request");
@@ -136,7 +127,6 @@ public class NotificationService {
         if (set == null || set.isEmpty())
             return;
 
-        // Safe copy
         List<SseEmitter> safeEmitters = List.copyOf(set);
 
         safeEmitters.forEach(emitter -> sendReactionEvent(emitter, like));
@@ -153,9 +143,7 @@ public class NotificationService {
         }
     }
 
-    // ---------------------------
-    // SAVE NOTIFICATION IN DB
-    // ---------------------------
+
     @Transactional
     public NotificationDTO saveNotification(User recipient, User creator, Post post) {
         NotificationEntity n = new NotificationEntity();
@@ -171,7 +159,8 @@ public class NotificationService {
                 saved.getCreator().getUsername(),
                 unread,
                 saved.getCreatedAt(),
-                saved.isSeen());
+                saved.isSeen()
+            );
     }
 
 
@@ -187,12 +176,10 @@ public class NotificationService {
         PageRequest pageRequest = PageRequest.of(0, NOTIFICATION_PAGE_SIZE);
 
         if (lastDate == null || lastId == null) {
-            // First page - get latest notifications
             notifications = notificationRepository.findByRecipientIdOrderByCreatedAtDescIdDesc(
                     user.getId(),
                     pageRequest);
         } else {
-            // Pagination - get older notifications
             notifications = notificationRepository
                     .findByRecipientIdAndCreatedAtLessThanOrCreatedAtEqualsAndIdLessThanOrderByCreatedAtDescIdDesc(
                             user.getId(),

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class RateLimiterService {
 
-    private static final int MAX_REQUESTS = 1;
+    private static final int MAX_REQUESTS = 10;
     private static final long WINDOW_MS = 1000;
 
     private final Map<String, UserRate> userRates = new ConcurrentHashMap<>();
@@ -19,8 +19,9 @@ public class RateLimiterService {
         userRates.putIfAbsent(username, new UserRate(0, now));
 
         UserRate rate = userRates.get(username);
+        System.out.println(rate.count + " " + (now - rate.timestamp));
 
-        synchronized (rate) { // prevent race conditions
+        synchronized (rate) { 
             if (now - rate.timestamp > WINDOW_MS) {
                 rate.count = 1;
                 rate.timestamp = now;
@@ -30,6 +31,7 @@ public class RateLimiterService {
                     rate.count++;
                     return true;
                 } else {
+                    System.out.println("Rate limit exceeded for user: " + username);
                     return false;
                 }
             }

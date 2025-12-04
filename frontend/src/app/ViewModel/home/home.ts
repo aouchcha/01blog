@@ -230,7 +230,8 @@ export class Home implements OnInit {
 
     this.postsService.getAllPosts(this.token, this.lastPost).subscribe({
       next: (res) => {
-
+        console.log({res});
+        
         if (res.posts && res.posts.length > 0) {
           this.posts = [...this.posts, ...res.posts];
           this.lastPost = this.posts[this.posts.length - 1];
@@ -467,7 +468,7 @@ export class Home implements OnInit {
     this.setToken();
     this.postsService.ReportPost(this.token, this.post_id, this.Report_Description).subscribe({
       next: (res) => {
-        this.toast.showSuccess('Post reported successfully.', 3000 );
+        // this.toast.showSuccess('Post reported successfully.', 3000 );
         this.CancelAction()
       },
       error: (err) => {

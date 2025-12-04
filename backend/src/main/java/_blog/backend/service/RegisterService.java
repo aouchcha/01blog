@@ -31,8 +31,12 @@ public class RegisterService {
         if (request.getEmail().trim().isEmpty() || !isValidEmail(request.getEmail())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The email is required or malformed"));
         }
-        if (request.getPassword().trim().isEmpty()) {
+        if (request.getPassword().trim().isEmpty() ) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The password is required"));
+        }
+
+        if (request.getPassword().length() > 50 || request.getPassword().length() < 8 ) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The password must be between 8 and 50 characters"));
         }
 
         if (userRepositry.existsByEmail(request.getEmail())) {

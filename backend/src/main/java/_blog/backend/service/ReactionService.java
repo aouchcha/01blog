@@ -54,15 +54,38 @@ public class ReactionService {
         if (!rateLimiterService.isAllowed(username)) {
             return ResponseEntity.status(429).body(Map.of("message", "Rate limit exceeded. Try again later."));
         }
-        final Long post_id = likeRequest.getPost_id();
-        if (!userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "user not found"));
-        }
-        if (!postRepository.existsById(post_id)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "post not found"));
+
+        final User me = userRepository.findByUsername(username);
+
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
         }
 
-        ReactionSaveResult rr = SaveReactEntity(post_id, username);
+        if (me.getisbaned()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You are banned"));
+        }
+
+        final Post p = postRepository.findById(likeRequest.getPost_id()).orElse(null);
+
+        if (p == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the post is not valid"));
+        }
+
+        if (p.getIsHidden()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You cannot react to a hidden post"));
+        }
+
+        // final Long post_id = likeRequest.getPost_id();
+        // if (!userRepository.existsByUsername(username)) {
+        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "user not found"));
+        // }
+        // if (!postRepository.existsById(post_id)) {
+        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "post not found"));
+        // }
+
+        ReactionSaveResult rr = SaveReactEntity(likeRequest.getPost_id(), username);
 
         for (Follow f : rr.followers) {
             notificationService.sendReaction(f.getFollower().getId(), rr.l);
@@ -77,11 +100,11 @@ public class ReactionService {
 
         final Optional<Post> p = postRepository.findById(post_id);
         final User u = userRepository.findByUsername(username);
-        Like l;
+        Like l = reactionRepository.findByPost_IdAndUser_Username(post_id, username);
 
-        List<Like> existingReactions = reactionRepository.findAllByPost_IdAndUser_Username(post_id, username);
+        // List<Like> existingReactions = reactionRepository.findAllByPost_IdAndUser_Username(post_id, username);
 
-        if (existingReactions.isEmpty()) {
+        if (l == null) {
             status = "Liked";
             l = new Like();
             l.setUser(u);
@@ -89,8 +112,9 @@ public class ReactionService {
             reactionRepository.save(l);
         } else {
             status = "UnLiked";
-            l = existingReactions.get(0);
-            reactionRepository.deleteAll(existingReactions);
+            reactionRepository.delete(l);
+            // l = existingReactions.get(0);
+            // reactionRepository.deleteAll(existingReactions);
         }
 
         p.get().setLikeCount(reactionRepository.countByPost_id(post_id));

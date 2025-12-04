@@ -89,11 +89,6 @@
 
         <!-- Meta Info -->
         <div class="profile-meta" *ngIf="user.email">
-          <!-- <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M14 6.667l-6 4-6-4M2.667 3.333h10.666c.737 0 1.334.597 1.334 1.334v6.666c0 .737-.597 1.334-1.334 1.334H2.667a1.333 1.333 0 01-1.334-1.334V4.667c0-.737.597-1.334 1.334-1.334z"
-              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          </svg> -->
           <mat-icon>email</mat-icon>
           <span>{{ user.email }}</span>
         </div>
@@ -133,15 +128,17 @@
           <!-- Delete Button -->
           <div class="postActions">
             <button class="delete-btn" *ngIf="post.user.username === me?.username || me?.role === 'Admin'"
-            (click)="CheckDeletePost(post.id)">
-            <mat-icon>delete</mat-icon>
-          </button>
-          <button class="hide-btn" *ngIf="me.role === 'Admin' && me.role === 'Admin' && !post.isHidden" (click)="CheckBeforeHide(post.id)">
-            <mat-icon>visibility_off</mat-icon>
-          </button>
-           <button class="hide-btn" *ngIf="me.role === 'Admin' && me.role === 'Admin' && post.isHidden" (click)="CheckBeforeUnHide(post.id)">
-            <mat-icon>visibility</mat-icon>
-          </button>
+              (click)="CheckDeletePost(post.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button class="hide-btn" *ngIf="me.role === 'Admin' && me.role === 'Admin' && !post.isHidden"
+              (click)="CheckBeforeHide(post.id)">
+              <mat-icon>visibility_off</mat-icon>
+            </button>
+            <button class="hide-btn" *ngIf="me.role === 'Admin' && me.role === 'Admin' && post.isHidden"
+              (click)="CheckBeforeUnHide(post.id)">
+              <mat-icon>visibility</mat-icon>
+            </button>
           </div>
         </header>
 
@@ -168,6 +165,9 @@
             </button>
             <button class="reaction-btn" (click)="ShowSinglePost(post.id)">
               <mat-icon>comment</mat-icon> {{ post.commentsCount || 0 }}
+            </button>
+            <button class="reaction-btn" (click)="OpenPostReportSection(post.id)">
+              <mat-icon>report</mat-icon>
             </button>
           </div>
         </div>
@@ -204,5 +204,22 @@
   <div class="popup-overlay" *ngIf="showConfirmation" (click)="CancelAction()">
     <app-confirmation [title]="confirmationTitle" [message]="confirmationMessage" (confirmed)="HandleAction($event)">
     </app-confirmation>
+  </div>
+  <div class="popup-overlay" *ngIf="DoYouWantReportPost">
+    <div class="report-card">
+      <h3>Report Post</h3>
+      <div class="form-group">
+        <textarea [(ngModel)]="Report_Description" required class="report-textarea"
+          placeholder="Describe the issue..."></textarea>
+      </div>
+      <div class="report-actions">
+        <button class="action-btn primary-btn" (click)="CheckBeforeReport()">
+          Submit Report
+        </button>
+        <button class="action-btn secondary-btn" (click)="Cancel()">
+          Cancel
+        </button>
+      </div>
+    </div>
   </div>
 </div>

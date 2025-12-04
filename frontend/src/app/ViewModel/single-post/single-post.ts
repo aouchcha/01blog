@@ -71,21 +71,21 @@ export class SinglePost implements OnInit {
     }
     this.token = CheckToken();
 
-  this.notifService.reactionsObservable
-    .pipe(takeUntil(this.destroy$))
-    .subscribe(react => {
-      console.log("single post react", react);
-      this.post.likeCount = react.post.likeCount
-    });
-    
+    this.notifService.reactionsObservable
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(react => {
+        console.log("single post react", react);
+        this.post.likeCount = react.post.likeCount
+      });
+
     this.post_id = Number(this.route.snapshot.paramMap.get('id'));
     this.LoadPage()
   }
 
   ngOnDestroy() {
-  this.destroy$.next();
-  this.destroy$.complete();
-}
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   public LoadPage() {
     this.userService.getMe(this.token).subscribe({
@@ -253,7 +253,7 @@ export class SinglePost implements OnInit {
     this.showConfirmation = false;
     this.comment_id = null;
   }
-  
+
 
 
 
@@ -284,7 +284,7 @@ export class SinglePost implements OnInit {
       }
     })
     console.log("hide Post");
-    
+
     console.log(this.post_id);
   }
 
@@ -299,7 +299,7 @@ export class SinglePost implements OnInit {
       }
     })
     console.log("unhide Post");
-    
+
     console.log(this.post_id);
   }
 
@@ -311,10 +311,12 @@ export class SinglePost implements OnInit {
       if (this.type === 'post') {
         if (this.confirmationAction === 'Hide') {
           this.hidePost()
-        }else if (this.confirmationAction === 'Delete') {
+        } else if (this.confirmationAction === 'Delete') {
           this.deletePost()
-        }else if (this.confirmationAction === 'UnHide') {
+        } else if (this.confirmationAction === 'UnHide') {
           this.unhidePost()
+        } else if (this.confirmationAction === 'Report') {
+          this.ReportPost()
         }
       } else {
         this.deleteComment()
@@ -345,7 +347,45 @@ export class SinglePost implements OnInit {
     this.confirmationMessage = 'Are you sure you want to delete this commet? This action cannot be undone.';
     this.confirmationAction = 'Delete';
     this.showConfirmation = true;
+    this.type = 'comment';
     this.comment_id = comment_id;
+  }
+
+  public DoYouWantReport: boolean = false;
+  public Report_Description: string = '';
+
+  OpenReportSection(post_id: number) {
+    this.post_id = post_id;
+    this.comment_id = null;
+    this.DoYouWantReport = true;
+    // this.type = 'post';CheckConfirmation
+    console.log("Open Report Section");
+  }
+
+  CheckBeforeReport() {
+    if (this.Report_Description.trim() === '') {
+      // this.toast.showError('Please provide a description for the report.', 3000);
+      // return;
+    }
+    this.showConfirmation = true;
+    this.DoYouWantReport = false;
+    this.confirmationAction = "Report";
+    this.confirmationMessage = "Are you sure you want to report this post ? This action cannot be undone."
+    this.confirmationTitle = `Report Post ?`;
+    this.type = 'post';
+  }
+
+  public ReportPost(): void {
+    // this.setToken();
+    this.postsService.ReportPost(this.token, this.post_id, this.Report_Description).subscribe({
+      next: (res) => {
+        // this.toast.showSuccess('Post reported successfully.', 3000);
+        this.CancelAction()
+      },
+      error: (err) => {
+        // console.log(err);
+      }
+    })
   }
 
   public deleteComment() {

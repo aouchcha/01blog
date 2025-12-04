@@ -18,6 +18,8 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
       switch (err.status) {
         case 0:
           console.log({ "message": "No Connection" });
+          toast.showError(`No Connection — Please check your internet connection.`);
+
           router.navigate(["/login"])
           break;
 
@@ -31,13 +33,12 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
         case 401:
           toast.showError("Unauthorized.");
           localStorage.removeItem("JWT");
-          console.log({ "message": "Error 401" });
 
           router.navigate(['/login']);
           break;
         case 403:
           toast.showError("Forbidden");
-          console.log({ "message": "Error 403" });
+          localStorage.removeItem("JWT");
           router.navigate(['/login']);
           break;
         case 404:
@@ -71,7 +72,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
             case 200:
               console.log({ "message": "Success 200" });
               if (body?.message) {
-                toast.showSuccess(body.message); // Use the message from response
+                toast.showSuccess(body.message);
               }
               break;
 

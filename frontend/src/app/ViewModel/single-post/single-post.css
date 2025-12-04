@@ -54,6 +54,52 @@
   color: #f08624;
 }
 
+/*Report Section*/
+
+.report-card {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 12px;
+  padding: 20px;
+  width: 50%;
+  height: fit-content;
+}
+
+.report-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.report-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  background-color: white;
+}
+
+.report-textarea:focus {
+  border-color: #681C28;
+  box-shadow: 0 0 0 3px rgba(104, 28, 40, 0.1);
+}
+
+.report-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: space-evenly;
+}
+
 /* Delete Button */
 .delete-btn , .hide-btn {
   width: 36px;

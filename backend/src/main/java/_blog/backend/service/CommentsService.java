@@ -43,12 +43,16 @@ public class CommentsService {
 
         final String username = contextHelpers.getUsername();
 
-
-        User u = userRepository.findByUsername(username);
+        final User u = userRepository.findByUsername(username);
 
         if (u == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "invalid user"));
+        }
+
+        if (u.getisbaned()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You are banned"));
         }
 
         if (request.getContent().trim().isEmpty()) {
@@ -84,23 +88,37 @@ public class CommentsService {
     @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> delete(Long comment_id) {
 
-        Comment comment = commentRepository.findById(comment_id).orElse(null);
+        final String username = contextHelpers.getUsername();
+
+        final User u = userRepository.findByUsername(username);
+
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "invalid user"));
+        }
+
+        if (u.getisbaned()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You are banned"));
+        }
+
+        final Comment comment = commentRepository.findById(comment_id).orElse(null);
 
         if (comment == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "comment doesn't removed"));
         }
 
-        commentRepository.delete(comment);
-
+        
         Post p = postRepository.findById(comment.getPost().getId()).orElse(null);
-
+        
         if (p == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "comment doesn't removed"));
         }
-
+        
         p.setCommentsCount(p.getCommentsCount() - 1);
-
+        
         postRepository.save(p);
+        commentRepository.delete(comment);
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "comment removed with success"));
     }

@@ -34,11 +34,22 @@ public class FollowService {
         String username = jwtUtil.getUsername(token);
 
         User follower = userRepository.findByUsername(username);
+
         User followed = userRepository.findById(followRequest.getFollowed_id()).orElse(null);
 
         if (follower == null || followed == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "one of the users isn't valid"));
+        }
+
+        if (follower.getId().equals(followed.getId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "you can't follow yourself"));
+        }
+
+        if (follower.getisbaned()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You are banned"));
         }
 
         Follow follow = followRepositry.findByFollower_IdAndFollowed_Id(follower.getId(), followed.getId());

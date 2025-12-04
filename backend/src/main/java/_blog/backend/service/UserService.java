@@ -47,6 +47,10 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalide user"));
         }
         User u = userRepository.findByUsername(username);
+        if (u.getisbaned()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You are banned"));
+        }
         int count = notificationRepository.countByRecipient_IdAndSeenFalse(u.getId());
 
         return ResponseEntity.ok().body(Map.of("me", u, "notifCount", count));
@@ -58,6 +62,11 @@ public class UserService {
         if (me == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "invalid user"));
+        }
+
+        if (me.getisbaned()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You are banned"));
         }
 
         List<User> users;
@@ -93,6 +102,11 @@ public class UserService {
         if (me == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "invalid user"));
+        }
+
+        if (me.getisbaned()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You are banned"));
         }
 
         User ProfileInfos = userRepository.findByUsername(username);
@@ -156,9 +170,7 @@ public class UserService {
                 }
                 repported = post.getUser();
             }
-        }
-
-        if (type.equals("user")) {
+        }else if (type.equals("user")) {
             if (reportRequest.getReportted_username() == null) {
                 throw new IllegalArgumentException("reportted_username is required for USER reports");
             } else {
@@ -169,10 +181,17 @@ public class UserService {
                 }
                 post = null;
             }
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalid report type"));
         }
 
         if (reportRequest.getDiscription().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "No Description Found"));
+        }
+
+        if (repported.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "you cant report admin users"));
         }
 
         final String myName = jwtUtil.getUsername(token);
@@ -186,14 +205,10 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "you cant report yourself"));
         }
 
-        // repported =
-        // userRepository.findByUsername(reportRequest.getReportted_username());
-        // if (repported == null) {
-        // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",
-        // "invalid user to report"));
-        // }
-
-        // post = postRepository.findById(reportRequest.getPost_id()).orElse(null);
+        if (me.getisbaned()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "You are banned"));
+        }
 
         ReportEntity r = new ReportEntity();
         r.setDescription(reportRequest.getDiscription());
@@ -207,6 +222,7 @@ public class UserService {
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> Remove(String username, String token) {
         if (!userRepository.existsByUsername(username)) {
@@ -219,6 +235,12 @@ public class UserService {
         }
 
         final User u = userRepository.findByUsername(username);
+
+        if (u.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "you cant remove admin users"));
+        }
+
         userRepository.delete(u);
         return ResponseEntity.ok().body(Map.of("message", "User " + u.getUsername() + " Removed with success"));
     }
@@ -232,6 +254,12 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "the user u wanna to ban doesnt exist"));
         }
+
+        if (u.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "you cant ban admin users"));
+        }
+        
         u.setisbaned(true);
         return ResponseEntity.ok().body(Map.of("message", "User " + u.getUsername() + " Banned with success"));
     }
