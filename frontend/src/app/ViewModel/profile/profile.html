@@ -166,7 +166,7 @@
             <button class="reaction-btn" (click)="ShowSinglePost(post.id)">
               <mat-icon>comment</mat-icon> {{ post.commentsCount || 0 }}
             </button>
-            <button class="reaction-btn" (click)="OpenPostReportSection(post.id)">
+            <button class="reaction-btn" *ngIf="post.user.username !== me?.username" (click)="OpenPostReportSection(post.id)">
               <mat-icon>report</mat-icon>
             </button>
           </div>

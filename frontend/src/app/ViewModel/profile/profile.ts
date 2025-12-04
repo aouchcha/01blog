@@ -65,13 +65,6 @@ export class Profile implements OnInit {
   }
 
   public ngOnInit(): void {
-    if (!this.isBrowser) {
-      return
-    }
-    if (!CheckToken()) {
-      localStorage.removeItem("JWT")
-      this.router.navigate(["login"])
-    }
     this.token = CheckToken();
     this.username = String(this.route.snapshot.paramMap.get('username'));
 
@@ -79,15 +72,16 @@ export class Profile implements OnInit {
 
     this.getMe()
     this.LoadProfile()
-
-    this.notifService.reactionsObservable
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(react => {
-        console.log("profile react", react);
-
-        let index = this.posts.findIndex((p: Post) => p.id === react.post.id);
-        this.posts[index].likeCount = react.post.likeCount;
-      });
+    if (this.me.role !== 'ADMIN') {
+      this.notifService.reactionsObservable
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(react => {
+          console.log("profile react", react);
+  
+          let index = this.posts.findIndex((p: Post) => p.id === react.post.id);
+          this.posts[index].likeCount = react.post.likeCount;
+        });
+    }
 
   }
 
@@ -102,7 +96,9 @@ export class Profile implements OnInit {
         console.log({ "me": res.me });
 
         this.me = res.me;
-        this.notifService.connect(this.me.id, this.token)
+        if (this.me.role !== "Admin") {
+          this.notifService.connect(this.me.id, this.token)
+        }
 
       },
       error: (err) => {

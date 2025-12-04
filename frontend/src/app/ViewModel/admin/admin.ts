@@ -22,8 +22,8 @@ export class Admin implements OnInit {
   public search: string = '';
   public admin: User = new User();
   public usersStates: User[] = [];
-  public OriginaleUsers : User[] = [];
-  public filtredUsers : any = [];
+  public OriginaleUsers: User[] = [];
+  public filtredUsers: any = [];
   public isBrowser: boolean = false;
   public report_count: number = 0;
   public isLoading: boolean = false;
@@ -31,7 +31,7 @@ export class Admin implements OnInit {
   public HasMoreUsers: boolean = true;
 
 
-  public constructor(private router: Router, private adminService: AdminService, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object) { 
+  public constructor(private router: Router, private adminService: AdminService, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId)
   }
 
@@ -39,79 +39,57 @@ export class Admin implements OnInit {
     if (!this.isBrowser) {
       return
     }
-    if (CheckToken() === null) {
-      console.log("token Not FOund");
-      this.router.navigate(["login"])
-      return
-    }
+
     this.token = CheckToken();
     this.getAdminInfo()
     this.getDashboard()
-
   }
-
-
 
   public getAdminInfo() {
     this.userService.getMe(this.token).subscribe({
       next: (res) => {
-        
         this.admin = res.me;
-        // console.log({"Admin":this.admin});
       },
       error: (err) => {
-        if (err.status == 401) {
-          this.router.navigate(["login"])
-        }
-        // console.log(err);
+        console.log(err);
       }
     })
   }
 
-
-    public handleScrollLogic(event: any): void {
+  public handleScrollLogic(event: any): void {
     const element = event.target;
 
     const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 50;
     if (atBottom && !this.isLoading && this.HasMoreUsers) {
-      console.log({"mwssage":"wsset lekher"});
-      
-     this.getDashboard();
-   }
+      console.log({ "mwssage": "wsset lekher" });
+
+      this.getDashboard();
+    }
   }
 
   public getDashboard() {
     if (this.isLoading) return;
-    // console.log({});
-    
-    console.log({"last user id: ":this.lastUserId});
+
     this.adminService.getDashBoard(this.token, this.lastUserId).subscribe({
       next: (res) => {
-        console.log({res});
-        
+        console.log({ res });
+
         if (res.users && res.users.length > 0) {
           this.OriginaleUsers = [...this.OriginaleUsers, ...res.users];
           this.lastUserId = this.OriginaleUsers[this.OriginaleUsers.length - 1].id;
           this.isLoading = false;
-          
-        }else {
+
+        } else {
           this.HasMoreUsers = false;
         }
 
-        console.log({"new :":this.OriginaleUsers});
-        
-        // this.OriginaleUsers = res.users;
         this.usersStates = this.OriginaleUsers;
         this.filtredUsers = this.OriginaleUsers;
         this.report_count = res.reportsCount;
-        // console.log({"FFFFFFFFFFFF": res});
 
       },
       error: (err) => {
-        if (err.status == 401) {
-          this.router.navigate(["login"])
-        }
-        // console.log(err);
+        console.log(err);
       }
     })
   }
@@ -122,10 +100,6 @@ export class Admin implements OnInit {
     this.router.navigate([`user/${username}`])
   }
 
-  public Home() {
-    this.router.navigate([''])
-  }
-
   public Logout() {
     localStorage.removeItem("JWT");
     this.token = null;
@@ -133,29 +107,23 @@ export class Admin implements OnInit {
   }
 
   public ShowReports() {
-    // console.log({"toreport":""});
-    
+
     this.router.navigate(["reports"])
   }
 
   Filter() {
     console.log(this.search);
-    
+
     if (this.search.length === 0) {
-      // console.log("hanni");
-      
       this.filtredUsers = this.OriginaleUsers;
     }
     this.filtredUsers = this.usersStates.filter((u) => {
       return u.username?.startsWith(this.search)
     })
-    // console.log(this.OriginaleUsers);
-    
-    // console.log(this.filtredUsers);
-    
+
   }
 
-    public ToDashboard() {
+  public ToDashboard() {
     this.router.navigate(["admin"])
   }
 }

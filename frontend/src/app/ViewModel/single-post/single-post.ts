@@ -62,21 +62,16 @@ export class SinglePost implements OnInit {
   }
 
   ngOnInit(): void {
-    if (!this.isBrowser) {
-      return
-    }
-    if (!CheckToken()) {
-      localStorage.removeItem("JWT")
-      this.router.navigate(["login"])
-    }
     this.token = CheckToken();
 
-    this.notifService.reactionsObservable
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(react => {
-        console.log("single post react", react);
-        this.post.likeCount = react.post.likeCount
-      });
+    if (this.me.role !== 'ADMIN') {
+      this.notifService.reactionsObservable
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(react => {
+          console.log("single post react", react);
+          this.post.likeCount = react.post.likeCount
+        });
+    }
 
     this.post_id = Number(this.route.snapshot.paramMap.get('id'));
     this.LoadPage()
@@ -90,8 +85,6 @@ export class SinglePost implements OnInit {
   public LoadPage() {
     this.userService.getMe(this.token).subscribe({
       next: (res) => {
-        // console.log({res});
-
         this.me = res.me;
         if (this.me.role !== "Admin") {
           this.notifService.connect(this.me.id, this.token)

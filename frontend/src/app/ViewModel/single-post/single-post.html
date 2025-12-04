@@ -72,7 +72,7 @@
                 <button class="action-btn">
                     <mat-icon>comment</mat-icon> {{ post.commentsCount || 0 }}
                 </button>
-                <button class="action-btn" (click)="OpenReportSection(post.id)">
+                <button class="action-btn" *ngIf="post.user.username !== me.username" (click)="OpenReportSection(post.id)">
                     <mat-icon>report</mat-icon>
                 </button>
             </div>
