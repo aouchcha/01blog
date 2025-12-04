@@ -3,70 +3,69 @@ import { inject } from '@angular/core';
 import { throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { ToastService } from '../services/toast.service';
 
 export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const toast = inject(ToastService);
   const router = inject(Router);
+  const location = inject(Location);
 
   return next(req).pipe(
 
     catchError(err => {
-      // const body = err;
-      console.log(err.error.error); // Access the message field
+      console.log(err.error?.error);
 
       switch (err.status) {
         case 0:
           console.log({ "message": "No Connection" });
           toast.showError(`No Connection — Please check your internet connection.`);
-
-          router.navigate(["/login"])
+          router.navigate(["login"]);
           break;
 
         case 400:
-          toast.showError(`Bad Request — ${err.error.error}.`);
+          toast.showError(`Bad Request — ${err.error?.error || 'Invalid request'}.`);
           console.log({ "message": "Error 400" });
-          router.navigate([""])
-
-
+          location.back(); // Go back to previous route
           break;
+
         case 401:
           toast.showError("Unauthorized.");
           localStorage.removeItem("JWT");
-
           router.navigate(['/login']);
           break;
+
         case 403:
-          toast.showError("Forbidden");
-          localStorage.removeItem("JWT");
-          router.navigate(['/login']);
+          toast.showError("Forbidden — You don't have permission to access this resource.");
+          location.back(); // Go back to previous route
           break;
+
         case 404:
-          toast.showError(`Not Found — ${err.error.error}.`);
+          toast.showError(`Not Found — ${err.error?.error || 'Resource not found'}.`);
           console.log({ "message": "Error 404" });
-          router.navigate([""])
-
-
+          location.back(); // Go back to previous route
           break;
+
         case 500:
           console.log({ "message": "Error 500" });
-          toast.showError(`Internal Server Error — ${err.error.error}.`);
-          router.navigate([""])
-
+          toast.showError(`Internal Server Error — ${err.error?.error || 'Something went wrong'}.`);
+          location.back(); // Go back to previous route
           break;
-        default:
-          // console.log({ "message": "Wa L9lawi" });
 
+        default:
           toast.showError("Unexpected error occurred.");
+          location.back(); // Go back to previous route
       }
+      
       return throwError(() => err);
     }),
+
     tap({
       next: (event) => {
         if (event instanceof HttpResponse) {
           const body = event.body as any;
           console.log({ "body": event.body });
-          console.log({ "message": body?.message }); // Access the message field
+          console.log({ "message": body?.message });
 
           switch (event.status) {
             case 200:

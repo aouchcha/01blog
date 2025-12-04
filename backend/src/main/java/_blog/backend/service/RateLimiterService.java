@@ -5,10 +5,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 @Service
 public class RateLimiterService {
-
     private static final int MAX_REQUESTS = 10;
     private static final long WINDOW_MS = 1000;
 
@@ -16,25 +14,27 @@ public class RateLimiterService {
 
     public boolean isAllowed(String username) {
         long now = Instant.now().toEpochMilli();
-        userRates.putIfAbsent(username, new UserRate(0, now));
-
-        UserRate rate = userRates.get(username);
-        System.out.println(rate.count + " " + (now - rate.timestamp));
-
-        synchronized (rate) { 
-            if (now - rate.timestamp > WINDOW_MS) {
-                rate.count = 1;
-                rate.timestamp = now;
-                return true;
-            } else {
-                if (rate.count < MAX_REQUESTS) {
-                    rate.count++;
-                    return true;
+        
+        UserRate rate = userRates.compute(username, (key, existingRate) -> {
+            if (existingRate == null) {
+                return new UserRate(1, now);
+            }
+            
+            synchronized (existingRate) {
+                if (now - existingRate.timestamp > WINDOW_MS) {
+                    existingRate.count = 1;
+                    existingRate.timestamp = now;
+                } else if (existingRate.count < MAX_REQUESTS) {
+                    existingRate.count++;
                 } else {
                     System.out.println("Rate limit exceeded for user: " + username);
-                    return false;
                 }
+                return existingRate;
             }
+        });
+        
+        synchronized (rate) {
+            return rate.count <= MAX_REQUESTS;
         }
     }
 
@@ -48,4 +48,3 @@ public class RateLimiterService {
         }
     }
 }
-

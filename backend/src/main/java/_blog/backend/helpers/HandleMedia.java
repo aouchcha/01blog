@@ -42,7 +42,7 @@ public class HandleMedia {
         // System.out.println("HaNNI F SAVE");
         if (postRequst.getMedia() != null) {
             p.setMedia(Rename(postRequst.getMedia().getOriginalFilename()));
-            File uploads = createFolder("/home/aouchcha/Desktop/01blog/backend/uploads");
+            File uploads = createFolder("../backend/uploads");
             Path dest = Paths.get(uploads.getAbsolutePath(), p.getMedia());
             try {
                 postRequst.getMedia().transferTo(dest);

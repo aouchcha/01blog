@@ -24,7 +24,7 @@ import _blog.backend.helpers.JwtUtil;
 import jakarta.transaction.Transactional;
 
 @Service
-@Transactional
+// @Transactional
 public class ReactionService {
     @Autowired
     private UserRepository userRepository;

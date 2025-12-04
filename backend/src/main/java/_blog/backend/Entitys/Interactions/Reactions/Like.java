@@ -12,21 +12,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "Likes")
+@Table(name = "Likes" , uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "post_id"}))
 public class Like {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment in PostgreSQL
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
     private Long id;
 
-    // @Column(nullable = false)
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // @Column(nullable = false)
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     @JsonIgnore

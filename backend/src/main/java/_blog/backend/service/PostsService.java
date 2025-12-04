@@ -130,7 +130,7 @@ public class PostsService {
         }
 
         if (p.getMedia() != null) {
-            Path path = Paths.get("/home/aouchcha/Desktop/01blog/backend/uploads", p.getMedia());
+            Path path = Paths.get("../backend/uploads", p.getMedia());
             try {
                 Files.deleteIfExists(path);
             } catch (Exception e) {
@@ -191,7 +191,8 @@ public class PostsService {
         up.setDescription(postRequst.getDescription());
         if (removed) {
             if (up.getMedia() != null) {
-                Path path = Paths.get("/home/aouchcha/Desktop/01blog/backend/uploads", up.getMedia());
+                Path path = Paths.get("../backend/uploads", up.getMedia());
+                ///home/aouchcha/Desktop/01blog/backend/uploads
                 try {
                     Files.deleteIfExists(path);
                 } catch (Exception e) {
