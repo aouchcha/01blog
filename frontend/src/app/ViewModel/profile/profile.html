@@ -156,7 +156,7 @@
 
         <!-- Post Content -->
         <div class="post-content">
-          <p class="post-description">{{ post.description }}</p>
+          <!-- <p class="post-description">{{ post.description }}</p> -->
 
           <!-- Post Footer -->
           <div class="post-footer" *ngIf="me.id === user.id || user.follow === true">
@@ -175,32 +175,6 @@
     </div>
   </section>
 
-  <!-- Popup Message
-  <div class="popup-overlay" *ngIf="showPopup">
-    <div class="popup-modal">
-      <div class="popup-header">
-        <h3>{{ popupMessage }}</h3>
-      </div>
-      <div class="popup-actions">
-        <button class="action-btn primary-btn" (click)="closePopup()">Close</button>
-      </div>
-    </div>
-  </div> -->
-
-  <!-- Confirmation Modal -->
-  <!-- <div class="popup-overlay" *ngIf="showConfirmation">
-    <div class="modal-overlay" (click)="CancelAction()">
-     <app-confirmation
-      *ngIf="showConfirmation"
-      [title]="confirmationTitle"
-      [message]="confirmationMessage"
-      [action]="confirmationAction"
-      [params]="confirmationParams"
-      (confirmed)="handleConfirmation($event)"
-      (cancelled)="showConfirmation = false"
-    ></app-confirmation>
-    </div>
-  </div> -->
   <div class="popup-overlay" *ngIf="showConfirmation" (click)="CancelAction()">
     <app-confirmation [title]="confirmationTitle" [message]="confirmationMessage" (confirmed)="HandleAction($event)">
     </app-confirmation>

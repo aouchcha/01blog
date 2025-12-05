@@ -39,7 +39,6 @@
                 <div class="post-admin-options" *ngIf="me.role === 'Admin'">
                     <button class="delete-btn" (click)="CheckConfirmation()">
                         <mat-icon>delete</mat-icon>
-                        <!-- <span>Delete</span> -->
                     </button>
                     <button class="hide-btn" *ngIf="!post.isHidden" (click)="CheckBeforeHide()">
                         <mat-icon>visibility_off</mat-icon>
@@ -52,7 +51,6 @@
 
             <div class="post-content">
                 <h2>{{ post.title }}</h2>
-                <p>{{ post.description }}</p>
                 <div class="post-media-container" *ngIf="!post.mediaUrl?.endsWith('null')">
                     <ng-container [ngSwitch]="post.mediaUrl ? post.mediaUrl.split('.').pop()?.toLowerCase() : ''">
                         <img *ngSwitchCase="'jpg'" [src]="post.mediaUrl" alt="Post image" class="post-media">
@@ -63,6 +61,7 @@
                             preload="metadata"></video>
                     </ng-container>
                 </div>
+                <p>{{ post.description }}</p>
             </div>
 
             <div class="post-actions" *ngIf="me.role !== 'Admin'">
@@ -91,20 +90,23 @@
                     class="modal-textarea"></textarea>
 
                 <label for="UpdateMedia" class="modal-media-btn">Select Media</label>
-                <input type="file" id="UpdateMedia" (change)="setMedia($event, 'update')" class="media-input"
+                <input type="file" id="UpdateMedia" (change)="setMedia($event)" class="media-input"
                     accept="image/*, video/*">
-                <p class="media-preview" *ngIf="updateMedia !== null">
-                    <b>File to upload: {{updatedMediaName}}</b>
-                    <button class="close-btn" (click)="RemoveImage('edit')">✕</button>
+                <!-- ///////////////////////////////////////////////////////////////// -->
+                <div class="media-preview" *ngIf="updatePreviewUrl">
+                    <button class="close-btn" (click)="RemoveImage()">✕</button>
 
-                </p>
+                    <img *ngIf="updateIsImage" [src]="updatePreviewUrl" class="preview-img">
+                    <video *ngIf="updateIsVideo" [src]="updatePreviewUrl" class="preview-video" controls></video>
 
+                    <p><b>{{ updatedMediaName }}</b></p>
+                </div>
+                <!-- ///////////////////////////////////////////////////////////////// -->
                 <div class="modal-actions">
-                    <button class="modal-save-btn" (click)="updatePost()">Save</button>
+                    <button class="modal-save-btn" (click)="UpdatePost()">Save</button>
                     <button class="modal-cancel-btn" (click)="Cancel()">Cancel</button>
                 </div>
             </div>
-
         </div>
 
         <!-- Comments Section -->

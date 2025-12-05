@@ -10,7 +10,9 @@ import { Reports } from './ViewModel/reports/reports';
 
 import { authGuard } from './helpers/guard';
 import { guestGuard } from './helpers/guest.guard';
+import { NotFound } from './ViewModel/not-found/not-found'; 
 
+// const toast = @inject(ToastService)
 export const routes: Routes = [
     { 
         path: "register", 
@@ -50,6 +52,6 @@ export const routes: Routes = [
     },
     {
         path: '**',
-        redirectTo: '',
+        component: NotFound,
     }
 ];

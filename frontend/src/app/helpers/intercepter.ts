@@ -20,13 +20,13 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
         case 0:
           console.log({ "message": "No Connection" });
           toast.showError(`No Connection — Please check your internet connection.`);
-          router.navigate(["login"]);
+          router.navigate([""]);
           break;
 
         case 400:
           toast.showError(`Bad Request — ${err.error?.error || 'Invalid request'}.`);
           console.log({ "message": "Error 400" });
-          location.back(); // Go back to previous route
+          // location.back(); // Go back to previous route
           break;
 
         case 401:
@@ -49,12 +49,12 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
         case 500:
           console.log({ "message": "Error 500" });
           toast.showError(`Internal Server Error — ${err.error?.error || 'Something went wrong'}.`);
-          location.back(); // Go back to previous route
+          router.navigate([""]); // Go back to previous route
           break;
 
         default:
           toast.showError("Unexpected error occurred.");
-          location.back(); // Go back to previous route
+          // location.back(); // Go back to previous route
       }
       
       return throwError(() => err);

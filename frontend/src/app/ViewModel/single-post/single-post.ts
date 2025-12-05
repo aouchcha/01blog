@@ -52,7 +52,9 @@ export class SinglePost implements OnInit {
   public comment_id: number | null = null;
   public type: string = '';
   private destroy$ = new Subject<void>();
-
+  updatePreviewUrl: string | null = null;
+  updateIsImage: boolean = false;
+  updateIsVideo: boolean = false;
 
 
   constructor(private router: Router, private http: HttpClient, private postsService: PostsService, private notifService: NotificationsService, private route: ActivatedRoute, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object) {
@@ -130,30 +132,49 @@ export class SinglePost implements OnInit {
     console.log("hanni");
 
     this.update = true;
-    // this.post_id = post_id;
-    // const post: Post = this.posts.find((p: Post) => p.id === post_id);
-
-    // if (!post) return;
-
     this.updatedTitle = this.post.title;
     this.updatedDescription = this.post.description;
+
     if (this.post.media && this.post.mediaUrl) {
       this.updateMedia = this.post.media;
       this.oldMedia = this.post.media;
       this.updatedMediaName = this.post.mediaUrl.substring(30);
       this.oldMediaName = this.post.mediaUrl.substring(30);
+      this.updatePreviewUrl = this.post.mediaUrl;
+      this.VideoOrImage(this.oldMediaName);
     }
   }
 
-  public setMedia(event: Event, helper: String): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-
-      this.Removed = true;
-      this.updateMedia = input.files[0];
-      this.updatedMediaName = input.files[0].name;
-
+    public VideoOrImage(Url: string) {
+    if (Url.endsWith(".mp4")) {
+      this.updateIsVideo = true;
+      this.updateIsImage = false;
+    } else {
+      this.updateIsImage = true;
+      this.updateIsVideo = false;
     }
+  }
+
+  public setMedia(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    const isImage = file.type.startsWith("image/");
+    const isVideo = file.type.startsWith("video/");
+
+    reader.onload = () => {
+      this.updatePreviewUrl = reader.result as string;
+      this.updateIsImage = isImage;
+      this.updateIsVideo = isVideo;
+      this.updateMedia = file;
+      this.updatedMediaName = file.name;
+    }
+
+    this.Removed = true;
+    reader.readAsDataURL(file);
   }
 
   public Cancel(): void {
@@ -164,7 +185,7 @@ export class SinglePost implements OnInit {
     this.updatedMediaName = null;
   }
 
-  public updatePost() {
+  public UpdatePost() {
     console.log({ "update alkhra": "" });
     const data = new FormData();
     data.append("title", this.updatedTitle);
@@ -201,13 +222,11 @@ export class SinglePost implements OnInit {
   public Removed: boolean = false;
 
 
-  public RemoveImage(type: string) {
-    console.log("sssssssssssss");
+  public RemoveImage() {
     this.Removed = true;
-
     this.updateMedia = null;
     this.updatedMediaName = null;
-
+    this.updatePreviewUrl = null;
   }
 
   public confirmationTitle: string = '';

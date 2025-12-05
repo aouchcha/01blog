@@ -67,7 +67,7 @@ public class CreatePostService {
          if (postRequest.getTitle().trim().isEmpty() ||
             postRequest.getTitle().length() > 100) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Description is invalid"));
+                    .body(Map.of("error", "Title is invalid"));
         }
 
         if (postRequest.getDescription().trim().isEmpty() ||

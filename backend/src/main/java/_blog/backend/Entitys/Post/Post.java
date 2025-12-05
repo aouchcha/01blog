@@ -30,10 +30,11 @@ public class Post {
     @Column(unique = true, nullable = false)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
+    
     private String description;
 
     private String media;
