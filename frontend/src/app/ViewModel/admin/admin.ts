@@ -6,13 +6,15 @@ import { User } from '../../models/User';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { FormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    MatIcon
   ],
   templateUrl: './admin.html',
   styleUrl: './admin.css'

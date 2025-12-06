@@ -49,8 +49,10 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private Long LikeCount = 0L;
-    private Long CommentsCount = 0L;
+    @Column(name = "like_count")
+    private Long likeCount;
+    @Column(name = "comments_count")
+    private Long commentsCount;
     private Boolean isHidden = false;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -118,19 +120,19 @@ public class Post {
     }
 
     public Long getLikeCount() {
-        return LikeCount;
+        return likeCount;
     }
 
     public void setLikeCount(Long likeCount) {
-        LikeCount = likeCount;
+        this.likeCount = likeCount;
     }
 
     public Long getCommentsCount() {
-        return CommentsCount;
+        return commentsCount;
     }
 
     public void setCommentsCount(Long commentsCount) {
-        CommentsCount = commentsCount;
+        this.commentsCount = commentsCount;
     }
 
     public String getMediaUrl() {

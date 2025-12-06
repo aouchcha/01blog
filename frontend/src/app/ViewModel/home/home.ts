@@ -94,7 +94,10 @@ export class Home implements OnInit {
     this.notifService.reactionsObservable
       .pipe(takeUntil(this.destroy$))
       .subscribe(react => {
+        console.log({ react });
         let index = this.posts.findIndex((p: Post) => p.id === react.post.id);
+        console.log({index});
+        
         if (index === -1) return;
         this.posts[index].likeCount = react.post.likeCount;
       });

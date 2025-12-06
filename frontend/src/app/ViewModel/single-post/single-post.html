@@ -121,10 +121,7 @@
                     <textarea [(ngModel)]="content" placeholder="Write a comment..."
                         class="comment-textarea"></textarea>
                     <button class="comment-submit-btn" (click)="Comment()">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M18 2L9 11M18 2l-6 16-3-7-7-3 16-6z" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
+                        <mat-icon>send</mat-icon>
                         Comment
                     </button>
                 </div>
@@ -159,11 +156,6 @@
                 </div>
 
                 <div class="empty-comments" *ngIf="!comments || comments.length === 0">
-                    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M56 28c0 13.255-10.745 24-24 24-2.85 0-5.582-.497-8.123-1.406L16 54l3.406-7.877A23.863 23.863 0 018 28c0-13.255 10.745-24 24-24s24 10.745 24 24z"
-                            stroke="#ccc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
                     <p>No comments yet. Be the first to comment!</p>
                 </div>
             </div>

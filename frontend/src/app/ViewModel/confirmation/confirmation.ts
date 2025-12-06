@@ -1,6 +1,8 @@
 import { Component, input, output } from '@angular/core';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
+  imports: [MatIcon],
   selector: 'app-confirmation',
   standalone: true,
   templateUrl: './confirmation.html',

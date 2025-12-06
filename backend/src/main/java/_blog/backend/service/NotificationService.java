@@ -118,7 +118,7 @@ public class NotificationService {
         }
     }
 
-    public void sendReaction(Long userId, Like like) {
+    public void sendReaction(Long userId, Like like, Post p) {
         if (userId == null || like == null) {
             throw new InvalidJwtException("Bad Request");
         }
@@ -129,15 +129,16 @@ public class NotificationService {
 
         List<SseEmitter> safeEmitters = List.copyOf(set);
 
-        safeEmitters.forEach(emitter -> sendReactionEvent(emitter, like));
+        safeEmitters.forEach(emitter -> sendReactionEvent(emitter, like, p));
     }
 
-    private void sendReactionEvent(SseEmitter emitter, Like like) {
+    private void sendReactionEvent(SseEmitter emitter, Like like, Post p) {
+        System.out.println("like sent in the sse " + p.getLikeCount());
         try {
             emitter.send(SseEmitter.event()
                     .id(String.valueOf(like.getId()))
                     .name("reaction")
-                    .data(Map.of("post", like.getPost())));
+                    .data(Map.of("post", p)));
         } catch (Exception e) {
             emitter.completeWithError(e);
         }

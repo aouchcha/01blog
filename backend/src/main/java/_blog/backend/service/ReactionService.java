@@ -66,7 +66,7 @@ public class ReactionService {
                     .body(Map.of("message", "You are banned"));
         }
 
-        final Post p = postRepository.findById(likeRequest.getPost_id()).orElse(null);
+        Post p = postRepository.findById(likeRequest.getPost_id()).orElse(null);
 
         if (p == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the post is not valid"));
@@ -77,51 +77,42 @@ public class ReactionService {
                     .body(Map.of("message", "You cannot react to a hidden post"));
         }
 
-        // final Long post_id = likeRequest.getPost_id();
-        // if (!userRepository.existsByUsername(username)) {
-        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "user not found"));
-        // }
-        // if (!postRepository.existsById(post_id)) {
-        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "post not found"));
-        // }
-
-        ReactionSaveResult rr = SaveReactEntity(likeRequest.getPost_id(), username);
+        ReactionSaveResult rr = SaveReactEntity(p, me);
 
         for (Follow f : rr.followers) {
-            notificationService.sendReaction(f.getFollower().getId(), rr.l);
+            System.out.println("notifying follower: " + f.getFollower().getUsername());
+            notificationService.sendReaction(f.getFollower().getId(), rr.l, rr.p);
         }
-        notificationService.sendReaction(rr.p.getUser().getId(), rr.l);
+        System.out.println("notifying the post owner : " + me.getUsername());
+        notificationService.sendReaction(p.getUser().getId(), rr.l, rr.p);
         return ResponseEntity.ok().body(Map.of("message", "post " + rr.status + " with success", "post", rr.p));
     }
 
-    @Transactional
-    public ReactionSaveResult SaveReactEntity(Long post_id, String username) {
+    // @Transactional
+    public ReactionSaveResult SaveReactEntity(Post p, User u) {
         String status = "";
 
-        final Optional<Post> p = postRepository.findById(post_id);
-        final User u = userRepository.findByUsername(username);
-        Like l = reactionRepository.findByPost_IdAndUser_Username(post_id, username);
-
-        // List<Like> existingReactions = reactionRepository.findAllByPost_IdAndUser_Username(post_id, username);
+        Like l = reactionRepository.findByPost_IdAndUser_Username(p.getId(), u.getUsername());
 
         if (l == null) {
             status = "Liked";
             l = new Like();
             l.setUser(u);
-            l.setPost(p.get());
-            reactionRepository.save(l);
+            l.setPost(p);
+            l = reactionRepository.save(l);
         } else {
             status = "UnLiked";
             reactionRepository.delete(l);
-            // l = existingReactions.get(0);
-            // reactionRepository.deleteAll(existingReactions);
         }
+       p.setLikeCount(reactionRepository.countByPost_id(p.getId()));
 
-        p.get().setLikeCount(reactionRepository.countByPost_id(post_id));
 
-        List<Follow> followers = followRepositry.findByFollowed_Id(p.get().getUser().getId());
+        p = postRepository.save(p);
 
-        return new ReactionSaveResult(l, followers, status, p.get());
+
+        List<Follow> followers = followRepositry.findByFollowed_Id(p.getUser().getId());
+
+        return new ReactionSaveResult(l, followers, status, p);
     }
 
     private class ReactionSaveResult {

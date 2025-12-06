@@ -10,22 +10,18 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-// This registers it as a Spring bean.
+//This class will handle unauthorized access attempts.
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    // By "implements AuthenticationEntryPoint", this class promises
-    // to have the "commence" method.
 
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
-                         AuthenticationException authException) throws IOException, ServletException {
-        // This method is called by Spring's filter chain *only when*
-        // an *unauthenticated* user (no token, or bad token)
-        // tries to access a *protected* resource (like /api/admin).
+                         AuthenticationException authException
+                ) throws IOException, ServletException 
+    {
         
-        // It sends a custom JSON error response.
         response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getWriter().write("{ \"error\": \"Unauthorized\", \"message\": \"Authentication is required to access this resource.\" }");
     }
 }
