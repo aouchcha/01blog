@@ -14,11 +14,9 @@ import _blog.backend.Entitys.User.Role;
 @Component
 public class JwtUtil {
 
-    // private final Key secretKey = Keys.hmacShaKeyFor("my-super-secret-key-12345678901234567890".getBytes());
-    // private final long expirationMs = 3600000; // 1 hour
-
     private final Key secretKey;
     private final long expirationMs;
+    
     public JwtUtil(@Value("${jwt.secret}") String secret,
                    @Value("${jwt.expiration-ms}") long expirationMs) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());

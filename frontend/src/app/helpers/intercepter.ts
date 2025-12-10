@@ -18,45 +18,40 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
       switch (err.status) {
         case 0:
-          console.log({ "message": "No Connection" });
           toast.showError(`No Connection — Please check your internet connection.`);
-          router.navigate([""]);
           break;
 
         case 400:
           toast.showError(`Bad Request — ${err.error?.error || 'Invalid request'}.`);
-          console.log({ "message": "Error 400" });
-          // location.back(); // Go back to previous route
           break;
 
         case 401:
           toast.showError("Unauthorized.");
           localStorage.removeItem("JWT");
-          router.navigate(['/login']);
+          router.navigate(['/login']);          
           break;
 
         case 403:
           toast.showError("Forbidden — You don't have permission to access this resource.");
-          location.back(); // Go back to previous route
+          localStorage.removeItem("JWT");
+          router.navigate(['/login']);
           break;
 
         case 404:
           toast.showError(`Not Found — ${err.error?.error || 'Resource not found'}.`);
           console.log({ "message": "Error 404" });
-          location.back(); // Go back to previous route
+          location.back();
           break;
 
         case 500:
           console.log({ "message": "Error 500" });
           toast.showError(`Internal Server Error — ${err.error?.error || 'Something went wrong'}.`);
-          router.navigate([""]); // Go back to previous route
           break;
 
         default:
-          toast.showError("Unexpected error occurred.");
-          // location.back(); // Go back to previous route
+        toast.showError("Unexpected error occurred.");
       }
-      
+
       return throwError(() => err);
     }),
 
@@ -64,32 +59,22 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
       next: (event) => {
         if (event instanceof HttpResponse) {
           const body = event.body as any;
-          console.log({ "body": event.body });
-          console.log({ "message": body?.message });
 
           switch (event.status) {
             case 200:
-              console.log({ "message": "Success 200" });
-              if (body?.message) {
-                toast.showSuccess(body.message);
-              }
+                toast.showSuccess(body?.message || "Operation Happened with success");
               break;
 
             case 201:
-              console.log({ "message": "Created 201" });
               toast.showSuccess(body?.message || "Resource created successfully!");
               break;
 
             case 204:
-              console.log({ "message": "No Content 204" });
-              // Note: 204 typically has no body
+              toast.showSuccess(body?.message || "Resource deleted successfully!");
               break;
 
             default:
-              console.log({ "message": `Success ${event.status}` });
-              if (body?.message) {
-                console.log({ "server_message": body.message });
-              }
+              toast.showSuccess(body?.message);
           }
         }
       }

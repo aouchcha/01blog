@@ -19,21 +19,35 @@ import _blog.backend.Entitys.User.UserStatsDTO;
 import _blog.backend.Repos.ReportRepository;
 import _blog.backend.Repos.UserRepository;
 import _blog.backend.helpers.ContextHelpers;
+import _blog.backend.Entitys.User.Role;
 
 @Service
 public class AdminService {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private ReportRepository reportRepository;
+    private final ReportRepository reportRepository;
 
-    @Autowired
-    private ContextHelpers contextHelpers;
+    private final ContextHelpers contextHelpers;
+
+    public AdminService( UserRepository userRepository, ReportRepository reportRepository, ContextHelpers contextHelpers) {
+        this.userRepository = userRepository;
+        this.reportRepository = reportRepository;
+        this.contextHelpers = contextHelpers;
+    } 
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> getBoard(String token, Long lastUserId) {
+
+        final User admin = userRepository.findByUsername(contextHelpers.getUsername());
+
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid user"));
+        }
+
+        if (!admin.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have access here"));
+        }
         PageRequest limit = PageRequest.of(0, 15);
 
         List<UserStatsDTO> users = new ArrayList<>();
@@ -46,7 +60,7 @@ public class AdminService {
             }
             reports_count = reportRepository.count();
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(null);
+            return ResponseEntity.internalServerError().body(Map.of("error", "we can get data"));
         }
         return ResponseEntity.ok(Map.of("users", users, "reportsCount", reports_count));
     }
@@ -61,18 +75,22 @@ public class AdminService {
         try {
             u = userRepository.findByUsername(username);
             if (u == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "the user is not valid"));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "the user is not valid"));
             }
-    
+
+            if (!u.getRole().equals(Role.Admin)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have access here"));
+            }
+
             PageRequest pageRequest = PageRequest.of(0, 10);
-    
+
             if (lastDate == null || lastId == null) {
                 reports = reportRepository.findInitialReports(pageRequest);
             } else {
                 reports = reportRepository.findNextReports(lastDate, lastId, pageRequest);
             }
             reports_count = reportRepository.count();
-            
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", "internal server error"));
 
@@ -83,6 +101,17 @@ public class AdminService {
 
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> DeleteReport(Long reportId) {
+
+          final User admin = userRepository.findByUsername(contextHelpers.getUsername());
+
+        if (admin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid user"));
+        }
+
+        if (!admin.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have access here"));
+        }
+        
         ReportEntity r = reportRepository.findById(reportId).orElse(null);
         if (r == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Bad Request"));

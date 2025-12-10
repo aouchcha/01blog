@@ -1,16 +1,13 @@
 package _blog.backend.Entitys.Interactions.Follow;
 
 import _blog.backend.Entitys.User.User;
-// import jakarta.persistence.Entity;
-// import jakarta.persistence.GeneratedValue;
-// import jakarta.persistence.GenerationType;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "follow")
 public class Follow {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment in PostgreSQL
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true)
     private Long id;
     

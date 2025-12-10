@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import _blog.backend.Entitys.Comment.Comment;
 import _blog.backend.Entitys.Interactions.Follow.Follow;
 import _blog.backend.Entitys.Interactions.Reactions.Like;
 import _blog.backend.Entitys.Notifications.NotificationEntity;
@@ -26,7 +27,7 @@ import jakarta.persistence.Table;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment in PostgreSQL
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
     @Column(unique = true, nullable = false)
     private Long id;
 
@@ -47,38 +48,41 @@ public class User {
 
     private boolean isbaned;
 
-    // Relations 👇
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("user") // avoid recursion
+    @JsonIgnoreProperties("user")
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "repported", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("repported") // avoid recursion
+    @JsonIgnoreProperties("repported")
     private List<ReportEntity> reports_against_me_list = new ArrayList<>();
 
     @OneToMany(mappedBy = "repporter", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("repporter") // avoid recursion
+    @JsonIgnoreProperties("repporter")
     private List<ReportEntity> reports_from_me = new ArrayList<>();
 
     @OneToMany(mappedBy = "followed", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("followed") // avoid recursion
+    @JsonIgnoreProperties("followed")
     private List<Follow> followers_list = new ArrayList<>();
 
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("follower") // avoid recursion
+    @JsonIgnoreProperties("follower")
     private List<Follow> followeds_list = new ArrayList<>();
 
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("creator") // avoid recursion
+    @JsonIgnoreProperties("creator")
     private List<NotificationEntity> created_byme_list = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("recipient") // avoid recursion
+    @JsonIgnoreProperties("recipient")
     private List<NotificationEntity> Follows_Forme_list = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties("user") // avoid recursion
+    @JsonIgnoreProperties("user")
     private List<Like> Like_List = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("user")
+    private List<Comment> Comments_list = new ArrayList<>();
 
     public User() {
     }
@@ -98,7 +102,6 @@ public class User {
         this.password = password;
     }
 
-    // Getters and setters
     public Long getId() {
         return this.id;
     }

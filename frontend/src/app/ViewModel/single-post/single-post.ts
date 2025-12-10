@@ -1,8 +1,7 @@
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { generateURL, generateHeader, CheckToken } from '../../helpers/genarateHeader';
+import { CommonModule } from '@angular/common';
+import { CheckToken } from '../../helpers/genarateHeader';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +15,7 @@ import { Comment } from '../../models/Comments';
 import { NotificationsService } from '../../services/notification.service';
 import { Confirmation } from '../confirmation/confirmation';
 import { Subject, takeUntil } from 'rxjs';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-single-post',
@@ -41,27 +41,21 @@ export class SinglePost implements OnInit {
   public content: String = "";
   public comments: any = [];
   public update: boolean = false;
-  // public post_id: number | null = null;
   public updatedTitle: string = '';
   public updatedDescription: string = '';
   public updatedMediaName: String | null = null;
   public updateMedia: File | null = null;
   public oldMediaName: string | null = null;
   public oldMedia: File | null = null;
-  public isBrowser: boolean = false;
   public comment_id: number | null = null;
   public type: string = '';
   private destroy$ = new Subject<void>();
-  updatePreviewUrl: string | null = null;
-  updateIsImage: boolean = false;
-  updateIsVideo: boolean = false;
+  public updatePreviewUrl: string | null = null;
+  public updateIsImage: boolean = false;
+  public updateIsVideo: boolean = false;
 
 
-  constructor(private router: Router, private http: HttpClient, private postsService: PostsService, private notifService: NotificationsService, private route: ActivatedRoute, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object) {
-    // this.postsService = postsService
-    this.isBrowser = isPlatformBrowser(platformId)
-
-  }
+  constructor(private router: Router, private postsService: PostsService, private notifService: NotificationsService, private route: ActivatedRoute, private userService: UserService, private toast: ToastService) { }
 
   ngOnInit(): void {
     this.token = CheckToken();
@@ -70,7 +64,6 @@ export class SinglePost implements OnInit {
       this.notifService.reactionsObservable
         .pipe(takeUntil(this.destroy$))
         .subscribe(react => {
-          console.log("single post react", react);
           this.post.likeCount = react.post.likeCount
         });
     }
@@ -93,9 +86,6 @@ export class SinglePost implements OnInit {
         }
 
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
     this.getPost()
   }
@@ -103,41 +93,29 @@ export class SinglePost implements OnInit {
   public getPost() {
     this.postsService.getSinglePost(this.token, this.post_id).subscribe({
       next: (res) => {
-        console.log({ res });
         this.post = res.post
         this.comments = res.comments
       },
-      error: (err) => {
-        console.log(err);
-        if (err.status === 401) {
-          this.router.navigate(["login"])
-        }
-      }
     })
   }
 
   public Comment() {
     this.postsService.CreateComment(this.content, this.post_id, this.token).subscribe({
-      next: (res) => {
+      next: () => {
         this.getPost()
         this.content = '';
-      },
-      error: (err) => {
-        console.log(err);
       },
     })
   }
 
   public ShowUpdate(): void {
-    console.log("hanni");
-
     this.update = true;
     this.updatedTitle = this.post.title;
     this.updatedDescription = this.post.description;
 
     if (this.post.media && this.post.mediaUrl) {
-      this.updateMedia = this.post.media;
-      this.oldMedia = this.post.media;
+      this.updateMedia = null;
+      this.oldMedia = null;
       this.updatedMediaName = this.post.mediaUrl.substring(30);
       this.oldMediaName = this.post.mediaUrl.substring(30);
       this.updatePreviewUrl = this.post.mediaUrl;
@@ -145,7 +123,7 @@ export class SinglePost implements OnInit {
     }
   }
 
-    public VideoOrImage(Url: string) {
+  public VideoOrImage(Url: string) {
     if (Url.endsWith(".mp4")) {
       this.updateIsVideo = true;
       this.updateIsImage = false;
@@ -186,37 +164,20 @@ export class SinglePost implements OnInit {
   }
 
   public UpdatePost() {
-    console.log({ "update alkhra": "" });
     const data = new FormData();
     data.append("title", this.updatedTitle);
     data.append("description", this.updatedDescription);
 
-    console.log({ "UpdatedMedia": this.updateMedia });
-    // console.log({ "OldMedia": this.oldMedia });
-    // console.log({ "UpdatedMediaName": this.updatedMediaName });
-    // console.log({ "OldMediaName": this.oldMediaName });
-
-
-    console.log(this.oldMedia === this.updateMedia);
-    console.log(this.oldMediaName === this.updatedMediaName);
-
-
-    if (this.updateMedia) {
-      data.append("media", this.updateMedia)
+    if (this.updateMedia && this.updateMedia instanceof File) {
+      data.append("media", this.updateMedia);
     }
     this.postsService.updatePost(this.token, this.post_id, data, this.Removed).subscribe({
       next: (res) => {
-        console.log(res.post);
-        // let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
         this.post = res.post;
         this.Removed = false;
         this.Cancel()
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
-    // this.postsService.updatePost(this.token, post_id)
   }
 
   public Removed: boolean = false;
@@ -271,16 +232,12 @@ export class SinglePost implements OnInit {
 
   public deletePost() {
     this.postsService.deletePost(this.token, this.post_id).subscribe({
-      next: (res) => {
-        console.log(res);
+      next: () => {
         this.CancelAction()
         setTimeout(() => {
           this.router.navigate([""])
         }, 2000);
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
 
   }
@@ -288,36 +245,23 @@ export class SinglePost implements OnInit {
   public hidePost() {
     this.postsService.HidePost(this.token, this.post_id).subscribe({
       next: (res: any) => {
-        console.log(res);
+        this.post.isHidden = res.post.isHidden
         this.CancelAction()
       },
-      error: (err: any) => {
-        console.log(err);
-      }
     })
-    console.log("hide Post");
-
-    console.log(this.post_id);
   }
 
   public unhidePost() {
     this.postsService.UnhidePost(this.token, this.post_id).subscribe({
       next: (res: any) => {
-        console.log(res);
+        this.post.isHidden = res.post.isHidden
         this.CancelAction()
       },
-      error: (err: any) => {
-        console.log(err);
-      }
     })
-    console.log("unhide Post");
-
-    console.log(this.post_id);
   }
 
   HandleAction(value: boolean) {
     if (!value) {
-      console.log("hanni");
       this.CancelAction()
     } else {
       if (this.type === 'post') {
@@ -337,20 +281,8 @@ export class SinglePost implements OnInit {
   }
 
   public React(post_id: number) {
-    // console.log(post_id);
-    // this.setToken();
-
     this.postsService.React(this.token, post_id).subscribe({
-      next: (res) => {
-        // console.log(res);
-        // this.posts = res.posts;
-        // this.stateup.detectChanges();
-        // this.getPost()
-        this.post.likeCount = res.post.likeCount
-      },
-      error: (err) => {
-        console.log(err);
-      }
+
     })
   }
 
@@ -370,15 +302,19 @@ export class SinglePost implements OnInit {
     this.post_id = post_id;
     this.comment_id = null;
     this.DoYouWantReport = true;
-    // this.type = 'post';CheckConfirmation
-    console.log("Open Report Section");
   }
 
   CheckBeforeReport() {
     if (this.Report_Description.trim() === '') {
-      // this.toast.showError('Please provide a description for the report.', 3000);
-      // return;
+      this.toast.showError('Please provide a description for the report.', 3000);
+      return;
     }
+
+    if (this.Report_Description.length > 500) {
+      this.toast.showError('Please provide a description for the report be less than 500 letter.', 3000);
+      return;
+    }
+
     this.showConfirmation = true;
     this.DoYouWantReport = false;
     this.confirmationAction = "Report";
@@ -388,31 +324,22 @@ export class SinglePost implements OnInit {
   }
 
   public ReportPost(): void {
-    // this.setToken();
     this.postsService.ReportPost(this.token, this.post_id, this.Report_Description).subscribe({
-      next: (res) => {
-        // this.toast.showSuccess('Post reported successfully.', 3000);
+      next: () => {
         this.CancelAction()
       },
-      error: (err) => {
-        // console.log(err);
-      }
     })
   }
 
   public deleteComment() {
     this.postsService.DeleteComment(this.token, this.comment_id).subscribe({
-      next: (res) => {
-        console.log(res);
+      next: () => {
         let index = this.comments.findIndex((c: Comment) => c.id === this.comment_id)
+        if (index === -1) return;
         this.comments.splice(index, 1)
         this.post.commentsCount -= 1;
         this.CancelAction()
-        // this.router.navigate([""])
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
 
   }

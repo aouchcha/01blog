@@ -1,6 +1,14 @@
 <div class="dashboard-container">
+    <!-- Add at the beginning of dashboard-container -->
+    <!-- Mobile menu button -->
+    <button class="mobile-menu-btn" (click)="toggleSidebar()"><mat-icon>menu</mat-icon></button>
+
+    <!-- Overlay -->
+    <div class="mobile-overlay" (click)="closeSidebar()"></div>
+
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" [class.open]="sidebarOpen">
+
         <div class="logo">
             <div class="logo-icon"></div>
             <span class="logo-text">O1Blog</span>
@@ -57,8 +65,8 @@
                         <th>IsBanned</th>
                     </tr>
                 </thead>
-                <tbody >
-                    <tr *ngFor="let u of filtredUsers" >
+                <tbody>
+                    <tr *ngFor="let u of filtredUsers">
                         <td class="user-cell" (click)="ToProfile(u.username)">
                             <!-- <img src="avatar-placeholder.jpg" alt="User" class="user-avatar"> -->
                             <span class="user-name">{{u.username}}</span>

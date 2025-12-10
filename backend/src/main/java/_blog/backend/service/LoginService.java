@@ -2,7 +2,6 @@ package _blog.backend.service;
 
 import java.util.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,32 +18,33 @@ import _blog.backend.Entitys.User.UserResponse;
 @Transactional
 public class LoginService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtils;
 
-    @Autowired
-    private JwtUtil jwtUtils;
+    public LoginService(UserRepository userRepository, JwtUtil jwtUtil) {
+        this.jwtUtils = jwtUtil;
+        this.userRepository = userRepository;
+    }
 
     public ResponseEntity<?> signin(LoginRequest request) {
-        // System.out.println(request.getUsername());
-        // System.out.println(request.getPassword());
+
         User user = null; 
 
         try {
             user = userRepository.findByUsername(request.getUsername());
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("message", "Ivalid Cridential"));
+                        .body(Map.of("error", "Ivalid Cridential"));
             }
     
             if (!PasswordUtils.checkPassword(request.getPassword(), user.getPassword())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("message", "Invalid Cridential"));
+                        .body(Map.of("error", "Invalid Cridential"));
             }
     
             if (user.getisbaned()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("message", "You are banned"));
+                        .body(Map.of("error", "You are banned"));
             }
             
         } catch (Exception e) {

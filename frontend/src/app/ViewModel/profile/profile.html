@@ -58,7 +58,7 @@
             <h3>Report User</h3>
             <div class="form-group">
               <textarea [(ngModel)]="description" required class="report-textarea"
-                placeholder="Describe the issue..."></textarea>
+                placeholder="Describe the issue..." maxlength="500" aria-required="true" ></textarea>
             </div>
             <div class="report-actions">
               <button class="action-btn primary-btn" (click)="CheckReport()">
@@ -180,7 +180,7 @@
       <h3>Report Post</h3>
       <div class="form-group">
         <textarea [(ngModel)]="Report_Description" required class="report-textarea"
-          placeholder="Describe the issue..."></textarea>
+          placeholder="Describe the issue..." maxlength="500" aria-required="true" ></textarea>
       </div>
       <div class="report-actions">
         <button class="action-btn primary-btn" (click)="CheckBeforeReport()">

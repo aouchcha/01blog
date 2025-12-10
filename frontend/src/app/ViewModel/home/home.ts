@@ -1,22 +1,22 @@
-import { ChangeDetectorRef, Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CheckToken } from '../../helpers/genarateHeader';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { FormsModule } from '@angular/forms'
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+
+import { Subject, takeUntil } from 'rxjs';
+
 import { PostsService } from '../../services/posts.service';
 import { UserService } from '../../services/user.service';
 import { NotificationsService } from '../../services/notification.service';
-import { Post } from '../../models/Post';
-import { HttpClient } from '@angular/common/http';
-import { Confirmation } from '../confirmation/confirmation';
-import { Subject } from 'rxjs'; // Import Subject
-import { takeUntil } from 'rxjs/operators'; // Import throttleTime
-// import { User } from '../../models/User';
 import { ToastService } from '../../services/toast.service';
+
+import { Post } from '../../models/Post';
+import { Confirmation } from '../confirmation/confirmation';
 
 
 @Component({
@@ -39,7 +39,7 @@ export class Home implements OnInit {
   public description: string = '';
   public updatedTitle: string = '';
   public updatedDescription: string = '';
-  public token: String | null = '';
+  private token: String | null = '';
   public posts: any = [];
   public me: any = {};
   public others: any = [];
@@ -52,12 +52,11 @@ export class Home implements OnInit {
   public post_id: number | null = null;
   public updatedMediaName: string | null = null;
   public updateMedia: File | null = null;
-  updatePreviewUrl: string | null = null;
-  updateIsImage: boolean = false;
-  updateIsVideo: boolean = false;
+  public updatePreviewUrl: string | null = null;
+  public updateIsImage: boolean = false;
+  public updateIsVideo: boolean = false;
   public oldMediaName: string | null = null;
   public oldMedia: File | null = null;
-  public isBrowser: boolean = false;
   public Notifs: any = [];
   public notifsCount: number = 0;
   public ShowNotifs: boolean = false;
@@ -71,17 +70,15 @@ export class Home implements OnInit {
   private destroy$ = new Subject<void>();
 
 
-  constructor(private router: Router, private postsService: PostsService, private userServise: UserService, @Inject(PLATFORM_ID) platformId: Object, private notifService: NotificationsService, private http: HttpClient, private toast: ToastService) {
-    this.isBrowser = isPlatformBrowser(platformId)
-  }
+  constructor(
+    private router: Router,
+    private postsService: PostsService,
+    private userServise: UserService,
+    private notifService: NotificationsService,
+    private toast: ToastService,
+  ) {  }
 
   ngOnInit(): void {
-    console.log({ "message": "hchithalQ w dkhelt" });
-
-    if (!this.isBrowser) {
-      return
-    }
-    // this.media?.
     this.setToken()
     this.loadHome()
 
@@ -94,10 +91,7 @@ export class Home implements OnInit {
     this.notifService.reactionsObservable
       .pipe(takeUntil(this.destroy$))
       .subscribe(react => {
-        console.log({ react });
         let index = this.posts.findIndex((p: Post) => p.id === react.post.id);
-        console.log({index});
-        
         if (index === -1) return;
         this.posts[index].likeCount = react.post.likeCount;
       });
@@ -112,8 +106,6 @@ export class Home implements OnInit {
 
   public setToken() {
     this.token = localStorage.getItem("JWT");
-    console.log(this.token);
-
   }
 
   public loadHome(): void {
@@ -133,8 +125,8 @@ export class Home implements OnInit {
     this.updateMedia = null;
     this.updatedMediaName = null;
     this.post_id = null;
-    // this.previewUrl = null;
-    // this.updatePreviewUrl = null;
+    this.previewUrl = null;
+    this.updatePreviewUrl = null;
     this.update = false;
     this.isImage = false;
     this.isVideo = false;
@@ -160,57 +152,64 @@ export class Home implements OnInit {
     const isVideo = file.type.startsWith("video/");
 
     reader.onload = () => {
-      if (helper === 'create') {
-        this.media = file;
-        this.mediaName = file.name;
-
-        this.previewUrl = reader.result as string;
-        this.isImage = isImage;
-        this.isVideo = isVideo;
-      }
-
-      else if (helper === 'update') {
-        this.Removed = true;
-        this.updateMedia = file;
-        this.updatedMediaName = file.name;
-
-        this.updatePreviewUrl = reader.result as string;
-        // console.log({isImage});
-        // console.log({isVideo});
-
-        this.updateIsImage = isImage;
-        this.updateIsVideo = isVideo;
-      }
+      this.handleSelectedMedia(helper, file, reader.result as string, isImage, isVideo);
     };
 
     reader.readAsDataURL(file);
   }
 
+  private handleSelectedMedia(helper: string, file: File, dataUrl: string, isImage: boolean, isVideo: boolean): void {
+    if (helper === 'create') {
+      this.media = file;
+      this.mediaName = file.name;
+      this.previewUrl = dataUrl;
+      this.isImage = isImage;
+      this.isVideo = isVideo;
+      return;
+    }
+
+    // update flow
+    this.Removed = true;
+    this.updateMedia = file;
+    this.updatedMediaName = file.name;
+    this.updatePreviewUrl = dataUrl;
+    this.updateIsImage = isImage;
+    this.updateIsVideo = isVideo;
+  }
+
 
   public CreatePost(): void {
+    if (this.title.trim() === '' || this.description.trim() === '') {
+      this.toast.showError('Title and Description are required.', 3000);
+      return;
+    }
+
+    if (this.title.length > 255) {
+      this.toast.showError('Title cannot exceed 255 characters.', 3000);
+      return;
+    }
+
+    if (this.description.length > 1000) {
+      this.toast.showError('Description cannot exceed 1000 characters.', 3000);
+      return;
+    }
+
     this.setToken();
     const data = new FormData();
     data.append("title", this.title);
     data.append("description", this.description);
     if (this.media) {
-      data.append("media", this.media)
+      data.append("media", this.media);
     }
 
     this.postsService.CreatePost(this.token, data).subscribe({
       next: () => {
-        this.Cancel()
+        this.Cancel();
         this.posts = [];
         this.lastPost = null;
         this.HasMorePosts = true;
         this.previewUrl = null;
-        this.HasMorePosts = true;
-        this.getAllPosts("feed");
-      },
-      error: (err) => {
-        console.log(err);
-        if (err.status === 403) {
-          this.router.navigate(["login"])
-        }
+        this.getAllPosts('feed');
       }
     })
   }
@@ -233,8 +232,6 @@ export class Home implements OnInit {
 
     this.postsService.getAllPosts(this.token, this.lastPost).subscribe({
       next: (res) => {
-        console.log({res});
-        
         if (res.posts && res.posts.length > 0) {
           this.posts = [...this.posts, ...res.posts];
           this.lastPost = this.posts[this.posts.length - 1];
@@ -244,12 +241,8 @@ export class Home implements OnInit {
 
         this.isLoading = false;
       },
-      error: (err) => {
-        console.log(err);
+      error: () => {
         this.isLoading = false;
-        if (err.status == 401) {
-          this.Logout();
-        }
       }
     });
   }
@@ -274,24 +267,18 @@ export class Home implements OnInit {
   }
 
   public getMe(): void {
-    console.log({ "TTTTTTTTTt": this.token });
-
     this.userServise.getMe(this.token).subscribe({
       next: (res) => {
-        console.log({ res });
-
         this.me = res.me;
         if (this.me.role === "Admin") {
-          this.toast.showError('Admins do not have access to home.', 3000 );
+          this.toast.showError('Admins do not have access to home.', 3000);
           this.Logout();
           return;
         };
+
         this.notifService.connect(this.me.id, this.token)
         this.notifsCount = res.notifCount;
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
@@ -305,15 +292,12 @@ export class Home implements OnInit {
           this.others = [...this.others, ...res.users];
           this.lastUserId = this.others[this.others.length - 1].id;
           this.isLoading = false;
-          console.log(this.others.length);
-
         } else {
           this.HasMoreUsers = false;
         }
       },
-      error: (err) => {
+      error: () => {
         this.isLoading = false;
-        console.log(err);
       }
     })
   }
@@ -328,15 +312,12 @@ export class Home implements OnInit {
     this.updatedTitle = post.title;
     this.updatedDescription = post.description;
     if (post.media && post.mediaUrl) {
-      this.updateMedia = post.media;
-      this.oldMedia = post.media;
+      this.updateMedia = null;
+      this.oldMedia = null;
       this.updatedMediaName = post.mediaUrl.substring(30);
       this.oldMediaName = post.mediaUrl.substring(30);
-      // console.log({"old media": this.oldMediaName});
       this.updatePreviewUrl = post.mediaUrl;
       this.VideoOrImage(this.oldMediaName);
-      // this.updateIsImage = true;
-      // this.old
     }
   }
 
@@ -357,8 +338,9 @@ export class Home implements OnInit {
     data.append("title", this.updatedTitle);
     data.append("description", this.updatedDescription);
 
-    if (this.updateMedia) {
-      data.append("media", this.updateMedia)
+    // Only append media if it's a File (user selected a new file).
+    if (this.updateMedia && this.updateMedia instanceof File) {
+      data.append("media", this.updateMedia);
     }
     this.postsService.updatePost(this.token, this.post_id, data, this.Removed).subscribe({
       next: (res) => {
@@ -367,9 +349,6 @@ export class Home implements OnInit {
         this.Removed = false;
         this.Cancel()
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
@@ -397,6 +376,9 @@ export class Home implements OnInit {
   public confirmationAction: string = 'Delete';
 
   CheckConfirmation(post_id: number) {
+    this.confirmationTitle = 'Delete Post?';
+    this.confirmationMessage = 'Are you sure you want to delete this post? This action cannot be undone.';
+    this.confirmationAction = 'Delete';
     this.post_id = post_id;
     this.showConfirmation = true;
   }
@@ -407,12 +389,11 @@ export class Home implements OnInit {
   OpenReportSection(post_id: number) {
     this.post_id = post_id;
     this.DoYouWantReport = true;
-    console.log("Open Report Section");
   }
 
   CheckBeforeReport() {
     if (this.Report_Description.trim() === '') {
-      this.toast.showError('Please provide a description for the report.', 3000 );
+      this.toast.showError('Please provide a description for the report.', 3000);
       return;
     }
     this.showConfirmation = true;
@@ -428,18 +409,14 @@ export class Home implements OnInit {
     this.postsService.deletePost(this.token, this.post_id).subscribe({
       next: (res) => {
         let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
+        if (index === -1) return;
         this.posts.splice(index, 1)
         this.lastPost = this.posts[this.posts.length - 1];
-        console.log({ "REMOVE LAST": this.lastPost });
-
         if (this.posts.length < 10) {
           this.getAllPosts('other')
         }
         this.CancelAction()
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
@@ -448,8 +425,6 @@ export class Home implements OnInit {
     this.DoYouWantReport = false;
     this.showConfirmation = false;
     this.post_id = null;
-    // console.log("CAncel action");
-    
   }
 
   HandleAction(value: boolean) {
@@ -460,9 +435,6 @@ export class Home implements OnInit {
         this.deletePost()
       } else if (this.confirmationAction === "Report") {
         this.ReportPost()
-        console.log({"Report Post": this.Report_Description});
-        // this.CancelAction()
-        
       }
     }
   }
@@ -470,42 +442,26 @@ export class Home implements OnInit {
   public ReportPost(): void {
     this.setToken();
     this.postsService.ReportPost(this.token, this.post_id, this.Report_Description).subscribe({
-      next: (res) => {
-        // this.toast.showSuccess('Post reported successfully.', 3000 );
+      next: () => {
         this.CancelAction()
       },
-      error: (err) => {
-        // console.log(err);
-      }
     })
   }
 
   public React(post_id: number): void {
     this.setToken();
-    this.postsService.React(this.token, post_id).subscribe({
-      next: () => {
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    })
+    this.postsService.React(this.token, post_id).subscribe({})
   }
 
   public Follow(user_id: number): void {
     this.setToken();
     this.userServise.Follow(user_id, this.token).subscribe({
-      next: (res) => {
-        console.log({ res });
+      next: () => {
         this.lastUserId = null;
         this.HasMoreUsers = true;
         this.others = [];
-        // let index = this.others.findIndex((u: User) => u.username === res.user.username);
-        // this.others[index] = res.user;
         this.getOthers()
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
@@ -525,21 +481,14 @@ export class Home implements OnInit {
 
     this.notifService.getNotifs(this.token, this.lastNotif).subscribe({
       next: (res) => {
-        console.log({ res });
-
         if (res.notifications && res.notifications.length > 0) {
           this.Notifs = [...this.Notifs, ...res.notifications];
           this.lastNotif = this.Notifs[this.Notifs.length - 1];
           this.isLoading = false;
-          console.log(this.Notifs.length);
-
         } else {
           this.HasMoreNotifs = false;
         }
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
@@ -574,11 +523,9 @@ export class Home implements OnInit {
       next: (res) => {
         this.notifsCount = this.notifsCount > 0 ? this.notifsCount - 1 : 0;
         let index = this.Notifs.findIndex((notif: any) => notif.id === notification_id);
+        if (index === -1) return;
         this.Notifs[index] = res.notification;
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
 
   }

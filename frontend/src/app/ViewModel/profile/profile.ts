@@ -14,7 +14,7 @@ import { Post } from '../../models/Post';
 import { Confirmation } from '../confirmation/confirmation';
 import { NotificationsService } from '../../services/notification.service';
 import { Subject, takeUntil } from 'rxjs';
-import { log } from 'node:console';
+import { ToastService } from '../../services/toast.service';
 
 
 @Component({
@@ -43,8 +43,6 @@ export class Profile implements OnInit {
   public DoYouWantReport: boolean = false;
   public DoYouWantReportPost: boolean = false;
   public description: string = "";
-  public isBrowser = false;
-  // public popupMessage: String = '';
   public showPopup: boolean = false;
   public ShowNotifs: boolean = false;
   public showConfirmation: boolean = false;
@@ -58,10 +56,7 @@ export class Profile implements OnInit {
   private lastPost: Post | null = null;
   public postscount: number = 0;
 
-  // public confirmationParams: any = {};
-
-  constructor(private router: Router, private route: ActivatedRoute, private notifService: NotificationsService, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object, private postService: PostsService) {
-    this.isBrowser = isPlatformBrowser(platformId)
+  constructor(private router: Router, private route: ActivatedRoute, private notifService: NotificationsService, private userService: UserService, private postService: PostsService, private toast: ToastService) {
   }
 
   public ngOnInit(): void {
@@ -75,10 +70,9 @@ export class Profile implements OnInit {
     if (this.me.role !== 'ADMIN') {
       this.notifService.reactionsObservable
         .pipe(takeUntil(this.destroy$))
-        .subscribe(react => {
-          console.log("profile react", react);
-  
+        .subscribe(react => {  
           let index = this.posts.findIndex((p: Post) => p.id === react.post.id);
+          if (index === -1) return;
           this.posts[index].likeCount = react.post.likeCount;
         });
     }
@@ -93,17 +87,12 @@ export class Profile implements OnInit {
   public getMe() {
     this.userService.getMe(this.token).subscribe({
       next: (res) => {
-        console.log({ "me": res.me });
-
         this.me = res.me;
         if (this.me.role !== "Admin") {
           this.notifService.connect(this.me.id, this.token)
         }
 
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
@@ -112,24 +101,20 @@ export class Profile implements OnInit {
     if (this.isLoading) return;
     this.userService.getProfile(this.username, this.token, this.lastPost).subscribe({
       next: (res) => {
-        console.log({ res });
         this.user = res.user;
         this.postscount = res.count;
-        // console.log({"ussssss":this.user});
         if (res.posts && res.posts.length > 0) {
           this.posts = [...this.posts, ...res.posts];
           this.lastPost = this.posts[this.posts.length - 1];
           this.followers = res.followers
           this.followings = res.followings
-          console.log(this.posts);
           this.isLoading = false
         } else {
           this.HasMorePosts = false;
         }
       },
-      error: (err) => {
+      error: () => {
         this.isLoading = false;
-        console.log(err);
       }
     })
   }
@@ -142,12 +127,9 @@ export class Profile implements OnInit {
     if (atBottom && !this.isLoading && this.HasMorePosts) {
       this.LoadProfile();
     }
-
   }
 
   public Home() {
-    console.log("home");
-
     this.router.navigate([""])
   }
 
@@ -156,15 +138,10 @@ export class Profile implements OnInit {
   }
 
   public Follow() {
-    console.log("zebbi");
-
     this.userService.Follow(this.user.id, this.token).subscribe({
-      next: (res) => {
+      next: () => {
         this.LoadProfile()
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
@@ -220,17 +197,15 @@ export class Profile implements OnInit {
 
   public hidePost() {
     this.postService.HidePost(this.token, this.post_id).subscribe({
-      next: (res: any) => {
-        console.log({ "rrrrrrrrrrrrrrrrr": res });
+      next: (res) => {
+        
+        let index = this.posts.findIndex((p: Post) => p.id == this.post_id);
+        if (index === -1) return;
+
+        this.posts[index].isHidden = res.post.isHidden;
         this.CancelAction()
       },
-      error: (err: any) => {
-        console.log(err);
-      }
     })
-    console.log("hide Post");
-
-    console.log(this.post_id);
   }
 
   public CheckReport() {
@@ -250,20 +225,11 @@ export class Profile implements OnInit {
     this.confirmationAction = 'Delete';
   }
 
-  // public setDescription(description: string) : void {
-  //   this.description = description
-  // }
-
   public Report() {
-    console.log("report", { name: this.user.username, description: this.description });
     this.userService.Report(this.user.username, this.description, this.token).subscribe({
-      next: (res) => {
-        console.log(res);
+      next: () => {
         this.Cancel();
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
@@ -277,7 +243,6 @@ export class Profile implements OnInit {
   }
 
   CancelAction() {
-    // this.
     this.showConfirmation = false;
     this.post_id = null;
     this.description = '';
@@ -295,12 +260,8 @@ export class Profile implements OnInit {
       if (this.confirmationAction === "Delete") {
         this.deletePost()
       } else if (this.confirmationAction === "Hide") {
-        console.log("hide Post");
-
         this.hidePost();
-        this.CancelAction();
       } else if (this.confirmationAction === "UnHide") {
-        console.log("unhide Post");
         this.unhidePost();
       } else if (this.confirmationAction === "Report") {
         this.ReportPost();
@@ -326,6 +287,7 @@ export class Profile implements OnInit {
       }
     }
   }
+
   public Report_Description: string = '';
   private type: string = '';
 
@@ -333,14 +295,17 @@ export class Profile implements OnInit {
     this.post_id = post_id;
     this.DoYouWantReportPost = true;
     this.DoYouWantReport = false;
-    // this.type = 'post';CheckConfirmation
-    console.log("Open Report Section");
   }
 
   CheckBeforeReport() {
     if (this.Report_Description.trim() === '') {
-      // this.toast.showError('Please provide a description for the report.', 3000);
-      // return;
+      this.toast.showError('Please provide a description for the report.', 3000);
+      return;
+    }
+
+    if (this.Report_Description.length > 500) {
+      this.toast.showError('Please provide a description for the report that is less than 500.', 3000);
+      return;
     }
     this.showConfirmation = true;
     this.DoYouWantReportPost = false;
@@ -354,76 +319,50 @@ export class Profile implements OnInit {
   public ReportPost(): void {
     this.setToken();
     this.postService.ReportPost(this.token, this.post_id, this.Report_Description).subscribe({
-      next: (res) => {
-        // this.toast.showSuccess('Post reported successfully.', 3000 );
+      next: () => {
         this.CancelAction()
       },
-      error: (err) => {
-        // console.log(err);
-      }
     })
   }
 
   public unhidePost() {
     this.postService.UnhidePost(this.token, this.post_id).subscribe({
-      next: (res: any) => {
-        console.log(res);
+      next: (res) => {
+        let index = this.posts.findIndex((p: Post) => p.id == this.post_id);
+        if (index === -1) return;
+
+        this.posts[index].isHidden = res.post.isHidden;
         this.CancelAction()
       },
-      error: (err: any) => {
-        console.log(err);
-      }
     })
-    console.log("unhide Post");
-
-    console.log(this.post_id);
   }
 
 
   public RemoveUser() {
-    console.log("hanni");
-
     this.userService.RemoveUser(this.user.username, this.token).subscribe({
-      next: (res) => {
-        console.log(res);
+      next: () => {
         this.router.navigate(["admin"])
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
   public UnBanUser() {
     this.setToken()
     this.userService.UnBanUserr(this.user.username, this.token).subscribe({
-      next: (res) => {
+      next: () => {
         this.user.isbaned = !this.user.isbaned;
-        console.log(res);
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
   public BanUser() {
     this.setToken()
     this.userService.BanUserr(this.user.username, this.token).subscribe({
-      next: (res) => {
+      next: () => {
         this.user.isbaned = !this.user.isbaned;
-        console.log(res);
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
-
-  // public closePopup() {
-  //   this.showPopup = false;
-  //   // this.popupMessage = '';
-  // }
 
   public setToken() {
     if (CheckToken() === null) {
@@ -434,13 +373,11 @@ export class Profile implements OnInit {
   }
 
   public deletePost() {
-    console.log(this.post_id);
-
     this.setToken();
     this.postService.deletePost(this.token, this.post_id).subscribe({
-      next: (res) => {
-        console.log(res);
+      next: () => {
         let index = this.posts.findIndex((p: Post) => p.id === this.post_id)
+        if (index === -1) return;
         this.posts.splice(index, 1)
         this.lastPost = this.posts[this.posts.length - 1];
         this.CancelAction()
@@ -448,22 +385,16 @@ export class Profile implements OnInit {
           this.LoadProfile()
         }
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
   public React(post_id: number) {
     this.postService.React(this.token, post_id).subscribe({
       next: (res) => {
-        console.log("Profile Result", res);
         let index = this.posts.findIndex((p: Post) => p.id === res.post.id)
+        if (index === -1) return;
         this.posts[index].likeCount = res.post.likeCount;
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 

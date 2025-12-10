@@ -478,6 +478,7 @@
   color: #1a1a1a;
   margin-bottom: 12px;
   justify-self: center;
+  word-break: break-all;
 }
 
 .post-content p {

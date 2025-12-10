@@ -29,7 +29,6 @@ export class AdminService {
     }
 
     public loadReports(token: String | null, lastReport: any) : Observable<any> {
-        // console.log({token});
         let params = new HttpParams();
         if (lastReport !== null) {
             params = params

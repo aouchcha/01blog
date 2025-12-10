@@ -1,9 +1,9 @@
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CheckToken } from '../../helpers/genarateHeader';
 import { AdminService } from '../../services/admin.service';
 import { User } from '../../models/User';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
@@ -26,22 +26,16 @@ export class Admin implements OnInit {
   public usersStates: User[] = [];
   public OriginaleUsers: User[] = [];
   public filtredUsers: any = [];
-  public isBrowser: boolean = false;
   public report_count: number = 0;
   public isLoading: boolean = false;
   public lastUserId: number | null = null;
   public HasMoreUsers: boolean = true;
 
 
-  public constructor(private router: Router, private adminService: AdminService, private userService: UserService, @Inject(PLATFORM_ID) platformId: Object) {
-    this.isBrowser = isPlatformBrowser(platformId)
+  public constructor(private router: Router, private adminService: AdminService, private userService: UserService) {
   }
 
   ngOnInit(): void {
-    if (!this.isBrowser) {
-      return
-    }
-
     this.token = CheckToken();
     this.getAdminInfo()
     this.getDashboard()
@@ -52,9 +46,6 @@ export class Admin implements OnInit {
       next: (res) => {
         this.admin = res.me;
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
@@ -63,8 +54,6 @@ export class Admin implements OnInit {
 
     const atBottom = element.scrollHeight - element.scrollTop <= element.clientHeight + 50;
     if (atBottom && !this.isLoading && this.HasMoreUsers) {
-      console.log({ "mwssage": "wsset lekher" });
-
       this.getDashboard();
     }
   }
@@ -74,8 +63,6 @@ export class Admin implements OnInit {
 
     this.adminService.getDashBoard(this.token, this.lastUserId).subscribe({
       next: (res) => {
-        console.log({ res });
-
         if (res.users && res.users.length > 0) {
           this.OriginaleUsers = [...this.OriginaleUsers, ...res.users];
           this.lastUserId = this.OriginaleUsers[this.OriginaleUsers.length - 1].id;
@@ -90,15 +77,10 @@ export class Admin implements OnInit {
         this.report_count = res.reportsCount;
 
       },
-      error: (err) => {
-        console.log(err);
-      }
     })
   }
 
   public ToProfile(username: String) {
-    console.log({ username });
-
     this.router.navigate([`user/${username}`])
   }
 
@@ -109,23 +91,30 @@ export class Admin implements OnInit {
   }
 
   public ShowReports() {
-
     this.router.navigate(["reports"])
   }
 
   Filter() {
-    console.log(this.search);
-
     if (this.search.length === 0) {
       this.filtredUsers = this.OriginaleUsers;
     }
     this.filtredUsers = this.usersStates.filter((u) => {
       return u.username?.startsWith(this.search)
     })
-
   }
 
   public ToDashboard() {
     this.router.navigate(["admin"])
   }
+
+  sidebarOpen = false;
+
+  toggleSidebar() {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  closeSidebar() {
+    this.sidebarOpen = false;
+  }
+
 }

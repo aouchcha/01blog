@@ -9,9 +9,7 @@ import { Injectable } from "@angular/core";
 export class authService {
     public constructor(private http: HttpClient) {}
 
-    public Login(body: Object) : Observable<any> {
-        console.log(body);
-        
+    public Login(body: Object) : Observable<any> {        
         return this.http.post<any>(
             'http://localhost:8080/api/login', 
             body

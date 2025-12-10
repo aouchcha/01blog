@@ -71,7 +71,8 @@
                 <button class="action-btn">
                     <mat-icon>comment</mat-icon> {{ post.commentsCount || 0 }}
                 </button>
-                <button class="action-btn" *ngIf="post.user.username !== me.username" (click)="OpenReportSection(post.id)">
+                <button class="action-btn" *ngIf="post.user.username !== me.username"
+                    (click)="OpenReportSection(post.id)">
                     <mat-icon>report</mat-icon>
                 </button>
             </div>
@@ -84,15 +85,14 @@
                     <h2>Update Post</h2>
                     <button class="modal-close" (click)="Cancel()">✕</button>
                 </div>
-                <textarea [(ngModel)]="updatedTitle" placeholder="Update your title..."
-                    class="modal-textarea"></textarea>
+                <textarea [(ngModel)]="updatedTitle" placeholder="Update your title..." class="modal-textarea"
+                    maxlength="255" required></textarea>
                 <textarea [(ngModel)]="updatedDescription" placeholder="Update your description..."
-                    class="modal-textarea"></textarea>
+                    class="modal-textarea" maxlength="1000" required></textarea>
 
                 <label for="UpdateMedia" class="modal-media-btn">Select Media</label>
                 <input type="file" id="UpdateMedia" (change)="setMedia($event)" class="media-input"
                     accept="image/*, video/*">
-                <!-- ///////////////////////////////////////////////////////////////// -->
                 <div class="media-preview" *ngIf="updatePreviewUrl">
                     <button class="close-btn" (click)="RemoveImage()">✕</button>
 
@@ -101,7 +101,6 @@
 
                     <p><b>{{ updatedMediaName }}</b></p>
                 </div>
-                <!-- ///////////////////////////////////////////////////////////////// -->
                 <div class="modal-actions">
                     <button class="modal-save-btn" (click)="UpdatePost()">Save</button>
                     <button class="modal-cancel-btn" (click)="Cancel()">Cancel</button>
@@ -118,8 +117,8 @@
                 <img src="../../assets/icons/pngtree-outline-user-icon-png-image_5045523.jpg" alt="Your Avatar"
                     class="comment-avatar">
                 <div class="comment-input-wrapper">
-                    <textarea [(ngModel)]="content" placeholder="Write a comment..."
-                        class="comment-textarea"></textarea>
+                    <textarea [(ngModel)]="content" placeholder="Write a comment..." class="comment-textarea"
+                        maxlength="100" required></textarea>
                     <button class="comment-submit-btn" (click)="Comment()">
                         <mat-icon>send</mat-icon>
                         Comment
@@ -169,7 +168,7 @@
                 <h3>Report Post</h3>
                 <div class="form-group">
                     <textarea [(ngModel)]="Report_Description" required class="report-textarea"
-                        placeholder="Describe the issue..."></textarea>
+                        placeholder="Describe the issue..." maxlength="500" aria-required="true"></textarea>
                 </div>
                 <div class="report-actions">
                     <button class="action-btn primary-btn" (click)="CheckBeforeReport()">

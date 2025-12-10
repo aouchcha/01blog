@@ -29,7 +29,7 @@ public class ReportEntity {
     @JoinColumn(name = "repporter_id", nullable = false)
     private User repporter;
 
-    @Nonnull
+    @Column(nullable = false, length = 500)
     private String description;
 
     @Nonnull

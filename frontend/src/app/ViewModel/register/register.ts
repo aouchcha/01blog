@@ -15,7 +15,6 @@ export class Register {
   password: string = '';
   email: string = '';
   error: String = '';
-  // sss: ChangeDetectorRef;
 
   constructor(private router: Router, private authService: authService, private stateup: ChangeDetectorRef) { };
 
@@ -32,8 +31,6 @@ export class Register {
   }
 
   public ToLogin() {
-    console.log("hanni");
-
     this.router.navigate(["login"]);
   }
 
@@ -45,19 +42,9 @@ export class Register {
     }
 
     this.authService.Register(user).subscribe({
-      next: (response) => {
-        console.log('Registration successful:', response);
-        // Redirect to login on success
-        this.router.navigate(['']);
+      next: () => {
+        this.router.navigate(['/login']);
       },
-      error: (error) => {
-        // this.error = error.error;
-        // this.stateup.detectChanges();
-        // setTimeout(() => {
-        //   this.error = '';
-        //   this.stateup.detectChanges();
-        // }, 5000);
-      }
     })
   }
 }

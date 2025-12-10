@@ -1,11 +1,12 @@
 package _blog.backend.service;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-@Service
+
+@Component
 public class RateLimiterService {
     private static final int MAX_REQUESTS = 10;
     private static final long WINDOW_MS = 1000;
@@ -26,8 +27,6 @@ public class RateLimiterService {
                     existingRate.timestamp = now;
                 } else if (existingRate.count < MAX_REQUESTS) {
                     existingRate.count++;
-                } else {
-                    System.out.println("Rate limit exceeded for user: " + username);
                 }
                 return existingRate;
             }

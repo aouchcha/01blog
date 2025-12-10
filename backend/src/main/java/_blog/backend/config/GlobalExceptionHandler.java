@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import _blog.backend.helpers.InvalidJwtException;
 import io.jsonwebtoken.io.IOException;
@@ -50,7 +51,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         String errorMessage = "Data integrity violation occurred.";
 
-        // Check if it's a duplicate key error
         if (ex.getMessage() != null && ex.getMessage().contains("duplicate key")) {
             errorMessage = "You have already reacted to this post.";
         }
@@ -58,5 +58,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(Map.of("error", errorMessage));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<?> handleBigSize(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "You passed the max size 10MB"));
     }
 }

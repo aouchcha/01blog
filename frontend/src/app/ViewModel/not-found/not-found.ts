@@ -1,4 +1,3 @@
-// src/app/ViewModel/not-found/not-found.component.ts
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';

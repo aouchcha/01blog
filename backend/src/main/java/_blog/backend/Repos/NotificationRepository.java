@@ -21,13 +21,10 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
 
     List<NotificationEntity> findByRecipient_IdAndSeenFalse(Long recipientId);
 
-    // First page: Get initial 10 notifications ordered by createdAt DESC, then id
-    // DESC
     List<NotificationEntity> findByRecipientIdOrderByCreatedAtDescIdDesc(
             Long recipientId,
             Pageable pageable);
 
-    // Subsequent pages: Get notifications older than the cursor (lastDate, lastId)
     @Query("SELECT n FROM NotificationEntity n WHERE n.recipient.id = :recipientId " +
             "AND (n.createdAt < :lastDate OR (n.createdAt = :lastDate AND n.id < :lastId)) " +
             "ORDER BY n.createdAt DESC, n.id DESC")

@@ -65,3 +65,77 @@
 .confirm-btn.cancel:hover {
   background-color: #e0e0e0;
 }
+
+/* Mobile Responsiveness */
+@media screen and (max-width: 768px) {
+  .confirmation-modal {
+    padding: 24px;
+    max-width: 90%;
+  }
+
+  .confirmation-modal h3 {
+    font-size: 20px;
+  }
+
+  .confirmation-modal p {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .confirm-btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .confirmation-modal {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .confirmation-icon {
+    margin-bottom: 16px;
+  }
+
+  .confirmation-modal h3 {
+    font-size: 18px;
+  }
+
+  .confirmation-modal p {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .confirmation-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .confirm-btn {
+    padding: 12px 16px;
+    font-size: 13px;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .confirmation-modal {
+    padding: 16px;
+  }
+
+  .confirmation-modal h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .confirmation-modal p {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .confirm-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}

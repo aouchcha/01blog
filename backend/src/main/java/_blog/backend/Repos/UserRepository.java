@@ -32,7 +32,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u.id FROM User u WHERE u.username = :username")
     Long findIdByUsername(@Param("username") String username);
 
-    // First page query
     @Query("""
                 SELECT new _blog.backend.Entitys.User.UserStatsDTO (
                     u.id,
@@ -51,7 +50,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             """)
     List<UserStatsDTO> findUsersStates(Pageable pageable);
 
-    // Subsequent pages query
     @Query("""
                 SELECT new _blog.backend.Entitys.User.UserStatsDTO (
                     u.id,

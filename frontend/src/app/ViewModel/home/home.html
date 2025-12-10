@@ -80,10 +80,10 @@
                 <div class="areas">
 
                     <textarea [(ngModel)]="title" placeholder="Write Blog Title..." class="post-textarea"
-                        id="title"></textarea>
+                        id="title" maxlength="255" required></textarea>
 
                     <textarea [(ngModel)]="description" placeholder="Write Blog Description..."
-                        class="post-textarea"></textarea>
+                        class="post-textarea" maxlength="1000" required></textarea>
                 </div>
             </div>
 
@@ -103,7 +103,7 @@
                     Select Media
                 </label>
                 <input type="file" id="Media" (change)="setMedia($event, 'create')" class="media-input"
-                    accept="image/*, video/*">
+                    >
                 <button class="share-btn" (click)="CreatePost()">Share</button>
                 <button class="cancel-btn" (click)="Cancel()">Cancel</button>
             </div>
@@ -181,14 +181,13 @@
                     <button class="modal-close" (click)="Cancel()">✕</button>
                 </div>
                 <textarea [(ngModel)]="updatedTitle" placeholder="Update your title..."
-                    class="modal-textarea"></textarea>
+                    class="modal-textarea" maxlength="255" required > </textarea>
                 <textarea [(ngModel)]="updatedDescription" placeholder="Update your description..."
-                    class="modal-textarea"></textarea>
+                    class="modal-textarea" maxlength="1000" required ></textarea>
 
                 <label for="UpdateMedia" class="modal-media-btn">Select Media</label>
                 <input type="file" id="UpdateMedia" (change)="setMedia($event, 'update')" class="media-input"
                     accept="image/*, video/*">
-                <!-- ///////////////////////////////////////////////////////////////// -->
                 <div class="media-preview" *ngIf="updatePreviewUrl">
                     <button class="close-btn" (click)="RemoveImage('edit')">✕</button>
 
@@ -197,7 +196,6 @@
 
                     <p><b>{{ updatedMediaName }}</b></p>
                 </div>
-                <!-- ///////////////////////////////////////////////////////////////// -->
                 <div class="modal-actions">
                     <button class="modal-save-btn" (click)="UpdatePost()">Save</button>
                     <button class="modal-cancel-btn" (click)="Cancel()">Cancel</button>
@@ -216,7 +214,7 @@
                 <h3>Report Post</h3>
                 <div class="form-group">
                     <textarea [(ngModel)]="Report_Description" required class="report-textarea"
-                        placeholder="Describe the issue..."></textarea>
+                        placeholder="Describe the issue..." maxlength="500" aria-required="true" ></textarea>
                 </div>
                 <div class="report-actions">
                     <button class="action-btn primary-btn" (click)="CheckBeforeReport()">

@@ -99,6 +99,192 @@
   overflow-y: auto;
 }
 
+/* Mobile Responsiveness */
+@media screen and (max-width: 768px) {
+  .reports-header {
+    padding: 16px 20px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .reports-header h1 {
+    font-size: 24px;
+  }
+
+  .header-stats {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .stat-badge {
+    padding: 10px 16px;
+  }
+
+  .stat-number {
+    font-size: 20px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+
+  .reports-main {
+    padding: 20px;
+  }
+
+  .reports-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .reports-header {
+    padding: 12px 16px;
+  }
+
+  .reports-header h1 {
+    font-size: 20px;
+  }
+
+  .back-button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .header-stats {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .stat-badge {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 12px 16px;
+  }
+
+  .stat-number {
+    font-size: 18px;
+  }
+
+  .reports-main {
+    padding: 12px;
+    height: auto;
+  }
+
+  .reports-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .report-card {
+    border-radius: 10px;
+  }
+
+  .report-card-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .report-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .report-user-info strong {
+    font-size: 13px;
+  }
+
+  .report-user-info span {
+    font-size: 11px;
+  }
+
+  .report-type-badge {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .report-status {
+    padding: 12px 16px;
+  }
+
+  .reason-badge {
+    font-size: 12px;
+  }
+
+  .report-footer {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .report-footer button {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .reports-header {
+    padding: 10px 12px;
+  }
+
+  .reports-header h1 {
+    font-size: 18px;
+  }
+
+  .back-button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .stat-badge {
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+
+  .stat-number {
+    font-size: 16px;
+  }
+
+  .reports-main {
+    padding: 10px;
+  }
+
+  .report-card {
+    margin-bottom: 12px;
+  }
+
+  .report-card-header {
+    padding: 12px;
+  }
+
+  .report-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .report-status {
+    padding: 10px 12px;
+  }
+
+  .report-footer {
+    padding: 10px 12px;
+    flex-direction: column;
+  }
+
+  .report-footer button {
+    width: 100%;
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+}
+
+
 /* Empty State */
 .empty-state {
   background-color: white;

@@ -62,13 +62,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                     OR (p.createdAt = :lastDate AND p.id < :lastId)
                 )
                 ORDER BY p.createdAt DESC, p.id DESC
-            """)
+            """) 
     List<Post> findNextFeedPosts(@Param("userId") Long userId,
             @Param("lastDate") LocalDateTime lastDate,
             @Param("lastId") Long lastId,
             Pageable pageable);
 
-    // @SuppressWarnings("null")
     boolean existsById(Long id);
 
     Long countByUserId(Long id);

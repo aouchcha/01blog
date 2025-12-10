@@ -31,16 +31,18 @@ public class NotificationService {
     private static final int NOTIFICATION_PAGE_SIZE = 20;
     private static final int MAX_CONNECTIONS_PER_USER = 5;
 
-    @Autowired
-    private NotificationRepository notificationRepository;
+    private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private UserRepository userRepository;
+    public NotificationService(NotificationRepository notificationRepository, 
+                              UserRepository userRepository, 
+                              JwtUtil jwtUtil) {
+        this.notificationRepository = notificationRepository;
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+    }
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    // Fully thread-safe
     private final Map<Long, Set<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
     public SseEmitter connect(Long userId, String lastEventIdHeader, String token) {
@@ -133,7 +135,6 @@ public class NotificationService {
     }
 
     private void sendReactionEvent(SseEmitter emitter, Like like, Post p) {
-        System.out.println("like sent in the sse " + p.getLikeCount());
         try {
             emitter.send(SseEmitter.event()
                     .id(String.valueOf(like.getId()))

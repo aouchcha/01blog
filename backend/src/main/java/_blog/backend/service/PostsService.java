@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,44 +26,41 @@ import _blog.backend.Entitys.User.Role;
 
 @Service
 public class PostsService {
-    @Autowired
-    private PostRepository postRepository;
-    
-    @Autowired
-    private ContextHelpers contextHelpers;
-    
-    @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private CommentRepository commentRepository;
-    
-    @Autowired
-    private HandleMedia MediaUtils;
+    private final PostRepository postRepository;
+    private final ContextHelpers contextHelpers;
+    private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final HandleMedia MediaUtils;
+
+    public PostsService(PostRepository postRepository, ContextHelpers contextHelpers,
+            UserRepository userRepository, CommentRepository commentRepository, HandleMedia MediaUtils) {
+        this.postRepository = postRepository;
+        this.contextHelpers = contextHelpers;
+        this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
+        this.MediaUtils = MediaUtils;
+    }
 
     public ResponseEntity<?> getPosts(LocalDateTime lastDate, Long lastId) {
         final String username = contextHelpers.getUsername();
         final User me = userRepository.findByUsername(username);
 
         if (me == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "the user is not valid"));
         }
 
         if (me.getisbaned()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "You are banned"));
+                    .body(Map.of("error", "You are banned"));
         }
 
         List<Post> posts;
 
-        // We enforce a limit of 10
         PageRequest limit = PageRequest.of(0, 10);
 
         if (lastDate == null || lastId == null) {
-            // Case 1: First load (Top 10)
             posts = postRepository.findInitialFeedPosts(me.getId(), limit);
         } else {
-            // Case 2: Scrolling (Next 10 after the cursor)
             posts = postRepository.findNextFeedPosts(me.getId(), lastDate, lastId, limit);
         }
 
@@ -77,12 +73,12 @@ public class PostsService {
         final User me = userRepository.findByUsername(username);
 
         if (me == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "the user is not valid"));
         }
 
         if (me.getisbaned()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "You are banned"));
+                    .body(Map.of("error", "You are banned"));
         }
 
         final Post p = postRepository.findById(post_id).orElse(null);
@@ -93,13 +89,13 @@ public class PostsService {
 
         if (p.getIsHidden() && !me.getRole().equals(Role.Admin)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "This post is hidden"));
+                    .body(Map.of("error", "This post is hidden"));
         }
 
         List<Comment> comments = commentRepository.findAllByPost_id(post_id);
 
         if (comments == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "the user is not valid"));
         }
 
         return ResponseEntity.ok().body(Map.of("comments", comments, "post", p));
@@ -111,22 +107,23 @@ public class PostsService {
         final User me = userRepository.findByUsername(contextHelpers.getUsername());
 
         if (me == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "the user is not valid"));
         }
 
         if (me.getisbaned()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "You are banned"));
+                    .body(Map.of("error", "You are banned"));
         }
 
         Post p = postRepository.findById(post_id).orElse(null);
 
         if (p == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Post doesn't removed"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Post doesn't removed"));
         }
 
         if (p.getUser().getId() != me.getId() && me.getRole().equals(Role.User)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "You are not allowed to delete this post"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "You are not allowed to delete this post"));
         }
 
         if (p.getMedia() != null) {
@@ -134,7 +131,7 @@ public class PostsService {
             try {
                 Files.deleteIfExists(path);
             } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
             }
         }
 
@@ -145,20 +142,16 @@ public class PostsService {
 
     @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> update(Long post_id, PostRequst postRequst, boolean removed) {
-        // if (!postRepository.existsById(post_id)) {
-        // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message",
-        // "invalid post id"));
-        // }
 
         final User me = userRepository.findByUsername(contextHelpers.getUsername());
 
         if (me == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "the user is not valid"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "the user is not valid"));
         }
 
         if (me.getisbaned()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "You are banned"));
+                    .body(Map.of("error", "You are banned"));
         }
 
         Post up = postRepository.findById(post_id).orElse(null);
@@ -168,23 +161,25 @@ public class PostsService {
         }
 
         if (up.getUser().getId() != me.getId()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "You are not allowed to update this post"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "You are not allowed to update this post"));
         }
 
         if (up.getIsHidden()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "You are not allowed to update a hidden post"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "You are not allowed to update a hidden post"));
         }
 
         if (postRequst.getTitle().trim().isEmpty() ||
-                postRequst.getTitle().length() > 100) {
+                postRequst.getTitle().length() > 255) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Description is invalid"));
+                    .body(Map.of("error", "Title is invalid"));
         }
 
         if (postRequst.getDescription().trim().isEmpty() ||
                 postRequst.getDescription().length() > 1000) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "Description is invalid"));
+                    .body(Map.of("error", "Description is invalid"));
         }
 
         up.setTitle(postRequst.getTitle());
@@ -192,12 +187,11 @@ public class PostsService {
         if (removed) {
             if (up.getMedia() != null) {
                 Path path = Paths.get("../backend/uploads", up.getMedia());
-                ///home/aouchcha/Desktop/01blog/backend/uploads
                 try {
                     Files.deleteIfExists(path);
                 } catch (Exception e) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(Map.of("message", e.getMessage()));
+                            .body(Map.of("error", e.getMessage()));
                 }
             }
 
@@ -206,7 +200,7 @@ public class PostsService {
         }
         if (!MediaUtils.save(up, postRequst)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Internal Server Error"));
+                    .body(Map.of("error", "Internal Server Error"));
         }
 
         postRepository.save(up);
@@ -216,6 +210,17 @@ public class PostsService {
 
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> HidePost(Long post_id) {
+        final User me = userRepository.findByUsername(contextHelpers.getUsername());
+
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "you doesn't exist"));
+        }
+
+        if (!me.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "you don't have acess to hide this post"));
+        }
+
         Post p = postRepository.findById(post_id).orElse(null);
 
         if (p == null) {
@@ -230,6 +235,18 @@ public class PostsService {
 
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> UnhidePost(Long post_id) {
+
+        final User me = userRepository.findByUsername(contextHelpers.getUsername());
+
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "you doesn't exist"));
+        }
+
+        if (!me.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "you don't have acess to hide this post"));
+        }
+
         Post p = postRepository.findById(post_id).orElse(null);
 
         if (p == null) {

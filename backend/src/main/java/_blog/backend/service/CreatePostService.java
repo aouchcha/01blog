@@ -4,60 +4,48 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-// import org.springframework.transaction.annotation.Transactional;
 
 import _blog.backend.Entitys.Post.PostRequst;
-// import _blog.backend.Entitys.Post.PostResponse;
 import _blog.backend.Repos.FollowRepositry;
 import _blog.backend.Repos.PostRepository;
 import _blog.backend.Repos.UserRepository;
 import _blog.backend.Entitys.Post.Post;
 import _blog.backend.Entitys.User.User;
-// import _blog.backend.Entitys.User.UserResponse;
 import _blog.backend.Entitys.Interactions.Follow.Follow;
 
 
-// import _blog.backend.helpers.JwtUtil;
 import _blog.backend.helpers.ContextHelpers;
 import _blog.backend.helpers.HandleMedia;
 
 @Service
 public class CreatePostService {
+    private final ContextHelpers contextHelpers;
+        private final HandleMedia mediaUtils;
+        private final UserRepository userRepository;
+        private final PostRepository postRepository;
+        private final FollowRepositry followRepositry;
+        private final NotificationService notificationService;
+        private final RateLimiterService rateLimiterService;
 
-    @Autowired
-    private ContextHelpers contextHelpers;
-
-    @Autowired
-    private HandleMedia mediaUtils;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PostRepository postRepository;
-
-    @Autowired
-    private FollowRepositry followRepositry;
-
-    @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
-    private RateLimiterService rateLimiterService;
+        public CreatePostService(ContextHelpers contextHelpers, HandleMedia mediaUtils,
+                UserRepository userRepository, PostRepository postRepository,
+                FollowRepositry followRepositry, NotificationService notificationService,
+                RateLimiterService rateLimiterService) {
+            this.contextHelpers = contextHelpers;
+            this.mediaUtils = mediaUtils;
+            this.userRepository = userRepository;
+            this.postRepository = postRepository;
+            this.followRepositry = followRepositry;
+            this.notificationService = notificationService;
+            this.rateLimiterService = rateLimiterService;
+        }
     
     @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> create(PostRequst postRequest) {
-
-        // if (!jwtUtil.validateToken(token)) {
-        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-        //             .body(Map.of("message", "your token isn't valid"));
-        // }
-
         final String username = contextHelpers.getUsername();   
 
          if (!rateLimiterService.isAllowed(username)) {
@@ -65,7 +53,7 @@ public class CreatePostService {
         }
 
          if (postRequest.getTitle().trim().isEmpty() ||
-            postRequest.getTitle().length() > 100) {
+            postRequest.getTitle().length() > 255) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "Title is invalid"));
         }
@@ -79,7 +67,7 @@ public class CreatePostService {
         final User u = userRepository.findByUsername(username);
 
         if (u == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "the user is not valid"));
         }
 
@@ -93,6 +81,12 @@ public class CreatePostService {
         newPost.setTitle(postRequest.getTitle());
         newPost.setCreatedAt(LocalDateTime.now());
         newPost.setUser(u);
+
+        if (postRequest.getMedia() != null) {
+            if (!postRequest.getMedia().getContentType().startsWith("image/") && !postRequest.getMedia().getContentType().startsWith("video/")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The media should be image or video")); 
+            }
+        }
 
         if (!mediaUtils.save(newPost, postRequest)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -25,7 +25,7 @@ public class RegisterService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The username is required"));
         }
 
-        if (!isValidName(request.getUsername().trim())) {
+        if (!isValidName(request.getUsername().trim()) || request.getUsername().length() > 15) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The username is malformed"));
         }
         if (request.getEmail().trim().isEmpty() || !isValidEmail(request.getEmail())) {
@@ -35,8 +35,8 @@ public class RegisterService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The password is required"));
         }
 
-        if (request.getPassword().length() > 50 || request.getPassword().length() < 8 ) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The password must be between 8 and 50 characters"));
+        if (request.getPassword().length() > 15 || request.getPassword().length() < 8 ) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The password must be between 8 and 15 characters"));
         }
 
         if (userRepositry.existsByEmail(request.getEmail())) {

@@ -2,7 +2,6 @@ package _blog.backend.Entitys.Post;
 
 import java.time.LocalDateTime;
 
-// import jakarta.annotation.Nonnull;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,7 +25,7 @@ import java.util.*;
 @Table(name = "posts")
 public class Post {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment in PostgreSQL
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Long id;
 
@@ -50,9 +49,9 @@ public class Post {
     private User user;
 
     @Column(name = "like_count")
-    private Long likeCount;
+    private Long likeCount = 0L;
     @Column(name = "comments_count")
-    private Long commentsCount;
+    private Long commentsCount = 0L;
     private Boolean isHidden = false;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -115,7 +114,6 @@ public class Post {
     }
 
     public void setMedia(String media) {
-        // System.err.println("SETMEDIA ====================> " + media);
         this.media = media;
     }
 

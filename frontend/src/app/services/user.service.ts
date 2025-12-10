@@ -84,8 +84,6 @@ export class UserService {
     }
 
     public RemoveUser(username: string | null, token: String | null): Observable<any> {
-        console.log(token);
-
         return this.http.delete(
             generateURL(`user/${username}`),
             generateHeader(token)
@@ -93,10 +91,6 @@ export class UserService {
     }
 
     public BanUserr(username: string | null, token: String | null): Observable<any> {
-        console.log({ token });
-        console.log("BAAAAAN");
-
-
         return this.http.put(
             generateURL(`user/ban/${username}`),
             null,
@@ -105,10 +99,6 @@ export class UserService {
     }
 
     public UnBanUserr(username: string | null, token: String | null): Observable<any> {
-        console.log({ token });
-        console.log("BAAAAAN");
-
-
         return this.http.put(
             generateURL(`user/unban/${username}`),
             null,

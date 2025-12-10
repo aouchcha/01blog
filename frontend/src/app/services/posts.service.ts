@@ -12,10 +12,6 @@ export class PostsService {
     constructor(private http: HttpClient) { }
 
     public CreatePost(token: String | null, data: FormData): Observable<any> {
-        // console.log({});
-        // console.log({token});
-
-
         return this.http.post<any>(
             generateURL("post"),
             data,
@@ -36,7 +32,7 @@ export class PostsService {
             ...options,
             params: params
         };
-        
+
         return this.http.get<any>(
             generateURL("post"),
             requestOptions
@@ -44,8 +40,6 @@ export class PostsService {
     }
 
     public getSinglePost(token: String | null, post_id: number) {
-        // console.log({ token });
-
         return this.http.get<any>(
             generateURL(`post/${post_id}`),
             generateHeader(token)
@@ -53,8 +47,6 @@ export class PostsService {
     }
 
     public React(token: String | null, post_id: number) {
-        console.log({token});
-        
         return this.http.post<any>(
             generateURL("react"),
             {
@@ -65,8 +57,6 @@ export class PostsService {
     }
 
     public updatePost(token: String | null, post_id: number | null, data: FormData, removed: boolean): Observable<any> {
-        console.log({removed});
-        
         let params = new HttpParams().set("removed", removed);
         const options = generateHeader(token);
 

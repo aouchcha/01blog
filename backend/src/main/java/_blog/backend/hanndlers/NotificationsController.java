@@ -16,14 +16,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-// import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import _blog.backend.helpers.InvalidJwtException;
-// import _blog.backend.Repos.ReportRepository;
 import _blog.backend.helpers.JwtUtil;
 import _blog.backend.service.NotificationService;
-// import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
@@ -56,7 +53,6 @@ public class NotificationsController {
 
         // Validate BEFORE any SSE setup
         if (token == null || !jwtUtil.validateToken(token)) {
-            // System.out.println("VVVVVVVVVVVVVVVVVVVVVv   " + token);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\": \"Invalid SSE token\"}");
@@ -64,11 +60,9 @@ public class NotificationsController {
             return null; // Exit early
         }
 
-        // if (jwtUtil.get)
 
         try {
             return notificationService.connect(userId, lastEventId, token);
-            // Spring handles SSE from here
         } catch (InvalidJwtException e) {
             // Handle user not found
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -78,11 +72,6 @@ public class NotificationsController {
             return null;
         }
     }
-
-    // @GetMapping("/disconnect/{userId}")
-    // public void disconnect(@PathVariable Long userId) {
-    // notificationService.disconnect(userId);
-    // }
 
     @GetMapping()
     public ResponseEntity<?> getNotifs(@RequestHeader("Authorization") String header,

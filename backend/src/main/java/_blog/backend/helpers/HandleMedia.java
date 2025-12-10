@@ -32,14 +32,13 @@ public class HandleMedia {
 
     public File createFolder(String folderPath) {
         File folder = new File(folderPath);
-        if (!folder.exists()) { // check if folder exists
-            folder.mkdirs(); // creates parent directories too
+        if (!folder.exists()) {
+            folder.mkdirs();
         }
         return folder;
     }
 
     public boolean save(Post p, PostRequst postRequst) {
-        // System.out.println("HaNNI F SAVE");
         if (postRequst.getMedia() != null) {
             p.setMedia(Rename(postRequst.getMedia().getOriginalFilename()));
             File uploads = createFolder("../backend/uploads");

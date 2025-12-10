@@ -1,6 +1,5 @@
 package _blog.backend.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,32 +23,36 @@ import _blog.backend.Repos.UserRepository;
 import _blog.backend.helpers.JwtUtil;
 
 @Service
-// @Transactional
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
+    private final FollowRepositry followRepositry;
+    private final PostRepository postRepository;
+    private final NotificationRepository notificationRepository;
+    private final ReportRepository reportRepository;
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private FollowRepositry followRepositry;
-
-    @Autowired
-    private PostRepository postRepository;
-
-    @Autowired
-    private NotificationRepository notificationRepository;
+    public UserService(UserRepository userRepository, JwtUtil jwtUtil, FollowRepositry followRepositry,
+            PostRepository postRepository, NotificationRepository notificationRepository,
+            ReportRepository reportRepository) {
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+        this.followRepositry = followRepositry;
+        this.postRepository = postRepository;
+        this.notificationRepository = notificationRepository;
+        this.reportRepository = reportRepository;
+    }
 
     public ResponseEntity<?> getData(String token) {
         final String username = jwtUtil.getUsername(token);
-        if (!userRepository.existsByUsername(username)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalide user"));
+
+        final User u = userRepository.findByUsername(username);
+
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalide user"));
         }
-        User u = userRepository.findByUsername(username);
         if (u.getisbaned()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "You are banned"));
+                    .body(Map.of("error", "You are banned"));
         }
         int count = notificationRepository.countByRecipient_IdAndSeenFalse(u.getId());
 
@@ -60,13 +63,13 @@ public class UserService {
         final String username = jwtUtil.getUsername(token);
         User me = userRepository.findByUsername(username);
         if (me == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "invalid user"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "invalid user"));
         }
 
         if (me.getisbaned()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "You are banned"));
+                    .body(Map.of("error", "You are banned"));
         }
 
         List<User> users;
@@ -97,29 +100,30 @@ public class UserService {
 
     public ResponseEntity<?> getUserProfile(String username, String token, LocalDateTime lastDate, Long lastId) {
         final String myName = jwtUtil.getUsername(token);
-        // System.out.println("MMMMMMMMMMMMMMMMMYYYYYYYYYYYYYYY = " + myName);
+
         User me = userRepository.findByUsername(myName);
         if (me == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "invalid user"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "invalid user"));
         }
 
         if (me.getisbaned()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "You are banned"));
+                    .body(Map.of("error", "You are banned"));
         }
 
         User ProfileInfos = userRepository.findByUsername(username);
 
         if (ProfileInfos == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "invalid user to search"));
+                    .body(Map.of("error", "invalid user to search"));
         }
 
         if (ProfileInfos.getRole().equals(Role.Admin)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", "you are trying to get sensitive data"));
+                    .body(Map.of("error", "you are trying to get sensitive data"));
         }
+
         if (followRepositry.existsByFollower_IdAndFollowed_Id(me.getId(), ProfileInfos.getId())) {
             ProfileInfos.setFollow(true);
         } else {
@@ -129,24 +133,18 @@ public class UserService {
         PageRequest limit = PageRequest.of(0, 10);
 
         if (lastDate == null || lastId == null) {
-            // get The First 10 posts of the user
             posts = postRepository.findTop10ByUserIdOrderByCreatedAtDescIdDesc(ProfileInfos.getId(),
                     me.getRole().equals(Role.Admin), limit);
         } else {
-            // get the next 10
             posts = postRepository.findNextPosts(ProfileInfos.getId(), me.getRole().equals(Role.Admin), lastDate,
                     lastId, limit);
         }
-        // = postRepository.findByUserIdOrderByIdDesc(ProfileInfos.getId());
 
         return ResponseEntity.ok(Map.of("user", ProfileInfos, "posts", posts, "followers",
                 followRepositry.countByFollowed_Id(ProfileInfos.getId()), "followings",
                 followRepositry.countByFollower_Id(ProfileInfos.getId()), "count",
                 postRepository.countByUserId(ProfileInfos.getId())));
     }
-
-    @Autowired
-    private ReportRepository reportRepository;
 
     @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> report(ReportRequest reportRequest, String token) {
@@ -170,7 +168,7 @@ public class UserService {
                 }
                 repported = post.getUser();
             }
-        }else if (type.equals("user")) {
+        } else if (type.equals("user")) {
             if (reportRequest.getReportted_username() == null) {
                 throw new IllegalArgumentException("reportted_username is required for USER reports");
             } else {
@@ -181,12 +179,16 @@ public class UserService {
                 }
                 post = null;
             }
-        }else {
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalid report type"));
         }
 
         if (reportRequest.getDiscription().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "No Description Found"));
+        }
+
+        if (reportRequest.getDiscription().length() > 500) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Description Should be under 200 letter"));
         }
 
         if (repported.getRole().equals(Role.Admin)) {
@@ -198,7 +200,7 @@ public class UserService {
 
         final User me = userRepository.findByUsername(myName);
         if (me == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "invalid user"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid user"));
         }
 
         if (me.getId() == repported.getId()) {
@@ -221,45 +223,61 @@ public class UserService {
         return ResponseEntity.ok().body(Map.of("message", "reported succesfuuly"));
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> Remove(String username, String token) {
-        if (!userRepository.existsByUsername(username)) {
+
+        User user_to_remove = userRepository.findByUsername(username);
+
+        if (user_to_remove == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", "the user u wanna to remove doesnt exist"));
         }
 
-        if (!userRepository.existsByUsername(jwtUtil.getUsername(token))) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "you doesnt exist"));
+        final User me = userRepository.findByUsername(jwtUtil.getUsername(token));
+
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "you doesnt exist"));
         }
 
-        final User u = userRepository.findByUsername(username);
+        if (!me.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have acess here"));
+        }
 
-        if (u.getRole().equals(Role.Admin)) {
+        if (user_to_remove.getRole().equals(Role.Admin)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "you cant remove admin users"));
+                    .body(Map.of("error", "you cant remove admin users"));
         }
+        userRepository.delete(user_to_remove);
 
-        userRepository.delete(u);
-        return ResponseEntity.ok().body(Map.of("message", "User " + u.getUsername() + " Removed with success"));
+        return ResponseEntity.ok()
+                .body(Map.of("message", "User " + user_to_remove.getUsername() + " Removed with success"));
     }
 
     @Transactional
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> Ban(String username, String token) {
-        // System.out.println("HAAAAAAAAAAAAAAAAAAAAAANNNNNNNNNNNIIIIIIIIIIIIIII");
+        User me = userRepository.findByUsername(jwtUtil.getUsername(token));
+
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "you doesnt exist"));
+        }
+
+        if (!me.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have acess here"));
+        }
+
         User u = userRepository.findByUsername(username);
+
         if (u == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "the user u wanna to ban doesnt exist"));
+                    .body(Map.of("error", "the user u wanna to ban doesnt exist"));
         }
 
         if (u.getRole().equals(Role.Admin)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "you cant ban admin users"));
+                    .body(Map.of("error", "you cant ban admin users"));
         }
-        
+
         u.setisbaned(true);
         return ResponseEntity.ok().body(Map.of("message", "User " + u.getUsername() + " Banned with success"));
     }
@@ -267,11 +285,26 @@ public class UserService {
     @Transactional
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> UnBanned(String username, String token) {
-        // System.out.println("HAAAAAAAAAAAAAAAAAAAAAANNNNNNNNNNNIIIIIIIIIIIIIII");
+        User me = userRepository.findByUsername(jwtUtil.getUsername(token));
+
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "you doesnt exist"));
+        }
+
+        if (!me.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have acess here"));
+        }
+
         User u = userRepository.findByUsername(username);
+
         if (u == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "the user u wanna to ban doesnt exist"));
+                    .body(Map.of("error", "the user u wanna to unban doesnt exist"));
+        }
+
+        if (u.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "you cant unban admin users"));
         }
         u.setisbaned(false);
         return ResponseEntity.ok().body(Map.of("message", "User " + u.getUsername() + " UnBanned with success"));

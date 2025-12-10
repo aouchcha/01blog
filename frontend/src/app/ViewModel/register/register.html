@@ -28,9 +28,10 @@
                         <input 
                             type="email" 
                             class="form-input" 
-                            placeholder="Enter your email" 
+                            placeholder="Enter your email less than 20 letter" 
                             (input)="setEmail($event.target.value)"
                             [value]="email"
+                            maxlength= "20"
                             required
                         >
                     </div>
@@ -40,9 +41,10 @@
                         <input 
                             type="text" 
                             class="form-input" 
-                            placeholder="Enter your username" 
+                            placeholder="Enter your username less than 15 letter" 
                             (input)="setUsername($event.target.value)"
                             [value]="username"
+                            maxlength= "15"
                             required
                         >
                     </div>
@@ -52,8 +54,10 @@
                         <input 
                             type="password" 
                             class="form-input" 
-                            placeholder="Enter your password" 
+                            placeholder="Enter your password between 8 and 15 letter" 
                             (input)="setPassword($event.target.value)"
+                            minlength="8"
+                            maxlength="15"
                             required
                         >
                     </div>

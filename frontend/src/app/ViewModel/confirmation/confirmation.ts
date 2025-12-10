@@ -14,17 +14,13 @@ export class Confirmation {
   message = input<string>('');
   action = input<string>('');
 
-  // Return to parent
   confirmed = output<boolean>();
-  // cancelled = output<void>();
 
   onConfirm() {
-    // console.log("Confirm");
     this.confirmed.emit(true);
   }
 
   onCancel() {
-    // console.log("Cancel");
     this.confirmed.emit(false);
   }
 }

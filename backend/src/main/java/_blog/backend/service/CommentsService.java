@@ -3,13 +3,10 @@ package _blog.backend.service;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-// import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-// import org.springframework.transaction.annotation.Transactional;
 
 import _blog.backend.Entitys.Comment.Comment;
 import _blog.backend.Entitys.Comment.CommentRequest;
@@ -19,25 +16,22 @@ import _blog.backend.Repos.CommentRepository;
 import _blog.backend.Repos.PostRepository;
 import _blog.backend.Repos.UserRepository;
 import _blog.backend.helpers.ContextHelpers;
-// import _blog.backend.helpers.JwtUtil;
 
 @Service
 public class CommentsService {
+    private final ContextHelpers contextHelpers;
+    private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
-    @Autowired
-    // private JwtUtil jwtUtil;
-    private ContextHelpers contextHelpers;
+    public CommentsService(ContextHelpers contextHelpers, UserRepository userRepository,
+        PostRepository postRepository, CommentRepository commentRepository) {
+        this.contextHelpers = contextHelpers;
+        this.userRepository = userRepository;
+        this.postRepository = postRepository;
+        this.commentRepository = commentRepository;
+    }
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PostRepository postRepository;
-
-    @Autowired
-    private CommentRepository commentRepository;
-
-    // @Transactional
     @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> create(CommentRequest request) {
 
@@ -60,7 +54,7 @@ public class CommentsService {
                     .body(Map.of("error", "comment content is mandatory"));
         }
 
-        if (request.getContent().trim().length() > 250) {
+        if (request.getContent().trim().length() > 100) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "comment content should be less than 250 letters"));
         }

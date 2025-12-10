@@ -21,19 +21,9 @@ export class NotificationsService {
 
 
   connect(userId: number, token: String | null) {
-    // if (userId === null || typeof userId !== "number") {
-    //   this.toast.showError("user id should be number", 5000);
-    //   this.router.navigate(["login"]);
-    //   return
-    // }
    this.userService.ValidateToken(token).subscribe({
       next: () => {
         this.EstablishConnection(userId, token)
-      },
-      error: (err) => {
-        console.log({ "validate": err });
-
-        return;
       },
     })
 
@@ -42,7 +32,6 @@ export class NotificationsService {
 
   public EstablishConnection(userId: number, token: String | null) {
     if (this.eventSource && this.eventSource.readyState !== EventSource.CLOSED) {
-
       return; // already connected
     }
 
@@ -51,7 +40,6 @@ export class NotificationsService {
     this.eventSource.addEventListener('notification', (event: any) => {
       const notification = JSON.parse(event.data);
 
-      // Run inside Angular zone so UI updates
       this.zone.run(() => {
         this.notificationsSubject.next(notification);
       });
@@ -60,22 +48,15 @@ export class NotificationsService {
     this.eventSource.addEventListener('reaction', (event: any) => {
       const reaction = JSON.parse(event.data);
 
-      // Run inside Angular zone so UI updates
       this.zone.run(() => {
         this.reactionsSubject.next(reaction);
       });
     });
 
     this.eventSource.onerror = (err: any) => {
-      console.log('⚠️ SSE disconnected. Browser will auto-reconnect...', err);
       this.disconnect();
       this.toast.showError("Error With SSE try later");
-      // localStorage.removeItem("JWT");
-      // console.log({ "message": "Error 401" });
-
-      this.router.navigate(['/login']);
     };
-    console.log("cennected");
   }
 
   disconnect() {

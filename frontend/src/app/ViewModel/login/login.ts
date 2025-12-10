@@ -1,9 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { authService } from '../../services/auth.service';
-import { NotificationsService } from '../../services/notification.service';
 import { CommonModule } from '@angular/common';
-import { CheckToken } from '../../helpers/genarateHeader';
 
 @Component({
   selector: 'app-login',
@@ -13,17 +11,12 @@ import { CheckToken } from '../../helpers/genarateHeader';
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login implements OnInit{
+export class Login {
   username : string = '';
   password : string = '';
   error : string | null = null;
-  constructor(private router : Router, private stateup: ChangeDetectorRef, private authService: authService, private notifService: NotificationsService){};
+  constructor(private router : Router, private stateup: ChangeDetectorRef, private authService: authService){};
 
-  ngOnInit(): void {
-      // if (CheckToken() !== null) {
-      //   this.router.navigate([""]);
-      // }
-  }
  
   public setUsername(username: string): void {
     this.username = username;
@@ -37,9 +30,7 @@ export class Login implements OnInit{
     this.router.navigate(["register"]);
   }
 
-  public Submit() {
-    // console.log("wesh wesh");
-    
+  public Submit() {    
     const body = {
       "username" : this.username,
       "password" : this.password
@@ -48,26 +39,12 @@ export class Login implements OnInit{
     this.authService.Login(body).subscribe({
       
       next: (res) => {
-        console.log('log in successful !', res.user.role, res);
-        // this.res = res;
         localStorage.setItem("JWT", res.token);
         if (res.user.role == "User") {
-          
           this.router.navigate([""]);
         }else {
-          console.log("wesh wesh");
           this.router.navigate(["admin"])
         }
-      },
-      error: (error) => {
-        console.log(error);
-        
-        this.error = error.error.message;
-        this.stateup.detectChanges();
-        setTimeout(() => {
-          this.error = '';
-          this.stateup.detectChanges();
-        }, 5000);
       }
     })
   }
