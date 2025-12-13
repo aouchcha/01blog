@@ -60,7 +60,7 @@ export class SinglePost implements OnInit {
   ngOnInit(): void {
     this.token = CheckToken();
 
-    if (this.me.role !== 'ADMIN') {
+    if (this.me.role !== 'Admin') {
       this.notifService.reactionsObservable
         .pipe(takeUntil(this.destroy$))
         .subscribe(react => {
@@ -101,8 +101,11 @@ export class SinglePost implements OnInit {
 
   public Comment() {
     this.postsService.CreateComment(this.content, this.post_id, this.token).subscribe({
-      next: () => {
+      next: (res) => {
         this.getPost()
+        // console.log({res});
+        
+        // this.post = res.post
         this.content = '';
       },
     })

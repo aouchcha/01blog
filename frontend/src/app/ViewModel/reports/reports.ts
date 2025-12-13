@@ -4,7 +4,6 @@ import { AdminService } from '../../services/admin.service';
 import { CheckToken } from '../../helpers/genarateHeader';
 import { Router } from '@angular/router';
 import { Confirmation } from '../confirmation/confirmation';
-import { UserService } from '../../services/user.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -32,7 +31,7 @@ export class Reports implements OnInit {
   public confirmationAction: string = 'Delete';
 
 
-  public constructor(private adminService: AdminService, private router: Router, private userService: UserService) { }
+  public constructor(private adminService: AdminService, private router: Router) { }
 
   ngOnInit(): void {
     this.setToken();
@@ -144,7 +143,7 @@ export class Reports implements OnInit {
   }
 
   BanUser() {
-    this.userService.BanUserr(this.username, this.token).subscribe({
+    this.adminService.BanUserr(this.username, this.token).subscribe({
 
     })
   }

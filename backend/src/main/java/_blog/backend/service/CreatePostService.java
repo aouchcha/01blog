@@ -73,7 +73,7 @@ public class CreatePostService {
 
         if (u.getisbaned()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "You are banned"));
+                    .body(Map.of("error", "You are banned"));
         }
 
         Post newPost = new Post();
@@ -83,7 +83,8 @@ public class CreatePostService {
         newPost.setUser(u);
 
         if (postRequest.getMedia() != null) {
-            if (!postRequest.getMedia().getContentType().startsWith("image/") && !postRequest.getMedia().getContentType().startsWith("video/")) {
+            String contentType = postRequest.getMedia().getContentType();
+            if (contentType == null || (!contentType.startsWith("image/") && !contentType.startsWith("video/"))) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","The media should be image or video")); 
             }
         }
@@ -98,7 +99,7 @@ public class CreatePostService {
         List<Follow> followers = followRepositry.findByFollowed_Id(u.getId());
         followers.forEach(f -> notificationService.sendNotification(f.getFollower(), u, p));
 
-        return ResponseEntity.ok(Map.of("message", "post created successfully", "newpost", p));
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "post created successfully", "newpost", p));
     }
 
 }

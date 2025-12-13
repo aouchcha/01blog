@@ -24,19 +24,27 @@ import _blog.backend.Entitys.Post.PostRequst;
 import _blog.backend.helpers.JwtUtil;
 import _blog.backend.service.CreatePostService;
 import _blog.backend.service.PostsService;
+import _blog.backend.service.RateLimiterService;
 
 @Controller
 @CrossOrigin(origins = { "http://localhost:4200" })
 @RequestMapping("/api/post")
 public class PostsHandler {
-    @Autowired
-    private PostsService postsService;
+    
+    private final PostsService postsService;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private CreatePostService createPostService;
+    
+    private final CreatePostService createPostService;
+
+
+    public PostsHandler(PostsService postsService, JwtUtil jwtUtil, CreatePostService createPostService, RateLimiterService rateLimiterService) {
+        this.createPostService = createPostService;
+        this.jwtUtil = jwtUtil;
+        this.postsService = postsService;
+    }
 
     @GetMapping
     public ResponseEntity<?> getPosts(@RequestHeader("Authorization") String header,

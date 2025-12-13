@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +28,16 @@ public class AdminService {
 
     private final ContextHelpers contextHelpers;
 
-    public AdminService( UserRepository userRepository, ReportRepository reportRepository, ContextHelpers contextHelpers) {
+    private final RateLimiterService rateLimiterService;
+
+    public AdminService(UserRepository userRepository, ReportRepository reportRepository, ContextHelpers contextHelpers,
+            RateLimiterService rateLimiterService) {
         this.userRepository = userRepository;
         this.reportRepository = reportRepository;
         this.contextHelpers = contextHelpers;
-    } 
+        this.rateLimiterService = rateLimiterService;
+    }
 
-    @Transactional(readOnly = true)
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> getBoard(String token, Long lastUserId) {
 
@@ -65,7 +67,6 @@ public class AdminService {
         return ResponseEntity.ok(Map.of("users", users, "reportsCount", reports_count));
     }
 
-    @Transactional(readOnly = true)
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> loadReports(LocalDateTime lastDate, Long lastId) {
         final String username = contextHelpers.getUsername();
@@ -102,7 +103,11 @@ public class AdminService {
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> DeleteReport(Long reportId) {
 
-          final User admin = userRepository.findByUsername(contextHelpers.getUsername());
+        if (!rateLimiterService.isAllowed(contextHelpers.getUsername())) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
+
+        final User admin = userRepository.findByUsername(contextHelpers.getUsername());
 
         if (admin == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid user"));
@@ -111,12 +116,113 @@ public class AdminService {
         if (!admin.getRole().equals(Role.Admin)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have access here"));
         }
-        
+
         ReportEntity r = reportRepository.findById(reportId).orElse(null);
         if (r == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Bad Request"));
         }
         reportRepository.delete(r);
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Report Deleted With success"));
+    }
+
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<?> Remove(String username, String token) {
+
+        if (!rateLimiterService.isAllowed(contextHelpers.getUsername())) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
+
+        User user_to_remove = userRepository.findByUsername(username);
+
+        if (user_to_remove == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "the user u wanna to remove doesnt exist"));
+        }
+
+        final User me = userRepository.findByUsername(contextHelpers.getUsername());
+
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "you doesnt exist"));
+        }
+
+        if (!me.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have acess here"));
+        }
+
+        if (user_to_remove.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "you cant remove admin users"));
+        }
+        userRepository.delete(user_to_remove);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("message", "User " + user_to_remove.getUsername() + " Removed with success"));
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<?> Ban(String username, String token) {
+
+        if (!rateLimiterService.isAllowed(contextHelpers.getUsername())) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
+        final User me = userRepository.findByUsername(contextHelpers.getUsername());
+
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "you doesnt exist"));
+        }
+
+        if (!me.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have acess here"));
+        }
+
+        User u = userRepository.findByUsername(username);
+
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "the user u wanna to ban doesnt exist"));
+        }
+
+        if (u.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "you cant ban admin users"));
+        }
+
+        u.setisbaned(true);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("message", "User " + u.getUsername() + " Banned with success"));
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('Admin')")
+    public ResponseEntity<?> UnBanned(String username, String token) {
+
+        if (!rateLimiterService.isAllowed(contextHelpers.getUsername())) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
+        final User me = userRepository.findByUsername(contextHelpers.getUsername());
+
+        if (me == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "you doesnt exist"));
+        }
+
+        if (!me.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have acess here"));
+        }
+
+        User u = userRepository.findByUsername(username);
+
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "the user u wanna to unban doesnt exist"));
+        }
+
+        if (u.getRole().equals(Role.Admin)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "you cant unban admin users"));
+        }
+        u.setisbaned(false);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("message", "User " + u.getUsername() + " UnBanned with success"));
     }
 }

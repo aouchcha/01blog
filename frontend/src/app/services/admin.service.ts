@@ -54,4 +54,27 @@ export class AdminService {
             generateHeader(token)
         )
     }
+
+    public RemoveUser(username: string | null, token: String | null): Observable<any> {
+        return this.http.delete(
+            generateURL(`admin/${username}`),
+            generateHeader(token)
+        )
+    }
+
+    public BanUserr(username: string | null, token: String | null): Observable<any> {
+        return this.http.put(
+            generateURL(`admin/ban/${username}`),
+            null,
+            generateHeader(token)
+        )
+    }
+
+    public UnBanUserr(username: string | null, token: String | null): Observable<any> {
+        return this.http.put(
+            generateURL(`admin/unban/${username}`),
+            null,
+            generateHeader(token)
+        )
+    }
 }

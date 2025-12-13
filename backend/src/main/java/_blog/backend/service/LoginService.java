@@ -20,15 +20,21 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtils;
+    private final RateLimiterService rateLimiterService;
 
-    public LoginService(UserRepository userRepository, JwtUtil jwtUtil) {
+    public LoginService(UserRepository userRepository, JwtUtil jwtUtil, RateLimiterService rateLimiterService) {
         this.jwtUtils = jwtUtil;
         this.userRepository = userRepository;
+        this.rateLimiterService = rateLimiterService;
     }
 
     public ResponseEntity<?> signin(LoginRequest request) {
 
         User user = null; 
+
+         if (!rateLimiterService.isAllowed(request.getUsername())) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
 
         try {
             user = userRepository.findByUsername(request.getUsername());

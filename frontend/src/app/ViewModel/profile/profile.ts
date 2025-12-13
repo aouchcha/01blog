@@ -2,6 +2,7 @@ import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { CheckToken } from '../../helpers/genarateHeader';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
+import { AdminService } from '../../services/admin.service';
 import { User } from '../../models/User';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
@@ -56,7 +57,7 @@ export class Profile implements OnInit {
   private lastPost: Post | null = null;
   public postscount: number = 0;
 
-  constructor(private router: Router, private route: ActivatedRoute, private notifService: NotificationsService, private userService: UserService, private postService: PostsService, private toast: ToastService) {
+  constructor(private router: Router, private route: ActivatedRoute, private notifService: NotificationsService, private userService: UserService, private postService: PostsService, private toast: ToastService, private adminService: AdminService) {
   }
 
   public ngOnInit(): void {
@@ -67,7 +68,7 @@ export class Profile implements OnInit {
 
     this.getMe()
     this.LoadProfile()
-    if (this.me.role !== 'ADMIN') {
+    if (this.me.role !== 'Admin') {
       this.notifService.reactionsObservable
         .pipe(takeUntil(this.destroy$))
         .subscribe(react => {  
@@ -173,7 +174,7 @@ export class Profile implements OnInit {
     this.showConfirmation = true;
     this.confirmationAction = "UnBan";
     this.confirmationMessage = "Are you sure you want to UnBan this user? This action cannot be undone."
-    this.confirmationTitle = `Ban User: ${this.user.username} ?`;
+    this.confirmationTitle = `UnBan User: ${this.user.username} ?`;
     this.type = 'user';
   }
 
@@ -339,7 +340,7 @@ export class Profile implements OnInit {
 
 
   public RemoveUser() {
-    this.userService.RemoveUser(this.user.username, this.token).subscribe({
+    this.adminService.RemoveUser(this.user.username, this.token).subscribe({
       next: () => {
         this.router.navigate(["admin"])
       },
@@ -348,7 +349,7 @@ export class Profile implements OnInit {
 
   public UnBanUser() {
     this.setToken()
-    this.userService.UnBanUserr(this.user.username, this.token).subscribe({
+    this.adminService.UnBanUserr(this.user.username, this.token).subscribe({
       next: () => {
         this.user.isbaned = !this.user.isbaned;
       },
@@ -357,7 +358,7 @@ export class Profile implements OnInit {
 
   public BanUser() {
     this.setToken()
-    this.userService.BanUserr(this.user.username, this.token).subscribe({
+    this.adminService.BanUserr(this.user.username, this.token).subscribe({
       next: () => {
         this.user.isbaned = !this.user.isbaned;
       },

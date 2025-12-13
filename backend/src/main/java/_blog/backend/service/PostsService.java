@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -31,14 +32,18 @@ public class PostsService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final HandleMedia MediaUtils;
+    private final RateLimiterService rateLimiterService;
+
 
     public PostsService(PostRepository postRepository, ContextHelpers contextHelpers,
-            UserRepository userRepository, CommentRepository commentRepository, HandleMedia MediaUtils) {
+            UserRepository userRepository, CommentRepository commentRepository, HandleMedia MediaUtils, RateLimiterService rateLimiterService) {
         this.postRepository = postRepository;
         this.contextHelpers = contextHelpers;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.MediaUtils = MediaUtils;
+        this.rateLimiterService = rateLimiterService;
+
     }
 
     public ResponseEntity<?> getPosts(LocalDateTime lastDate, Long lastId) {
@@ -103,6 +108,9 @@ public class PostsService {
     }
 
     public ResponseEntity<?> delete(Long post_id) {
+          if (!rateLimiterService.isAllowed(contextHelpers.getUsername())) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
 
         final User me = userRepository.findByUsername(contextHelpers.getUsername());
 
@@ -137,11 +145,15 @@ public class PostsService {
 
         postRepository.delete(p);
 
-        return ResponseEntity.ok().body(Map.of("message", "post removed", "post", p));
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "post removed", "post", p));
     }
 
     @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> update(Long post_id, PostRequst postRequst, boolean removed) {
+
+        if (!rateLimiterService.isAllowed(contextHelpers.getUsername())) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
 
         final User me = userRepository.findByUsername(contextHelpers.getUsername());
 
@@ -198,6 +210,13 @@ public class PostsService {
             up.setMedia(null);
 
         }
+        if (postRequst.getMedia() != null) {
+            String contentType = postRequst.getMedia().getContentType();
+            if (contentType == null || (!contentType.startsWith("image/") && !contentType.startsWith("video/"))) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "The media should be image or video"));
+            }
+        }
         if (!MediaUtils.save(up, postRequst)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Internal Server Error"));
@@ -205,11 +224,15 @@ public class PostsService {
 
         postRepository.save(up);
 
-        return ResponseEntity.ok().body(Map.of("message", "post updated with sucess", "post", up));
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "post updated with sucess", "post", up));
     }
 
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> HidePost(Long post_id) {
+
+        if (!rateLimiterService.isAllowed(contextHelpers.getUsername())) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
         final User me = userRepository.findByUsername(contextHelpers.getUsername());
 
         if (me == null) {
@@ -235,6 +258,10 @@ public class PostsService {
 
     @PreAuthorize("hasRole('Admin')")
     public ResponseEntity<?> UnhidePost(Long post_id) {
+
+        if (!rateLimiterService.isAllowed(contextHelpers.getUsername())) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
 
         final User me = userRepository.findByUsername(contextHelpers.getUsername());
 

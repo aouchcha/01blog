@@ -30,16 +30,18 @@ public class UserService {
     private final PostRepository postRepository;
     private final NotificationRepository notificationRepository;
     private final ReportRepository reportRepository;
+    private final RateLimiterService rateLimiterService;
 
     public UserService(UserRepository userRepository, JwtUtil jwtUtil, FollowRepositry followRepositry,
             PostRepository postRepository, NotificationRepository notificationRepository,
-            ReportRepository reportRepository) {
+            ReportRepository reportRepository, RateLimiterService rateLimiterService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.followRepositry = followRepositry;
         this.postRepository = postRepository;
         this.notificationRepository = notificationRepository;
         this.reportRepository = reportRepository;
+        this.rateLimiterService = rateLimiterService;
     }
 
     public ResponseEntity<?> getData(String token) {
@@ -149,6 +151,8 @@ public class UserService {
     @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> report(ReportRequest reportRequest, String token) {
 
+
+
         if (reportRequest.getType() == null || reportRequest.getType().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "No Type Found"));
         }
@@ -198,6 +202,10 @@ public class UserService {
 
         final String myName = jwtUtil.getUsername(token);
 
+        if (!rateLimiterService.isAllowed(myName)) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
+
         final User me = userRepository.findByUsername(myName);
         if (me == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid user"));
@@ -223,90 +231,5 @@ public class UserService {
         return ResponseEntity.ok().body(Map.of("message", "reported succesfuuly"));
     }
 
-    @PreAuthorize("hasRole('Admin')")
-    public ResponseEntity<?> Remove(String username, String token) {
-
-        User user_to_remove = userRepository.findByUsername(username);
-
-        if (user_to_remove == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("message", "the user u wanna to remove doesnt exist"));
-        }
-
-        final User me = userRepository.findByUsername(jwtUtil.getUsername(token));
-
-        if (me == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "you doesnt exist"));
-        }
-
-        if (!me.getRole().equals(Role.Admin)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have acess here"));
-        }
-
-        if (user_to_remove.getRole().equals(Role.Admin)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "you cant remove admin users"));
-        }
-        userRepository.delete(user_to_remove);
-
-        return ResponseEntity.ok()
-                .body(Map.of("message", "User " + user_to_remove.getUsername() + " Removed with success"));
-    }
-
-    @Transactional
-    @PreAuthorize("hasRole('Admin')")
-    public ResponseEntity<?> Ban(String username, String token) {
-        User me = userRepository.findByUsername(jwtUtil.getUsername(token));
-
-        if (me == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "you doesnt exist"));
-        }
-
-        if (!me.getRole().equals(Role.Admin)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have acess here"));
-        }
-
-        User u = userRepository.findByUsername(username);
-
-        if (u == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "the user u wanna to ban doesnt exist"));
-        }
-
-        if (u.getRole().equals(Role.Admin)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "you cant ban admin users"));
-        }
-
-        u.setisbaned(true);
-        return ResponseEntity.ok().body(Map.of("message", "User " + u.getUsername() + " Banned with success"));
-    }
-
-    @Transactional
-    @PreAuthorize("hasRole('Admin')")
-    public ResponseEntity<?> UnBanned(String username, String token) {
-        User me = userRepository.findByUsername(jwtUtil.getUsername(token));
-
-        if (me == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "you doesnt exist"));
-        }
-
-        if (!me.getRole().equals(Role.Admin)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "you don't have acess here"));
-        }
-
-        User u = userRepository.findByUsername(username);
-
-        if (u == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "the user u wanna to unban doesnt exist"));
-        }
-
-        if (u.getRole().equals(Role.Admin)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "you cant unban admin users"));
-        }
-        u.setisbaned(false);
-        return ResponseEntity.ok().body(Map.of("message", "User " + u.getUsername() + " UnBanned with success"));
-    }
+   
 }

@@ -20,23 +20,29 @@ public class FollowService {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final FollowRepositry followRepositry;
+    private final RateLimiterService rateLimiterService;
 
-    public FollowService(JwtUtil jwtUtil, UserRepository userRepository, FollowRepositry followRepositry) {
+    public FollowService(JwtUtil jwtUtil, UserRepository userRepository, FollowRepositry followRepositry, RateLimiterService rateLimiterService) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
         this.followRepositry = followRepositry;
+        this.rateLimiterService = rateLimiterService;
     }
 
     @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> follow(FollowRequest followRequest, String token) {
         String username = jwtUtil.getUsername(token);
 
+        if (!rateLimiterService.isAllowed(username)) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
+
         User follower = userRepository.findByUsername(username);
 
         User followed = userRepository.findById(followRequest.getFollowed_id()).orElse(null);
 
         if (follower == null) {
-             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "the follower user isn't valid"));
         }
 
@@ -46,7 +52,7 @@ public class FollowService {
         }
 
         if (followed.getRole().equals(Role.Admin)) {
-             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", "you can follow admin"));
         }
 
@@ -74,6 +80,6 @@ public class FollowService {
             followRepositry.delete(follow);
         }
 
-        return ResponseEntity.ok(Map.of("message", status + " applied"));
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", status + " applied"));
     }
 }

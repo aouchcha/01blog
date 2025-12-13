@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -212,7 +211,7 @@ public class NotificationService {
         notification.setSeen(true);
         NotificationEntity updatedNotification = notificationRepository.save(notification);
 
-        return ResponseEntity.ok(Map.of(
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
                 "message", "Notification marked as read",
                 "notification", updatedNotification));
     }

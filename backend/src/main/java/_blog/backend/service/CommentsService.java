@@ -23,19 +23,25 @@ public class CommentsService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final RateLimiterService rateLimiterService;
 
     public CommentsService(ContextHelpers contextHelpers, UserRepository userRepository,
-        PostRepository postRepository, CommentRepository commentRepository) {
+            PostRepository postRepository, CommentRepository commentRepository, RateLimiterService rateLimiterService) {
         this.contextHelpers = contextHelpers;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
+        this.rateLimiterService = rateLimiterService;
     }
 
     @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> create(CommentRequest request) {
 
         final String username = contextHelpers.getUsername();
+
+        if (!rateLimiterService.isAllowed(username)) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
 
         final User u = userRepository.findByUsername(username);
 
@@ -46,7 +52,7 @@ public class CommentsService {
 
         if (u.getisbaned()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "You are banned"));
+                    .body(Map.of("error", "You are banned"));
         }
 
         if (request.getContent().trim().isEmpty()) {
@@ -76,13 +82,18 @@ public class CommentsService {
         p.setCommentsCount(p.getCommentsCount() + 1);
         postRepository.save(p);
 
-        return ResponseEntity.ok(Map.of("message", "comment added successfully", "post", p));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "comment added successfully", "post", p));
     }
 
     @PreAuthorize("hasRole('User')")
     public ResponseEntity<?> delete(Long comment_id) {
 
         final String username = contextHelpers.getUsername();
+        
+        if (!rateLimiterService.isAllowed(username)) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
+        }
 
         final User u = userRepository.findByUsername(username);
 
@@ -93,7 +104,7 @@ public class CommentsService {
 
         if (u.getisbaned()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("message", "You are banned"));
+                    .body(Map.of("error", "You are banned"));
         }
 
         final Comment comment = commentRepository.findById(comment_id).orElse(null);
@@ -102,15 +113,14 @@ public class CommentsService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "comment doesn't removed"));
         }
 
-        
         Post p = postRepository.findById(comment.getPost().getId()).orElse(null);
-        
+
         if (p == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "comment doesn't removed"));
         }
-        
+
         p.setCommentsCount(p.getCommentsCount() - 1);
-        
+
         postRepository.save(p);
         commentRepository.delete(comment);
 

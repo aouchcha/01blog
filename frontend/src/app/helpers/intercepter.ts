@@ -59,10 +59,12 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
       next: (event) => {
         if (event instanceof HttpResponse) {
           const body = event.body as any;
-
+          // console.log({body});
+          
+          if (!body?.message) return;
           switch (event.status) {
             case 200:
-                toast.showSuccess(body?.message || "Operation Happened with success");
+                toast.showSuccess(body?.message);
               break;
 
             case 201:

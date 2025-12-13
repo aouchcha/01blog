@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import org.apache.catalina.filters.RateLimitFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import _blog.backend.helpers.InvalidJwtException;
 import _blog.backend.helpers.JwtUtil;
 import _blog.backend.service.NotificationService;
+import _blog.backend.service.RateLimiterService;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
@@ -28,13 +30,19 @@ import jakarta.servlet.http.HttpServletResponse;
 @CrossOrigin(origins = { "http://localhost:4200" })
 
 public class NotificationsController {
-    @Autowired
-    private NotificationService notificationService;
+    
+    private final NotificationService notificationService;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    
+    private final JwtUtil jwtUtil;
 
+    private final RateLimiterService RateLimiterservice;
 
+    public NotificationsController(NotificationService notificationService, JwtUtil jwtUtil, RateLimiterService RateLimiterservice) {
+        this.notificationService = notificationService;
+        this.jwtUtil = jwtUtil;
+        this.RateLimiterservice = RateLimiterservice;
+    }
 
     @GetMapping("/stream/{userId}")
     public SseEmitter stream(
@@ -91,6 +99,9 @@ public class NotificationsController {
         String token = header.replace("Bearer ", "");
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "invalid token"));
+        }
+          if (!RateLimiterservice.isAllowed(jwtUtil.getUsername(token))) {
+            return ResponseEntity.status(429).body(Map.of("error", "Rate limit exceeded. Try again later."));
         }
         return notificationService.markAsRead(notification_id);
     }
